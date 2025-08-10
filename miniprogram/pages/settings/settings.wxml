@@ -1,0 +1,67 @@
+<!--settings.wxml-->
+<view class="container">
+  <view class="settings-content">
+    <!-- 外观设置 -->
+    <view class="settings-section">
+      <view class="section-title">外观设置</view>
+      <t-cell-group>
+        <t-cell title="深色模式" arrow>
+          <picker 
+            mode="selector" 
+            range="{{darkModeOptions}}" 
+            range-key="label"
+            value="{{settings.darkMode}}"
+            bind:change="onDarkModeChange"
+          >
+            <view class="picker-text">
+              {{darkModeOptions[settings.darkMode] ? darkModeOptions[settings.darkMode].label : '跟随系统'}}
+            </view>
+          </picker>
+        </t-cell>
+      </t-cell-group>
+    </view>
+
+    <!-- 通知设置 -->
+    <view class="settings-section">
+      <view class="section-title">通知设置</view>
+      <t-cell-group>
+        <t-cell title="推送通知">
+          <checkbox-group bind:change="onNotificationChange">
+            <checkbox value="enable" checked="{{settings.notifications}}" />
+          </checkbox-group>
+        </t-cell>
+        <t-cell title="自动更新">
+          <checkbox-group bind:change="onAutoUpdateChange">
+            <checkbox value="enable" checked="{{settings.autoUpdate}}" />
+          </checkbox-group>
+        </t-cell>
+      </t-cell-group>
+    </view>
+
+    <!-- 存储设置 -->
+    <view class="settings-section">
+      <view class="section-title">存储设置</view>
+      <t-cell-group>
+        <t-cell title="清除缓存" arrow bind:click="onClearCache">
+          <view class="cache-size">约 2.5MB</view>
+        </t-cell>
+      </t-cell-group>
+    </view>
+
+    <!-- 关于 -->
+    <view class="settings-section">
+      <view class="section-title">关于</view>
+      <t-cell-group>
+        <t-cell title="关于资信猫" arrow bind:click="onAbout" />
+        <t-cell title="用户协议" arrow bind:click="onUserAgreement" />
+        <t-cell title="隐私政策" arrow bind:click="onPrivacyPolicy" />
+      </t-cell-group>
+    </view>
+
+    <!-- 版本信息 -->
+    <view class="version-info">
+      <view class="version-text">资信猫 v1.0.0</view>
+      <view class="copyright">© 2023 资信猫团队</view>
+    </view>
+  </view>
+</view>

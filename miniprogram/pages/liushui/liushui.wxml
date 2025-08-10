@@ -1,0 +1,101 @@
+<!--liushui.wxml-->
+<view class="container">
+  <!-- 标签导航 -->
+  <view class="tabs">
+    <view class="tab active">流水宝</view>
+    <view class="tab" bind:tap="navigateToJianxin">简信宝</view>
+    <view class="tab" bind:tap="navigateToZhuanxin">专信宝</view>
+  </view>
+
+  <!-- 上传区域 -->
+  <view class="card upload-card">
+    <view wx:if="{{!selectedFile}}" class="upload-area" bind:tap="onChooseFile">
+      <view class="upload-icon">☁️</view>
+      <view class="upload-text">拖拽或点击上传文件至此处</view>
+      <view class="upload-desc">支持 PDF/JPEG/PNG，最大 10MB</view>
+      <t-button theme="primary" size="medium" style="margin-top: 20rpx;">
+        选择文件
+      </t-button>
+    </view>
+
+    <!-- 已选择文件 -->
+    <view wx:else class="selected-file">
+      <view class="file-info">
+        <view class="file-icon">📄</view>
+        <view class="file-details">
+          <view class="file-name">{{selectedFile.name}}</view>
+          <view class="file-size">{{selectedFile.size}} 字节</view>
+        </view>
+        <view class="file-actions">
+          <view class="remove-btn" bind:tap="onRemoveFile">✕</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 上传进度 -->
+    <view wx:if="{{uploading}}" class="progress-section">
+      <view class="progress-text">上传中... {{uploadProgress}}%</view>
+      <t-progress percentage="{{uploadProgress}}" theme="primary" />
+    </view>
+
+    <!-- 分析进度 -->
+    <view wx:if="{{generating}}" class="progress-section">
+      <view class="progress-text">{{reportStatus}} {{reportProgress}}%</view>
+      <t-progress percentage="{{reportProgress}}" theme="primary" />
+    </view>
+
+    <!-- 开始分析按钮 -->
+    <view wx:if="{{selectedFile && !uploading && !generating}}" class="action-section">
+      <t-button 
+        theme="primary" 
+        size="large" 
+        block
+        bind:tap="onStartAnalysis"
+      >
+        开始分析
+      </t-button>
+    </view>
+  </view>
+
+  <!-- 历史报告 -->
+  <view class="card history-card">
+    <view class="card-header">
+      <view class="card-title">历史报告</view>
+      <view class="date-filter">
+        <picker 
+          mode="selector" 
+          range="{{dateOptions}}" 
+          range-key="label"
+          value="{{dateRange}}"
+          bind:change="onDateRangeChange"
+        >
+          <view class="filter-text">更早 ▼</view>
+        </picker>
+      </view>
+    </view>
+
+    <!-- 报告列表 -->
+    <view wx:if="{{reportList.length > 0}}" class="report-list">
+      <view 
+        wx:for="{{reportList}}" 
+        wx:key="id"
+        class="report-item"
+        data-report="{{item}}"
+        bind:tap="onViewReport"
+      >
+        <view class="report-icon">🧾</view>
+        <view class="report-info">
+          <view class="report-title">{{item.title}}</view>
+          <view class="report-date">{{item.date}}</view>
+        </view>
+        <view class="report-arrow">→</view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:else class="empty-state">
+      <view class="empty-icon">📋</view>
+      <view class="empty-text">暂无历史报告</view>
+    </view>
+  </view>
+</view>

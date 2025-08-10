@@ -1,0 +1,325 @@
+/* report.wxss */
+.container {
+  background: #f5f7fa;
+  min-height: 100vh;
+  padding-bottom: 40rpx;
+}
+
+/* 加载状态 */
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #666;
+}
+
+/* 报告内容 */
+.report-content {
+  padding: 24rpx;
+}
+
+/* 报告头部 */
+.report-header {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+}
+
+.report-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 16rpx;
+}
+
+.report-date {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 24rpx;
+}
+
+.report-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+/* 评分区域 */
+.score-section {
+  background: linear-gradient(135deg, #0b3a95, #1e5bb8);
+  border-radius: 16rpx;
+  padding: 40rpx;
+  margin-bottom: 24rpx;
+  color: #fff;
+  text-align: center;
+}
+
+.score-card {
+  margin-bottom: 24rpx;
+}
+
+.score-number {
+  font-size: 80rpx;
+  font-weight: 700;
+  margin-bottom: 8rpx;
+}
+
+.score-label {
+  font-size: 28rpx;
+  opacity: 0.9;
+  margin-bottom: 8rpx;
+}
+
+.score-level {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.risk-info {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12rpx;
+  padding: 16rpx;
+  backdrop-filter: blur(10rpx);
+}
+
+.risk-level {
+  font-size: 26rpx;
+}
+
+/* 分析区域 */
+.analysis-section {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 24rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+/* 分析网格 */
+.analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24rpx;
+  margin-bottom: 32rpx;
+}
+
+.analysis-item {
+  text-align: center;
+  padding: 24rpx;
+  background: #f8fafc;
+  border-radius: 12rpx;
+}
+
+.item-label {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.item-value {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #0b3a95;
+}
+
+/* 稳定性信息 */
+.stability-info {
+  background: #f0f9ff;
+  border-radius: 12rpx;
+  padding: 24rpx;
+}
+
+.stability-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+  font-size: 26rpx;
+}
+
+.stability-item:last-child {
+  margin-bottom: 0;
+}
+
+.stability-item .label {
+  color: #666;
+}
+
+.stability-item .value {
+  color: #0b3a95;
+  font-weight: 600;
+}
+
+/* 信息行 */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+  font-size: 26rpx;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row .label {
+  color: #666;
+}
+
+.info-row .value {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.info-row .value.success {
+  color: #22c55e;
+}
+
+/* 子标题 */
+.subsection-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 24rpx 0 16rpx 0;
+}
+
+/* 查询信息 */
+.query-info {
+  background: #f8fafc;
+  border-radius: 12rpx;
+  padding: 24rpx;
+}
+
+.query-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+  font-size: 26rpx;
+}
+
+.query-item:last-child {
+  margin-bottom: 0;
+}
+
+/* 风险评估网格 */
+.risk-assessment {
+  margin-top: 24rpx;
+}
+
+.risk-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16rpx;
+}
+
+.risk-item {
+  text-align: center;
+  padding: 20rpx;
+  background: #f8fafc;
+  border-radius: 12rpx;
+}
+
+.risk-label {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.risk-value {
+  font-size: 26rpx;
+  font-weight: 600;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+.risk-value.low {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.risk-value.medium {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.risk-value.high {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* 风险提示 */
+.risk-section {
+  background: #fff7ed;
+  border: 2rpx solid #fed7aa;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.risk-list {
+  margin-top: 16rpx;
+}
+
+.risk-item-text {
+  font-size: 26rpx;
+  color: #9a3412;
+  line-height: 1.6;
+  margin-bottom: 12rpx;
+}
+
+/* 建议区域 */
+.suggestion-section {
+  background: #f0fdf4;
+  border: 2rpx solid #bbf7d0;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.suggestion-list {
+  margin-top: 16rpx;
+}
+
+.suggestion-item {
+  font-size: 26rpx;
+  color: #166534;
+  line-height: 1.6;
+  margin-bottom: 16rpx;
+}
+
+/* 免责声明 */
+.disclaimer {
+  background: #f8fafc;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-top: 40rpx;
+}
+
+.disclaimer-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 16rpx;
+}
+
+.disclaimer-text {
+  font-size: 24rpx;
+  color: #6b7280;
+  line-height: 1.6;
+}

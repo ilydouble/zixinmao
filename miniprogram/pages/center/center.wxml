@@ -1,0 +1,101 @@
+<!--center.wxml-->
+<view class="container">
+  <!-- 顶部安全区占位，避免与状态栏重叠 -->
+  <view class="status-bar-spacer user-section-bg" style="height: {{statusBarHeight}}px;"></view>
+
+  <!-- 用户信息区域 -->
+  <view class="user-section">
+    <view wx:if="{{isLoggedIn}}" class="user-info">
+      <!-- 用户头像 -->
+      <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+        <t-avatar
+          size="large"
+          image="{{userInfo.avatarUrl || '/images/default-avatar.png'}}"
+        />
+      </button>
+
+      <!-- 用户信息 -->
+      <view class="user-details">
+        <view class="user-name">
+          <input
+            wx:if="{{!userInfo.nickName}}"
+            type="nickname"
+            placeholder="点击设置昵称"
+            bind:blur="onNicknameChange"
+            class="nickname-input"
+          />
+          <text wx:else class="nickname-text">{{userInfo.nickName}}</text>
+        </view>
+        <view class="user-status">
+          <text wx:if="{{userInfo.realNameVerified}}" class="verified">✅ 已实名认证</text>
+          <text wx:else class="unverified">⚠️ 未实名认证</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 未登录状态 -->
+    <view wx:else class="login-prompt">
+      <t-avatar size="large" image="/images/default-avatar.png" />
+      <view class="prompt-text">
+        <view class="prompt-title">未登录</view>
+        <t-button theme="primary" size="small" bind:tap="onGetUserProfile">
+          点击登录
+        </t-button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快捷统计 -->
+  <view wx:if="{{isLoggedIn}}" class="stats-section">
+    <view class="stats-grid">
+      <view class="stat-item" data-url="/pages/orders/orders" bind:tap="onNavigateToMenu">
+        <view class="stat-number">3</view>
+        <view class="stat-label">历史订单</view>
+      </view>
+      <view class="stat-item" data-url="/pages/balance/balance" bind:tap="onNavigateToMenu">
+        <view class="stat-number">¥256</view>
+        <view class="stat-label">账户余额</view>
+      </view>
+      <view class="stat-item" data-url="/pages/help/help" bind:tap="onNavigateToMenu">
+        <view class="stat-number">24h</view>
+        <view class="stat-label">在线客服</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-section">
+    <t-cell-group>
+      <t-cell
+        wx:for="{{menuItems}}"
+        wx:key="id"
+        title="{{item.title}}"
+        left-icon="{{item.icon}}"
+        arrow
+        data-url="{{item.url}}"
+        bind:click="onNavigateToMenu"
+      />
+    </t-cell-group>
+  </view>
+
+  <!-- 退出登录 -->
+  <view wx:if="{{isLoggedIn}}" class="logout-section">
+    <t-button
+      theme="light"
+      size="large"
+      block
+      bind:tap="onLogout"
+    >
+      退出登录
+    </t-button>
+  </view>
+
+  <!-- 版本信息 -->
+  <view class="version-info">
+    <view class="app-info">
+      <text class="app-name">🐱 资信猫</text>
+      <text class="version">v1.0.0</text>
+    </view>
+    <view class="copyright">© 2023 资信猫团队</view>
+  </view>
+</view>

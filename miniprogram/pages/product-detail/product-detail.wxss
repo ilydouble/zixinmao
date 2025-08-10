@@ -1,0 +1,201 @@
+/* product-detail.wxss */
+.container {
+  background: #f5f7fa;
+  min-height: 100vh;
+  padding-bottom: 40rpx;
+}
+
+.product-content {
+  /* 产品内容容器 */
+}
+
+/* Hero 区域 */
+.hero {
+  margin: 24rpx;
+  padding: 48rpx 32rpx;
+  border-radius: 16rpx;
+  color: #fff;
+  text-align: center;
+}
+
+.hero.orange {
+  background: linear-gradient(135deg, #ef4444, #f97316);
+}
+
+.hero.blue {
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+}
+
+.hero.purple {
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+}
+
+.hero-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  margin-bottom: 16rpx;
+  line-height: 1.3;
+}
+
+.hero-subtitle {
+  font-size: 26rpx;
+  opacity: 0.95;
+  line-height: 1.4;
+}
+
+/* 通用区域样式 */
+.features-section,
+.qr-section,
+.advantages-section,
+.process-section {
+  margin: 24rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 24rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+/* 产品特色 */
+.features-list {
+  /* 特色列表 */
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 24rpx;
+}
+
+.feature-item:last-child {
+  margin-bottom: 0;
+}
+
+.feature-bullet {
+  color: #0b3a95;
+  font-size: 32rpx;
+  font-weight: 700;
+  margin-right: 16rpx;
+  margin-top: 4rpx;
+}
+
+.feature-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.5;
+}
+
+/* 二维码区域 */
+.qr-card {
+  text-align: center;
+}
+
+.qr-image {
+  width: 300rpx;
+  height: 300rpx;
+  border-radius: 16rpx;
+  background: #f8fafc;
+  margin-bottom: 24rpx;
+}
+
+.qr-note {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 32rpx;
+  line-height: 1.4;
+}
+
+.qr-actions {
+  display: flex;
+  gap: 16rpx;
+  justify-content: center;
+}
+
+/* 服务优势 */
+.advantages-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24rpx;
+}
+
+.advantage-item {
+  text-align: center;
+  padding: 24rpx;
+  background: #f8fafc;
+  border-radius: 12rpx;
+}
+
+.advantage-icon {
+  font-size: 48rpx;
+  margin-bottom: 16rpx;
+}
+
+.advantage-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8rpx;
+}
+
+.advantage-desc {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* 合作流程 */
+.process-steps {
+  /* 流程步骤 */
+}
+
+.step-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 32rpx;
+}
+
+.step-item:last-child {
+  margin-bottom: 0;
+}
+
+.step-number {
+  width: 48rpx;
+  height: 48rpx;
+  background: #0b3a95;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: 700;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+}
+
+.step-content {
+  flex: 1;
+  padding-top: 8rpx;
+}
+
+.step-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8rpx;
+}
+
+.step-desc {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.4;
+}

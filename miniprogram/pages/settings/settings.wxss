@@ -1,0 +1,67 @@
+/* settings.wxss */
+.container {
+  background: #f5f7fa;
+  min-height: 100vh;
+  padding: 24rpx;
+  padding-bottom: 40rpx;
+}
+
+.settings-content {
+  /* 设置内容 */
+}
+
+/* 设置区域 */
+.settings-section {
+  margin-bottom: 32rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 16rpx;
+  padding-left: 8rpx;
+}
+
+/* 选择器文本 */
+.picker-text {
+  color: #666;
+  font-size: 28rpx;
+}
+
+/* 缓存大小 */
+.cache-size {
+  color: #666;
+  font-size: 26rpx;
+}
+
+/* 版本信息 */
+.version-info {
+  text-align: center;
+  padding: 40rpx 24rpx;
+  color: #999;
+}
+
+.version-text {
+  font-size: 28rpx;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+
+.copyright {
+  font-size: 24rpx;
+}
+
+/* 复选框样式调整 */
+checkbox {
+  transform: scale(0.8);
+}
+
+checkbox .wx-checkbox-input {
+  border-radius: 6rpx;
+}
+
+checkbox .wx-checkbox-input.wx-checkbox-input-checked {
+  background-color: #0b3a95;
+  border-color: #0b3a95;
+}

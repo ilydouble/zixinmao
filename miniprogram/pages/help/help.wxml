@@ -1,0 +1,83 @@
+<!--help.wxml-->
+<view class="container">
+  <view class="help-content">
+    <!-- 常见问题 -->
+    <view class="faq-section">
+      <view class="section-title">常见问题</view>
+      
+      <view class="faq-list">
+        <view 
+          wx:for="{{faqs}}" 
+          wx:key="id"
+          class="faq-item {{expandedFaq === item.id ? 'expanded' : ''}}"
+          data-faq-id="{{item.id}}"
+          bind:tap="onToggleFaq"
+        >
+          <view class="faq-question">
+            <text class="question-text">❓ {{item.question}}</text>
+            <text class="expand-icon">{{expandedFaq === item.id ? '▲' : '▼'}}</text>
+          </view>
+          <view wx:if="{{expandedFaq === item.id}}" class="faq-answer">
+            {{item.answer}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 使用指南 -->
+    <view class="guide-section">
+      <view class="section-title">使用指南</view>
+      
+      <view class="guide-steps">
+        <view class="step-item">
+          <view class="step-number">1</view>
+          <view class="step-content">
+            <view class="step-title">注册登录</view>
+            <view class="step-desc">使用微信快速登录，完成实名认证</view>
+          </view>
+        </view>
+        
+        <view class="step-item">
+          <view class="step-number">2</view>
+          <view class="step-content">
+            <view class="step-title">选择服务</view>
+            <view class="step-desc">根据需求选择流水宝、简信宝或专信宝</view>
+          </view>
+        </view>
+        
+        <view class="step-item">
+          <view class="step-number">3</view>
+          <view class="step-content">
+            <view class="step-title">上传文件</view>
+            <view class="step-desc">上传相关文件，等待系统分析</view>
+          </view>
+        </view>
+        
+        <view class="step-item">
+          <view class="step-number">4</view>
+          <view class="step-content">
+            <view class="step-title">查看报告</view>
+            <view class="step-desc">获取专业分析报告，支持下载分享</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 联系我们 -->
+    <view class="contact-section">
+      <view class="section-title">联系我们</view>
+      <view class="contact-card">
+        <view class="contact-text">
+          如果您有其他问题或需要帮助，请随时联系我们的客服团队。
+        </view>
+        <t-button 
+          theme="primary" 
+          size="medium" 
+          bind:tap="onContactSupport"
+        >
+          联系客服
+        </t-button>
+      </view>
+    </view>
+  </view>
+</view>

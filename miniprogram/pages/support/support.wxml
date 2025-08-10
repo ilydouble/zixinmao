@@ -1,0 +1,84 @@
+<!--support.wxml-->
+<view class="container">
+  <!-- 企业微信客服 -->
+  <view class="qr-section">
+    <view class="section-title">企业微信客服</view>
+    <view class="section-desc">工作日 9:00-18:00 在线</view>
+    
+    <view class="qr-card">
+      <image 
+        class="qr-image" 
+        src="{{qrCodeUrl}}" 
+        mode="aspectFit"
+        bind:tap="onPreviewQRCode"
+      />
+      <view class="qr-note">请使用微信扫码，备注"资信猫咨询"</view>
+      <t-button 
+        theme="light" 
+        size="small" 
+        bind:tap="onSaveQRCode"
+      >
+        保存二维码
+      </t-button>
+    </view>
+  </view>
+
+  <!-- 其他联系方式 -->
+  <view class="contact-section">
+    <view class="section-title">其他联系方式</view>
+    
+    <t-cell-group>
+      <t-cell 
+        wx:for="{{contactMethods}}" 
+        wx:key="id"
+        title="{{item.title}}"
+        description="{{item.desc}}"
+        left-icon="{{item.icon}}"
+        arrow
+        data-method="{{item}}"
+        bind:click="onContactMethodTap"
+      />
+    </t-cell-group>
+  </view>
+
+  <!-- 常见问题 -->
+  <view class="faq-section">
+    <view class="section-title">常见问题</view>
+    
+    <view class="faq-list">
+      <view class="faq-item">
+        <view class="faq-question">❓ 如何上传银行流水？</view>
+        <view class="faq-answer">在"流水宝"页面点击上传按钮，支持PDF、JPG、PNG格式文件。</view>
+      </view>
+      
+      <view class="faq-item">
+        <view class="faq-question">❓ 为什么需要实名认证？</view>
+        <view class="faq-answer">为了合规和保护用户权益，征信相关功能需要实名认证。</view>
+      </view>
+      
+      <view class="faq-item">
+        <view class="faq-question">❓ 数据安全如何保障？</view>
+        <view class="faq-answer">我们采用银行级加密技术，严格遵守数据保护法规，不会泄露用户隐私。</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 服务时间 -->
+  <view class="service-time">
+    <view class="time-title">🕐 服务时间</view>
+    <view class="time-content">
+      <view class="time-item">
+        <text class="time-label">在线客服：</text>
+        <text class="time-value">工作日 9:00-18:00</text>
+      </view>
+      <view class="time-item">
+        <text class="time-label">邮件回复：</text>
+        <text class="time-value">24小时内回复</text>
+      </view>
+      <view class="time-item">
+        <text class="time-label">电话支持：</text>
+        <text class="time-value">工作日 9:00-17:00</text>
+      </view>
+    </view>
+  </view>
+</view>

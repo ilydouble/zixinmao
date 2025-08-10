@@ -1,0 +1,7 @@
+<!--index.wxml-->
+<view class="container">
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-icon">🐱</view>
+    <view class="loading-text">资信猫启动中...</view>
+  </view>
+</view>

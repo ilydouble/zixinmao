@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>个人中心 · 原型</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="app">
+  <div class="navbar light">
+    <a class="back" href="page-home.html">←</a>
+    <div class="title">个人中心</div>
+    <div class="space"></div>
+  </div>
+
+  <div class="card" style="display:flex; gap:12px; align-items:center;">
+    <div style="width:48px; height:48px; border-radius:12px; background:#dce7ff; display:grid; place-items:center;">🧑</div>
+    <div style="flex:1;">
+      <div style="font-weight:600;">张明 <span id="authBadge" class="tag gray">未认证</span></div>
+      <div class="small">138****5689</div>
+    </div>
+    <a id="authEntry" class="btn small ghost" href="page-auth.html?return=page-center.html#auth">去认证</a>
+  </div>
+
+  <script>
+    // 个人中心认证状态与操作
+    (function(){
+      const verified = localStorage.getItem('isVerified')==='1';
+      const badge = document.getElementById('authBadge');
+      const entry = document.getElementById('authEntry');
+      if(verified){
+        badge.textContent = '实名认证';
+        badge.classList.remove('gray');
+        badge.classList.add('success');
+        entry.textContent = '重新认证 / 退出认证';
+        entry.href = '#';
+        entry.addEventListener('click', (e)=>{
+          e.preventDefault();
+          if(confirm('确定要清除当前认证状态吗？')){
+            localStorage.removeItem('isVerified');
+            location.reload();
+          }
+        });
+      }
+    })();
+  </script>
+
+  <div class="card" style="display:grid; grid-template-columns: repeat(3,1fr); gap:10px;">
+    <div class="qcard" style="text-align:center;">
+      <div class="qtitle">¥256.00</div>
+      <div class="qsub">余额</div>
+    </div>
+    <div class="qcard" style="text-align:center;">
+      <div class="qtitle">4890</div>
+      <div class="qsub">积分</div>
+    </div>
+    <div class="qcard" style="text-align:center;">
+      <div class="qtitle">3张</div>
+      <div class="qsub">优惠券</div>
+    </div>
+  </div>
+
+  <div class="list">
+    <a class="item" href="page-support.html">
+      <div class="icon">🎧</div>
+      <div class="meta">
+        <div class="title">联系客服</div>
+      </div>
+      <div class="right">→</div>
+    </a>
+    <a class="item" href="page-orders.html">
+      <div class="icon">🧾</div>
+      <div class="meta">
+        <div class="title">个人订单</div>
+      </div>
+      <div class="right">→</div>
+    </a>
+    <a class="item" href="page-recharge.html">
+      <div class="icon">💳</div>
+      <div class="meta">
+        <div class="title">会员充值</div>
+      </div>
+      <div class="right">→</div>
+    </a>
+    <a class="item" href="page-balance.html">
+      <div class="icon">💰</div>
+      <div class="meta">
+        <div class="title">我的余额</div>
+      </div>
+      <div class="right">→</div>
+    </a>
+    <a class="item" href="page-help.html">
+      <div class="icon">🧠</div>
+      <div class="meta">
+        <div class="title">帮助中心</div>
+      </div>
+      <div class="right">→</div>
+    </a>
+    <a class="item" href="page-settings.html">
+      <div class="icon">⚙️</div>
+      <div class="meta">
+        <div class="title">设置</div>
+      </div>
+      <div class="right">→</div>
+    </a>
+  </div>
+</div>
+</body>
+</html>
+

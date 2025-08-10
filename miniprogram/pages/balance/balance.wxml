@@ -1,0 +1,57 @@
+<!--balance.wxml-->
+<view class="container">
+  <view class="balance-content">
+    <!-- 余额卡片 -->
+    <view class="balance-card">
+      <view class="balance-title">账户余额</view>
+      <view class="balance-amount">¥{{balance}}</view>
+      <view class="balance-desc">可用余额</view>
+      <view class="balance-actions">
+        <t-button theme="primary" size="medium" bind:tap="onRecharge">
+          立即充值
+        </t-button>
+      </view>
+    </view>
+
+    <!-- 交易记录 -->
+    <view class="transactions-section">
+      <view class="section-title">最近账变</view>
+      
+      <view wx:if="{{transactions.length > 0}}" class="transactions-list">
+        <view 
+          wx:for="{{transactions}}" 
+          wx:key="id"
+          class="transaction-item"
+          data-transaction="{{item}}"
+          bind:tap="onViewTransaction"
+        >
+          <view class="transaction-icon {{item.type}}">
+            <text wx:if="{{item.type === 'recharge'}}">⬆️</text>
+            <text wx:else>⬇️</text>
+          </view>
+          <view class="transaction-info">
+            <view class="transaction-title">{{item.title}}</view>
+            <view class="transaction-date">{{item.date}}</view>
+          </view>
+          <view class="transaction-amount {{item.type}}">{{item.amount}}</view>
+        </view>
+      </view>
+
+      <!-- 空状态 -->
+      <view wx:else class="empty-state">
+        <view class="empty-icon">💰</view>
+        <view class="empty-text">暂无交易记录</view>
+      </view>
+    </view>
+
+    <!-- 余额说明 -->
+    <view class="balance-note">
+      <view class="note-title">💡 余额说明</view>
+      <view class="note-content">
+        • 余额可用于购买各类分析服务<br/>
+        • 支持微信支付充值<br/>
+        • 余额不支持提现，请合理充值
+      </view>
+    </view>
+  </view>
+</view>

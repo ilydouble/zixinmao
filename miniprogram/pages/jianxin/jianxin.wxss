@@ -1,0 +1,38 @@
+/* jianxin.wxss */
+@import "../liushui/liushui.wxss";
+
+/* 认证提示 */
+.auth-notice {
+  margin: 24rpx;
+  background: #fff7ed;
+  border: 2rpx solid #fed7aa;
+  border-radius: 16rpx;
+  padding: 24rpx;
+}
+
+.notice-content {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.notice-icon {
+  font-size: 48rpx;
+}
+
+.notice-text {
+  flex: 1;
+}
+
+.notice-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #9a3412;
+  margin-bottom: 8rpx;
+}
+
+.notice-desc {
+  font-size: 24rpx;
+  color: #9a3412;
+  opacity: 0.8;
+}

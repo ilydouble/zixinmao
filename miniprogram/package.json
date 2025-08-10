@@ -1,0 +1,25 @@
+{
+  "name": "zixinmao-miniprogram",
+  "version": "1.0.0",
+  "description": "资信猫小程序",
+  "main": "app.js",
+  "dependencies": {
+    "tdesign-miniprogram": "^1.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "dev": "npm run build:npm",
+    "build:npm": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "miniprogram",
+    "wechat",
+    "tdesign"
+  ],
+  "author": "资信猫团队",
+  "license": "MIT"
+}

@@ -1,0 +1,167 @@
+/* balance.wxss */
+.container {
+  background: #f5f7fa;
+  min-height: 100vh;
+  padding: 24rpx;
+  padding-bottom: 40rpx;
+}
+
+.balance-content {
+  /* 余额内容 */
+}
+
+/* 余额卡片 */
+.balance-card {
+  background: linear-gradient(135deg, #0b3a95, #1e5bb8);
+  border-radius: 16rpx;
+  padding: 48rpx 32rpx;
+  text-align: center;
+  color: #fff;
+  margin-bottom: 32rpx;
+}
+
+.balance-title {
+  font-size: 28rpx;
+  opacity: 0.9;
+  margin-bottom: 16rpx;
+}
+
+.balance-amount {
+  font-size: 56rpx;
+  font-weight: 700;
+  margin-bottom: 8rpx;
+}
+
+.balance-desc {
+  font-size: 24rpx;
+  opacity: 0.8;
+  margin-bottom: 32rpx;
+}
+
+.balance-actions {
+  /* 操作按钮 */
+}
+
+/* 交易记录 */
+.transactions-section {
+  margin-bottom: 32rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 24rpx;
+}
+
+.transactions-list {
+  background: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+}
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.transaction-item:last-child {
+  border-bottom: none;
+}
+
+.transaction-item:active {
+  background-color: #f8fafc;
+}
+
+.transaction-icon {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx;
+  font-size: 24rpx;
+}
+
+.transaction-icon.recharge {
+  background: #dcfce7;
+}
+
+.transaction-icon.consume {
+  background: #fee2e2;
+}
+
+.transaction-info {
+  flex: 1;
+}
+
+.transaction-title {
+  font-size: 28rpx;
+  color: #1a1a1a;
+  margin-bottom: 8rpx;
+  font-weight: 600;
+}
+
+.transaction-date {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.transaction-amount {
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.transaction-amount.recharge {
+  color: #16a34a;
+}
+
+.transaction-amount.consume {
+  color: #dc2626;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 80rpx 40rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 24rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 余额说明 */
+.balance-note {
+  background: #f0f9ff;
+  border: 2rpx solid #bae6fd;
+  border-radius: 16rpx;
+  padding: 24rpx;
+}
+
+.note-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #0369a1;
+  margin-bottom: 16rpx;
+}
+
+.note-content {
+  font-size: 24rpx;
+  color: #0369a1;
+  line-height: 1.6;
+}

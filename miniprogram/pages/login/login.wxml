@@ -1,0 +1,44 @@
+<!--login.wxml-->
+<view class="container">
+  <view class="login-content">
+    <!-- Logo 区域 -->
+    <view class="logo-section">
+      <view class="logo">🐱</view>
+      <view class="app-name">资信猫</view>
+      <view class="app-desc">专业的金融数据分析平台</view>
+    </view>
+
+    <!-- 功能介绍 -->
+    <view class="features">
+      <view class="feature-item">
+        <view class="feature-icon">📊</view>
+        <view class="feature-text">银行流水智能分析</view>
+      </view>
+      <view class="feature-item">
+        <view class="feature-icon">📋</view>
+        <view class="feature-text">征信报告专业解读</view>
+      </view>
+      <view class="feature-item">
+        <view class="feature-icon">🔒</view>
+        <view class="feature-text">数据安全有保障</view>
+      </view>
+    </view>
+
+    <!-- 登录按钮 -->
+    <view class="login-actions">
+      <t-button 
+        theme="primary" 
+        size="large" 
+        block
+        loading="{{loading}}"
+        bind:tap="onWechatLogin"
+      >
+        微信快速登录
+      </t-button>
+      
+      <view class="login-tips">
+        登录即表示同意《用户协议》和《隐私政策》
+      </view>
+    </view>
+  </view>
+</view>

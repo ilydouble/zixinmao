@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>实名认证 · 原型</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="app">
+  <div class="navbar light">
+    <a class="back" href="javascript:history.back()">←</a>
+    <div class="title">实名认证</div>
+    <div class="space"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">请完成实名认证后继续</div>
+    <input class="input" id="phone" placeholder="请输入手机号" />
+    <div class="row">
+      <input class="input" id="code" placeholder="请输入验证码" style="flex:1;" />
+      <a class="btn small" id="send">获取验证码</a>
+    </div>
+    <input class="input" id="name" placeholder="请输入真实姓名" />
+    <input class="input" id="idno" placeholder="请输入18位身份证号" />
+    <div style="margin-top:10px;">
+      <a class="btn full" id="submit">提交并认证</a>
+    </div>
+    <div class="small" style="margin-top:6px; color:#6b7280;">仅为原型演示，不会保存个人数据</div>
+  </div>
+
+  <script>
+    (function(){
+      const q = new URLSearchParams(location.search);
+      const ret = q.get('return') || 'page-home.html';
+      const phone = document.getElementById('phone');
+      const code = document.getElementById('code');
+      const name = document.getElementById('name');
+      const idno = document.getElementById('idno');
+      const send = document.getElementById('send');
+      const submit = document.getElementById('submit');
+
+      let countdown = 0, timer = null;
+      function tick(){
+        if (countdown <= 0) {
+          send.textContent = '获取验证码';
+          send.classList.remove('disabled');
+          if (timer) clearInterval(timer); timer = null;
+          return;
+        }
+        send.textContent = countdown + 's 后重发';
+        countdown--;
+      }
+
+      send.addEventListener('click', ()=>{
+        if (timer) return;
+        if (!/^[1-9][0-9]{10}$/.test(phone.value)) { alert('请输入11位手机号'); return; }
+        countdown = 60;
+        send.classList.add('disabled');
+        tick(); timer = setInterval(tick, 1000);
+      });
+
+      submit.addEventListener('click', ()=>{
+        if (!/^[1-9][0-9]{10}$/.test(phone.value)) { alert('请输入有效手机号'); return; }
+        if (!/^\d{4,6}$/.test(code.value)) { alert('请输入4-6位验证码'); return; }
+        if (!name.value.trim()) { alert('请输入姓名'); return; }
+        if (!/^\d{17}[\dXx]$/.test(idno.value)) { alert('请输入18位身份证号'); return; }
+        localStorage.setItem('isVerified','1');
+        location.href = ret;
+      });
+    })();
+  </script>
+</div>
+</body>
+</html>
+

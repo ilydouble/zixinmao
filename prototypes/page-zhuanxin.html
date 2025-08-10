@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>专信宝 · 原型</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="app">
+  <div class="navbar light">
+    <a class="back" href="page-home.html">←</a>
+    <div class="title">专信宝</div>
+    <div class="space"></div>
+  </div>
+
+  <div class="tabs">
+    <a class="tab" href="page-liushui.html">流水宝</a>
+    <a class="tab" href="page-jianxin.html">简信宝</a>
+    <a class="tab active" href="page-zhuanxin.html">专信宝</a>
+  </div>
+
+  <script>
+    // 未认证则跳转至实名认证页面
+    (function(){
+      const verified = localStorage.getItem('isVerified')==='1';
+      if(!verified){
+        const ret = encodeURIComponent('page-zhuanxin.html');
+        window.location.href = `page-auth.html?return=${ret}`;
+      }
+    })();
+  </script>
+
+  <div class="card">
+    <div class="card-title">上传数据</div>
+    <div class="upload">
+      <div style="font-size:40px">☁️</div>
+      <div style="margin-top:6px;">拖拽或点击上传文件至此处</div>
+      <div class="small">支持 PDF/JPEG/PNG</div>
+      <div class="row" style="margin-top:10px;">
+        <a class="btn">选择文件</a>
+      </div>
+    </div>
+    <div style="margin-top:12px;">
+      <div class="small">处理中… 50%</div>
+      <div class="progress"><span style="width:50%"></span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">历史报告</div>
+    <div class="list">
+      <a class="item" href="report.html?type=zhuanxin&title=%E5%BE%81%E4%BF%A1%E8%AF%A6%E7%89%88&date=2023-07-12">
+        <div class="icon">📘</div>
+        <div class="meta">
+          <div class="title">征信详版 <span class="tag purple">详版</span></div>
+          <div class="sub">2023-07-12</div>
+        </div>
+        <div class="right">→</div>
+      </a>
+
+    </div>
+  </div>
+
+
+
+</div>
+</body>
+</html>
+

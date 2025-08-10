@@ -1,0 +1,161 @@
+/* center.wxss */
+.container {
+  background: #f5f7fa;
+  min-height: 100vh;
+  padding-bottom: 120rpx;
+}
+
+/* 用户信息区域 */
+.user-section {
+  background: linear-gradient(135deg, #0b3a95, #1e5bb8);
+  padding: 60rpx 32rpx 40rpx;
+  color: #fff;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.avatar-wrapper {
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.user-details {
+  flex: 1;
+}
+
+.user-name {
+  margin-bottom: 12rpx;
+}
+
+.nickname-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2rpx solid rgba(255, 255, 255, 0.2);
+  border-radius: 8rpx;
+  padding: 12rpx 16rpx;
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.nickname-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.nickname-text {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.user-status {
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+
+.verified {
+  color: #4ade80;
+}
+
+.unverified {
+  color: #fbbf24;
+}
+
+/* 未登录状态 */
+.login-prompt {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.prompt-text {
+  flex: 1;
+}
+
+.prompt-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 16rpx;
+}
+
+/* 快捷统计 */
+.stats-section {
+  margin: 24rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32rpx;
+}
+
+.stat-item {
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.stat-item:active {
+  transform: scale(0.95);
+}
+
+.stat-number {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #0b3a95;
+  margin-bottom: 8rpx;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 功能菜单 */
+.menu-section {
+  margin: 24rpx;
+}
+
+/* 退出登录 */
+.logout-section {
+  margin: 40rpx 24rpx 24rpx;
+}
+
+/* 版本信息 */
+.version-info {
+  text-align: center;
+  padding: 40rpx 24rpx;
+  color: #999;
+}
+
+.app-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.app-name {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.version {
+  font-size: 24rpx;
+  background: #f0f0f0;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+}
+
+.copyright {
+  font-size: 22rpx;
+}

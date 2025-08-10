@@ -1,0 +1,30 @@
+<!--orders.wxml-->
+<view class="container">
+  <view class="orders-content">
+    <!-- 订单列表 -->
+    <view wx:if="{{orders.length > 0}}" class="orders-list">
+      <view 
+        wx:for="{{orders}}" 
+        wx:key="id"
+        class="order-item"
+        data-order="{{item}}"
+        bind:tap="onViewOrder"
+      >
+        <view class="order-header">
+          <view class="order-title">{{item.title}}</view>
+          <view class="order-status success">{{item.status}}</view>
+        </view>
+        <view class="order-info">
+          <view class="order-date">{{item.date}}</view>
+          <view class="order-amount">{{item.amount}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:else class="empty-state">
+      <view class="empty-icon">🧾</view>
+      <view class="empty-text">暂无订单记录</view>
+    </view>
+  </view>
+</view>

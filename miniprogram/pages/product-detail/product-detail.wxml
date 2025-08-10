@@ -1,0 +1,117 @@
+<!--product-detail.wxml-->
+<view class="container">
+  <view wx:if="{{productInfo}}" class="product-content">
+    <!-- 产品介绍 -->
+    <view class="hero {{productInfo.color}}">
+      <view class="hero-title">{{productInfo.title}}</view>
+      <view class="hero-subtitle">{{productInfo.subtitle}}</view>
+    </view>
+
+    <!-- 产品特色 -->
+    <view class="features-section">
+      <view class="section-title">产品特色</view>
+      <view class="features-list">
+        <view 
+          wx:for="{{productInfo.features}}" 
+          wx:key="index"
+          class="feature-item"
+        >
+          <view class="feature-bullet">•</view>
+          <view class="feature-text">{{item}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 客服二维码 -->
+    <view class="qr-section">
+      <view class="section-title">联系我们</view>
+      <view class="qr-card">
+        <image 
+          class="qr-image" 
+          src="{{qrCodeUrl}}" 
+          mode="aspectFit"
+          bind:tap="onPreviewQRCode"
+        />
+        <view class="qr-note">扫码添加企业微信，获取演示与接入支持</view>
+        <view class="qr-actions">
+          <t-button 
+            theme="light" 
+            size="small" 
+            bind:tap="onCopyWechat"
+          >
+            复制微信号
+          </t-button>
+          <t-button 
+            theme="primary" 
+            size="small" 
+            bind:tap="onConsult"
+          >
+            立即咨询
+          </t-button>
+        </view>
+      </view>
+    </view>
+
+    <!-- 服务优势 -->
+    <view class="advantages-section">
+      <view class="section-title">服务优势</view>
+      <view class="advantages-grid">
+        <view class="advantage-item">
+          <view class="advantage-icon">🏆</view>
+          <view class="advantage-title">专业团队</view>
+          <view class="advantage-desc">资深技术团队，丰富行业经验</view>
+        </view>
+        <view class="advantage-item">
+          <view class="advantage-icon">🔒</view>
+          <view class="advantage-title">安全可靠</view>
+          <view class="advantage-desc">银行级安全标准，数据加密保护</view>
+        </view>
+        <view class="advantage-item">
+          <view class="advantage-icon">⚡</view>
+          <view class="advantage-title">快速部署</view>
+          <view class="advantage-desc">标准化产品，快速上线部署</view>
+        </view>
+        <view class="advantage-item">
+          <view class="advantage-icon">🎯</view>
+          <view class="advantage-title">定制服务</view>
+          <view class="advantage-desc">根据需求定制，满足个性化要求</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 合作流程 -->
+    <view class="process-section">
+      <view class="section-title">合作流程</view>
+      <view class="process-steps">
+        <view class="step-item">
+          <view class="step-number">1</view>
+          <view class="step-content">
+            <view class="step-title">需求沟通</view>
+            <view class="step-desc">了解具体需求，制定解决方案</view>
+          </view>
+        </view>
+        <view class="step-item">
+          <view class="step-number">2</view>
+          <view class="step-content">
+            <view class="step-title">方案确认</view>
+            <view class="step-desc">确认技术方案，签署合作协议</view>
+          </view>
+        </view>
+        <view class="step-item">
+          <view class="step-number">3</view>
+          <view class="step-content">
+            <view class="step-title">系统部署</view>
+            <view class="step-desc">环境搭建，系统配置与部署</view>
+          </view>
+        </view>
+        <view class="step-item">
+          <view class="step-number">4</view>
+          <view class="step-content">
+            <view class="step-title">培训上线</view>
+            <view class="step-desc">用户培训，系统正式上线运行</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

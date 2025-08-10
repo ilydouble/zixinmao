@@ -1,0 +1,48 @@
+/* zhuanxin.wxss */
+@import "../liushui/liushui.wxss";
+@import "../jianxin/jianxin.wxss";
+
+/* 功能介绍 */
+.feature-intro {
+  margin: 24rpx;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  border-radius: 16rpx;
+  padding: 32rpx;
+  color: #fff;
+}
+
+.intro-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  margin-bottom: 16rpx;
+}
+
+.intro-desc {
+  font-size: 26rpx;
+  opacity: 0.9;
+  margin-bottom: 24rpx;
+  line-height: 1.4;
+}
+
+.intro-features {
+  display: flex;
+  gap: 16rpx;
+}
+
+.feature-tag {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+  backdrop-filter: blur(10rpx);
+}
+
+/* 报告项样式调整 */
+.report-tag {
+  background: #7c3aed;
+  color: #fff;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+  font-size: 20rpx;
+  margin-right: 16rpx;
+}

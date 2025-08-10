@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>流水宝 · 原型</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="app">
+  <div class="navbar light">
+    <a class="back" href="page-home.html">←</a>
+    <div class="title">流水宝</div>
+    <div class="space"></div>
+  </div>
+
+  <script>
+    // 未登录则跳转登录页（流水宝仅需登录）
+    (function(){
+      const loggedIn = localStorage.getItem('isLoggedIn')==='1';
+      if(!loggedIn){
+        const ret = encodeURIComponent('page-liushui.html');
+        window.location.href = `page-login.html?return=${ret}`;
+      }
+    })();
+  </script>
+
+
+  <div class="tabs">
+    <a class="tab active" href="page-liushui.html">流水宝</a>
+    <a class="tab" href="page-jianxin.html">简信宝</a>
+    <a class="tab" href="page-zhuanxin.html">专信宝</a>
+
+  </div>
+
+  <div class="card">
+    <div class="upload">
+      <div style="font-size:40px">☁️</div>
+      <div style="margin-top:6px;">拖拽或点击上传文件至此处</div>
+      <div class="small">支持 PDF/JPEG/PNG</div>
+      <div class="row" style="margin-top:10px;">
+        <a class="btn">选择文件</a>
+      </div>
+    </div>
+    <div style="margin-top:12px;">
+      <div class="small">处理中… 50%</div>
+      <div class="progress"><span style="width:50%"></span></div>
+    </div>
+  </div>
+
+  <div class="card" id="historyCard">
+    <div class="card-title">历史报告</div>
+    <div class="list"></div>
+  </div>
+
+
+
+  <script>
+    // 简单的日期筛选分组（原型）
+    (function(){
+      const list = [
+        {t:'银行流水报告',d:'2023-07-15',href:'report.html?type=liushui&title=银行流水报告&date=2023-07-15'},
+        {t:'工商银行流水',d:'2023-07-10',href:'report.html?type=liushui&title=工商银行流水&date=2023-07-10'},
+        {t:'建行银行流水',d:'2023-07-08',href:'report.html?type=liushui&title=建行银行流水&date=2023-07-08'}
+      ];
+      function daysBetween(str){ return Math.floor((Date.now()-new Date(str).getTime())/86400000); }
+      function render(range){
+        const card = document.getElementById('historyCard');
+        let groups = {最近:'',更早:''};
+        list.forEach(i=>{
+          const within = range==='all' || daysBetween(i.d) <= Number(range);
+          if(!within) return;
+          const g = daysBetween(i.d)<=7 ? '最近' : '更早';
+          const row = `<a class="item" href="${i.href}"><div class="icon">🏦</div><div class="meta"><div class="title">${i.t} <span class="tag blue">流水</span></div><div class="sub">${i.d}</div></div><div class="right">→</div></a>`;
+          groups[g]+=row;
+        });
+        card.innerHTML = `<div class="card-title">历史报告</div>` +
+          (groups.最近?`<div class="group-h">最近</div><div class="list">${groups.最近}</div>`:'')+
+          (groups.更早?`<div class="group-h">更早</div><div class="list">${groups.更早}</div>`:'');
+      }
+      render('all');
+      const filters = document.getElementById('filters');
+      if (filters) {
+        filters.addEventListener('click', e=>{
+          const c = e.target.closest('.chip'); if(!c) return;
+          filters.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+          c.classList.add('active');
+          render(c.dataset.range);
+        });
+      }
+    })();
+  </script>
+
+
+
+</div>
+</body>
+</html>
+

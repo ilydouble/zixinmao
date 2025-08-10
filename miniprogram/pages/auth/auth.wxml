@@ -1,0 +1,94 @@
+<!--auth.wxml-->
+<view class="container">
+  <view class="auth-content">
+    <!-- 头部说明 -->
+    <view class="auth-header">
+      <view class="auth-icon">🔐</view>
+      <view class="auth-title">实名认证</view>
+      <view class="auth-desc">为了保障您的权益和数据安全，使用征信相关功能需要进行实名认证</view>
+    </view>
+
+    <!-- 认证表单 -->
+    <view class="auth-form">
+      <view class="form-item">
+        <view class="form-label">真实姓名</view>
+        <input 
+          class="form-input"
+          placeholder="请输入真实姓名"
+          value="{{formData.realName}}"
+          data-field="realName"
+          bind:input="onInputChange"
+        />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">身份证号</view>
+        <input 
+          class="form-input"
+          placeholder="请输入身份证号"
+          value="{{formData.idCard}}"
+          data-field="idCard"
+          bind:input="onInputChange"
+        />
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">手机号码</view>
+        <input 
+          class="form-input"
+          placeholder="请输入手机号码"
+          type="number"
+          value="{{formData.phone}}"
+          data-field="phone"
+          bind:input="onInputChange"
+        />
+      </view>
+    </view>
+
+    <!-- 协议勾选 -->
+    <view class="agreement-section">
+      <view class="agreement-item">
+        <checkbox-group bind:change="onAgreementChange" data-agreement="userAgreement">
+          <checkbox value="agree" checked="{{agreements.userAgreement}}" />
+        </checkbox-group>
+        <text class="agreement-text">
+          我已阅读并同意
+          <text class="agreement-link" data-type="user" bind:tap="onViewAgreement">《用户协议》</text>
+        </text>
+      </view>
+
+      <view class="agreement-item">
+        <checkbox-group bind:change="onAgreementChange" data-agreement="privacyPolicy">
+          <checkbox value="agree" checked="{{agreements.privacyPolicy}}" />
+        </checkbox-group>
+        <text class="agreement-text">
+          我已阅读并同意
+          <text class="agreement-link" data-type="privacy" bind:tap="onViewAgreement">《隐私政策》</text>
+        </text>
+      </view>
+    </view>
+
+    <!-- 提交按钮 -->
+    <view class="submit-section">
+      <t-button 
+        theme="primary" 
+        size="large" 
+        block
+        loading="{{loading}}"
+        bind:tap="onSubmit"
+      >
+        提交认证
+      </t-button>
+    </view>
+
+    <!-- 安全提示 -->
+    <view class="security-tips">
+      <view class="tips-title">🛡️ 安全承诺</view>
+      <view class="tips-content">
+        • 您的个人信息将严格加密保护<br/>
+        • 仅用于身份验证，不会泄露给第三方<br/>
+        • 符合国家信息安全相关法规要求
+      </view>
+    </view>
+  </view>
+</view>

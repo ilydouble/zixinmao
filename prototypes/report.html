@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>报告查看 · 原型</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .report { margin: 12px; padding: 14px; background: #fff; border-radius: 14px; box-shadow: 0 6px 14px rgba(20,50,120,0.06); }
+    .report h2 { margin: 6px 0 4px; }
+    .report .meta { color:#6b7280; font-size:12px; margin-bottom:10px; }
+    .section { margin-top:10px; padding-top:6px; border-top:1px dashed #e5e7eb; }
+    .kv { display:grid; grid-template-columns: 100px 1fr; gap:8px; font-size:13px; color:#374151; }
+    .kv div:nth-child(odd) { color:#6b7280; }
+    .score { font-size:40px; font-weight:700; color:#2563eb; }
+    .table { width:100%; border-collapse: collapse; font-size:12px; margin-top:6px; }
+    .table th, .table td { border-bottom: 1px solid #eef2f7; padding:6px; text-align:left; }
+    canvas.spark { width: 100%; height: 80px; background: #f8fafc; border-radius: 8px; }
+
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="navbar light">
+  <div class="card" style="margin:12px; display:flex; gap:8px;">
+    <a class="btn" id="btnDownload">下载PDF/导出</a>
+    <a class="btn ghost" id="btnShare">分享</a>
+  </div>
+
+    <a class="back" href="javascript:history.back()">←</a>
+    <div class="title">报告查看</div>
+    <div class="space"></div>
+  </div>
+
+  <div class="report">
+    <div id="rTitle" style="font-weight:700; font-size:18px;">报告标题</div>
+    <div class="meta">类型：<span id="rType">-</span> · 日期：<span id="rDate">-</span></div>
+
+    <div id="rContent"></div>
+  </div>
+
+  <script>
+    (function(){
+      // 读取参数
+      const q = new URLSearchParams(location.search);
+      const type = q.get('type') || 'liushui';
+      const title = decodeURIComponent(q.get('title')||'报告');
+      const date = q.get('date') || '';
+      document.getElementById('rTitle').textContent = title;
+      document.getElementById('rType').textContent = ({liushui:'银行流水', jianxin:'征信简版', zhuanxin:'征信详版'})[type] || type;
+      document.getElementById('rDate').textContent = date;
+
+      const c = document.getElementById('rContent');
+      if(type==='liushui'){
+        c.innerHTML = `
+          <div class="section">
+            <div class="kv">
+              <div>开户行</div><div>中国工商银行</div>
+              <div>账户</div><div>6222 **** **** 1234</div>
+              <div>期间</div><div>${date} 至 ${date}</div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="card-title">收支概览</div>
+            <div class="row" style="justify-content:space-between;">
+              <div>收入：<b>¥52,340.00</b></div>
+              <div>支出：<b>¥41,120.50</b></div>
+            </div>
+            <div class="pie" style="margin-top:8px;"></div>
+            <canvas class="spark" id="spark1"></canvas>
+          </div>
+          <div class="section">
+            <div class="card-title">交易明细（示例）</div>
+            <table class="table">
+              <tr><th>日期</th><th>摘要</th><th>收入</th><th>支出</th><th>余额</th></tr>
+              <tr><td>${date}</td><td>工资入账</td><td>12,000.00</td><td>-</td><td>22,300.00</td></tr>
+              <tr><td>${date}</td><td>餐饮消费</td><td>-</td><td>180.50</td><td>22,119.50</td></tr>
+            </table>
+          </div>
+        `;
+      } else if(type==='jianxin'){
+        c.innerHTML = `
+          <div class="section">
+            <div class="kv">
+              <div>姓名</div><div>张三</div>
+              <div>身份证号</div><div>1101**********1234</div>
+              <div>报告日期</div><div>${date}</div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="card-title">核心评分</div>
+            <div class="score">87</div>
+            <div class="small">信用良好 · 无逾期</div>
+          </div>
+          <div class="section">
+            <div class="card-title">关键指标</div>
+            <table class="table">
+              <tr><th>指标</th><th>结果</th></tr>
+              <tr><td>近12个月逾期</td><td>0</td></tr>
+              <tr><td>信用卡使用率</td><td>18%</td></tr>
+            </table>
+          </div>
+        `;
+      } else if(type==='zhuanxin'){
+        c.innerHTML = `
+          <div class="section">
+            <div class="kv">
+              <div>姓名</div><div>李四</div>
+              <div>身份证号</div><div>3205**********5678</div>
+              <div>报告日期</div><div>${date}</div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="card-title">综合评分</div>
+            <div class="score">92</div>
+            <div class="small">信用优质</div>
+          </div>
+          <div class="section">
+            <div class="card-title">负债与授信</div>
+            <table class="table">
+              <tr><th>项目</th><th>数值</th></tr>
+              <tr><td>总授信额度</td><td>180,000</td></tr>
+              <tr><td>当前负债</td><td>35,600</td></tr>
+            </table>
+
+          </div>
+        `;
+      }
+      // 绑定导出/分享按钮
+      const d = document.getElementById('btnDownload');
+      const s = document.getElementById('btnShare');
+      if (d) d.addEventListener('click', ()=> alert('已开始导出PDF（原型示意）'));
+      if (s) s.addEventListener('click', ()=>{
+        if (navigator.share) navigator.share({ title: document.title, text: '查看报告', url: location.href }).catch(()=>{});
+        else { navigator.clipboard?.writeText(location.href); alert('已复制分享链接'); }
+      });
+
+      // 如果存在简单图表画布，则绘制折线（仅流水类型有）
+      const cvs = document.getElementById('spark1');
+      if (cvs) {
+        const ctx = cvs.getContext('2d');
+        const w = cvs.width = cvs.clientWidth; const h = cvs.height = cvs.clientHeight;
+        const data = [20,40,35,50,38,60,70,65,80,72,88,90];
+        const max = Math.max(...data), min = Math.min(...data);
+        ctx.lineWidth = 2; ctx.strokeStyle = '#2563eb'; ctx.beginPath();
+        data.forEach((v,i)=>{
+          const x = i/(data.length-1)*w;
+          const y = h - (v-min)/(max-min) * (h-10) - 5;
+          if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        });
+        ctx.stroke();
+        const grad = ctx.createLinearGradient(0,0,0,h);
+        grad.addColorStop(0,'rgba(37,99,235,0.25)'); grad.addColorStop(1,'rgba(37,99,235,0)');
+        ctx.fillStyle = grad; ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); ctx.fill();
+      }
+
+    })();
+  </script>
+</div>
+</body>
+</html>
+

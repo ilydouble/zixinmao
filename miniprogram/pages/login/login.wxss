@@ -1,0 +1,94 @@
+/* login.wxss */
+.container {
+  height: 100vh;
+  background: linear-gradient(135deg, #0b3a95, #1e5bb8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 48rpx;
+}
+
+.login-content {
+  width: 100%;
+  max-width: 600rpx;
+  text-align: center;
+  color: #fff;
+}
+
+/* Logo 区域 */
+.logo-section {
+  margin-bottom: 120rpx;
+}
+
+.logo {
+  font-size: 160rpx;
+  margin-bottom: 32rpx;
+  animation: float 3s ease-in-out infinite;
+}
+
+.app-name {
+  font-size: 48rpx;
+  font-weight: 700;
+  margin-bottom: 16rpx;
+}
+
+.app-desc {
+  font-size: 28rpx;
+  opacity: 0.9;
+}
+
+/* 功能介绍 */
+.features {
+  margin-bottom: 120rpx;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32rpx;
+  opacity: 0.95;
+}
+
+.feature-icon {
+  font-size: 32rpx;
+  margin-right: 16rpx;
+}
+
+.feature-text {
+  font-size: 28rpx;
+}
+
+/* 登录按钮 */
+.login-actions {
+  margin-top: 80rpx;
+}
+
+.login-tips {
+  font-size: 24rpx;
+  opacity: 0.8;
+  margin-top: 32rpx;
+  line-height: 1.5;
+}
+
+/* 动画效果 */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20rpx);
+  }
+}
+
+/* 按钮样式覆盖 */
+.login-actions .t-button {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 2rpx solid rgba(255, 255, 255, 0.3) !important;
+  color: #fff !important;
+  backdrop-filter: blur(10rpx);
+}
+
+.login-actions .t-button:active {
+  background: rgba(255, 255, 255, 0.1) !important;
+}

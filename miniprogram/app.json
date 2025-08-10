@@ -1,0 +1,62 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/home/home",
+    "pages/login/login",
+    "pages/auth/auth",
+    "pages/liushui/liushui",
+    "pages/jianxin/jianxin",
+    "pages/zhuanxin/zhuanxin",
+    "pages/report/report",
+    "pages/center/center",
+    "pages/support/support",
+    "pages/orders/orders",
+    "pages/recharge/recharge",
+    "pages/balance/balance",
+    "pages/help/help",
+    "pages/settings/settings",
+    "pages/product-detail/product-detail"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#0b3a95",
+    "navigationBarTitleText": "资信猫",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f5f7fa"
+  },
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#0b3a95",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "position": "bottom",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "iconPath": "images/tab-home.png",
+        "selectedIconPath": "images/tab-home-active.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/center/center",
+        "iconPath": "images/tab-center.png",
+        "selectedIconPath": "images/tab-center-active.png",
+        "text": "个人中心"
+      }
+    ]
+  },
+  "cloud": true,
+  "style": "v2",
+  "componentFramework": "glass-easel",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "usingComponents": {
+    "t-button": "miniprogram_npm/tdesign-miniprogram/button/button",
+    "t-cell": "miniprogram_npm/tdesign-miniprogram/cell/cell",
+    "t-cell-group": "miniprogram_npm/tdesign-miniprogram/cell-group/cell-group",
+    "t-upload": "miniprogram_npm/tdesign-miniprogram/upload/upload",
+    "t-progress": "miniprogram_npm/tdesign-miniprogram/progress/progress",
+    "t-tag": "miniprogram_npm/tdesign-miniprogram/tag/tag",
+    "t-avatar": "miniprogram_npm/tdesign-miniprogram/avatar/avatar"
+  }
+}

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>首页 · 资信通</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="app">
+  <div class="navbar">
+    <div class="title">🐱 资信猫</div>
+    <div class="space"></div>
+    <div class="small">原型</div>
+  </div>
+
+  <div class="banner" id="homeBanner">
+    <div class="slides">
+      <a class="slide s1" href="#">
+        <div class="title">详版宝 · 个人客户详版征信解析</div>
+        <div class="sub">新手入口 · 一键生成详版征信报告</div>
+        <span class="pill">立即查看</span>
+      </a>
+      <a class="slide s2" href="#">
+        <div class="title">流水宝 · 银行流水分析</div>
+        <div class="sub">支持多类格式 · 智能识别消费与收入</div>
+        <span class="pill">去上传</span>
+      </a>
+      <a class="slide s3" href="#">
+        <div class="title">专信宝 · 全面信用分析</div>
+        <div class="sub">可视化指标 · 专家建议</div>
+        <span class="pill">立即体验</span>
+      </a>
+    </div>
+    <div class="dots"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
+  </div>
+
+  <script>
+    // 简单的自动轮播（纯原型）
+    (function(){
+      const banner = document.getElementById('homeBanner');
+      if(!banner) return;
+      const slides = banner.querySelector('.slides');
+      const dots = banner.querySelectorAll('.dot');
+      let i = 0; let n = dots.length;
+      setInterval(()=>{
+        i = (i + 1) % n;
+        slides.style.transform = `translateX(-${i*100}%)`;
+        dots.forEach((d,idx)=> d.classList.toggle('active', idx===i));
+      }, 3000);
+    })();
+  </script>
+
+  <script>
+    // 首页登录状态演示：未登录时，引导去登录（不强制跳转）
+    (function(){
+      const loggedIn = localStorage.getItem('isLoggedIn')==='1';
+      if(!loggedIn){
+        // 可以在需要时弹提示或弱引导；此处保持静默。
+      }
+    })();
+  </script>
+
+
+
+  <div class="card" style="background:#0b3a95; color:#fff;">
+    <div class="row" style="justify-content:space-between; align-items:center;">
+      <div style="font-weight:700; font-size:18px;">功能中心</div>
+      <div>🔔</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="grid">
+      <a class="qcard" href="page-liushui.html">
+        <div class="qicon">📊</div>
+        <div class="qtitle">流水宝</div>
+        <div class="qsub">登录后可用</div>
+      </a>
+      <a class="qcard" href="page-jianxin.html">
+        <div class="qicon">🚀</div>
+        <div class="qtitle">简信宝 <span class="badge">需认证</span></div>
+        <div class="qsub">认证后生成简版征信</div>
+      </a>
+      <a class="qcard" href="page-zhuanxin.html">
+        <div class="qicon">🧩</div>
+        <div class="qtitle">专信宝 <span class="badge">需认证</span></div>
+        <div class="qsub">认证后进行全面分析</div>
+      </a>
+      <a class="qcard" href="page-center.html">
+        <div class="qicon">👨</div>
+        <div class="qtitle">个人中心</div>
+        <div class="qsub">账户与设置</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="card" id="authCard">
+    <div class="row" style="justify-content:space-between;">
+      <div class="row"><div class="icon">🛡️</div><b id="authState">身份未认证</b></div>
+      <a class="btn small ghost" id="authAction" href="page-auth.html?return=page-home.html">立即认证</a>
+    </div>
+    <div class="small" style="margin-top:6px;">完成认证享受全额赔付保障</div>
+  </div>
+
+  <script>
+    // 首页根据认证状态更新UI
+    (function(){
+      const verified = localStorage.getItem('isVerified')==='1';
+      const state = document.getElementById('authState');
+      const action = document.getElementById('authAction');
+      if(verified){
+        state.textContent = '已完成实名认证';
+        action.textContent = '查看认证信息';
+        action.href = 'page-center.html#auth';
+      }
+    })();
+  </script>
+
+  <div class="card">
+    <div class="card-title">定制化产品服务</div>
+    <div class="p-list">
+      <a class="p-banner red" href="product-dianziqian.html">
+        <div>
+          <div class="title">电子签</div>
+          <div class="sub">本地化部署，为金融企业订制专属的线上签署系统</div>
+        </div>
+        <div class="illus">🖊️</div>
+      </a>
+      <a class="p-banner blue" href="product-sheloubao.html">
+        <div>
+          <div class="title">赊楼宝</div>
+          <div class="sub">赊楼系统，全流程ERP管控</div>
+        </div>
+        <div class="illus">🎁</div>
+        <div class="badge">激励计划</div>
+      </a>
+      <a class="p-banner purple" href="product-diyabao.html">
+        <div>
+          <div class="title">抵押宝</div>
+          <div class="sub">抵押贷产品解决方案 · 核心流程在线化</div>
+        </div>
+        <div class="illus">🏦</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="footer">
+    <a class="nav active" href="page-home.html">🏠<span>首页</span></a>
+    <a class="nav" href="page-center.html">👤<span>个人</span></a>
+  </div>
+</div>
+</body>
+</html>
+

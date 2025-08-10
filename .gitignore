@@ -1,0 +1,11 @@
+node_modules
+.env
+.env.local
+.env.development
+.env.production
+miniprogram_npm
+dist
+.wxml
+.vscode
+.idea
+.Ds_Store

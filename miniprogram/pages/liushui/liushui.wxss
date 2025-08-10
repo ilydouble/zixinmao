@@ -1,0 +1,226 @@
+/* liushui.wxss */
+.container {
+  background: #f5f7fa;
+  min-height: 100vh;
+  padding-bottom: 120rpx;
+}
+
+/* 标签导航 */
+.tabs {
+  display: flex;
+  background: #fff;
+  margin: 24rpx;
+  border-radius: 16rpx;
+  padding: 8rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 0;
+  font-size: 28rpx;
+  color: #666;
+  border-radius: 12rpx;
+  transition: all 0.3s ease;
+}
+
+.tab.active {
+  background: #0b3a95;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* 上传卡片 */
+.upload-card {
+  margin-bottom: 24rpx;
+}
+
+.upload-area {
+  text-align: center;
+  padding: 60rpx 40rpx;
+  border: 2rpx dashed #d9d9d9;
+  border-radius: 12rpx;
+  background: #fafafa;
+  transition: all 0.3s ease;
+}
+
+.upload-area:active {
+  border-color: #0b3a95;
+  background: #f6f8ff;
+}
+
+.upload-icon {
+  font-size: 80rpx;
+  margin-bottom: 16rpx;
+}
+
+.upload-text {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.upload-desc {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 已选择文件 */
+.selected-file {
+  padding: 24rpx;
+  background: #f8fafc;
+  border-radius: 12rpx;
+  border: 2rpx solid #e2e8f0;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+}
+
+.file-icon {
+  font-size: 48rpx;
+  margin-right: 24rpx;
+}
+
+.file-details {
+  flex: 1;
+}
+
+.file-name {
+  font-size: 28rpx;
+  color: #1a1a1a;
+  margin-bottom: 8rpx;
+  font-weight: 600;
+}
+
+.file-size {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.file-actions {
+  margin-left: 24rpx;
+}
+
+.remove-btn {
+  width: 48rpx;
+  height: 48rpx;
+  background: #ef4444;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+}
+
+/* 进度区域 */
+.progress-section {
+  margin-top: 24rpx;
+}
+
+.progress-text {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 16rpx;
+  text-align: center;
+}
+
+/* 操作区域 */
+.action-section {
+  margin-top: 32rpx;
+}
+
+/* 历史报告卡片 */
+.history-card {
+  margin-bottom: 24rpx;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.date-filter {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.filter-text {
+  padding: 8rpx 16rpx;
+  background: #f5f7fa;
+  border-radius: 8rpx;
+}
+
+/* 报告列表 */
+.report-list {
+  /* 样式继承自全局 list-item */
+}
+
+.report-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.report-item:last-child {
+  border-bottom: none;
+}
+
+.report-item:active {
+  background-color: #f8fafc;
+}
+
+.report-icon {
+  width: 48rpx;
+  height: 48rpx;
+  margin-right: 24rpx;
+  font-size: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.report-info {
+  flex: 1;
+}
+
+.report-title {
+  font-size: 28rpx;
+  color: #1a1a1a;
+  margin-bottom: 8rpx;
+  font-weight: 600;
+}
+
+.report-date {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.report-arrow {
+  color: #ccc;
+  font-size: 24rpx;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 80rpx 40rpx;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 24rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999;
+}
