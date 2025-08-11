@@ -1,0 +1,53 @@
+<!--test.wxml-->
+<view class="container">
+  <view class="test-section">
+    <view class="section-title">项目初始化</view>
+    <view class="test-item">
+      <t-button theme="primary" bind:tap="testInitStorage">测试存储结构初始化</t-button>
+    </view>
+    <view class="test-item">
+      <t-button theme="primary" bind:tap="testInitDatabase">测试数据库初始化</t-button>
+    </view>
+  </view>
+
+  <view class="test-section">
+    <view class="section-title">云函数测试</view>
+    
+    <view class="test-item">
+      <t-button theme="primary" bind:tap="testLogin">测试登录</t-button>
+    </view>
+    
+    <view class="test-item">
+      <t-button theme="primary" bind:tap="testGetUserInfo">获取用户信息</t-button>
+    </view>
+    
+    <view class="test-item">
+      <t-button theme="primary" bind:tap="testUpdateUserInfo">更新用户信息</t-button>
+    </view>
+    
+    <view class="test-item">
+      <t-button theme="primary" bind:tap="testRealNameAuth">测试实名认证</t-button>
+    </view>
+
+    <view class="test-item">
+      <t-button theme="success" bind:tap="testSetUserLocation">设置用户组织和城市</t-button>
+    </view>
+
+    <view class="test-item">
+      <t-button theme="warning" bind:tap="testVerifyDisplay">验证个人中心显示</t-button>
+    </view>
+
+    <view class="test-item">
+      <t-button theme="light" bind:tap="testDisplayStates">测试不同显示状态</t-button>
+    </view>
+
+    <view class="test-item">
+      <t-button theme="danger" bind:tap="testCreateOrders">创建测试订单数据</t-button>
+    </view>
+  </view>
+
+  <view class="result-section" wx:if="{{testResult}}">
+    <view class="section-title">测试结果</view>
+    <text class="result-text">{{testResult}}</text>
+  </view>
+</view>

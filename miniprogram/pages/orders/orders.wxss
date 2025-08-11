@@ -1,57 +1,30 @@
 /* orders.wxss */
 .container {
-  background: #f5f7fa;
   min-height: 100vh;
-  padding: 24rpx;
+  background: #f5f7fa;
 }
 
+/* 订单内容 */
 .orders-content {
-  /* 订单内容 */
+  padding: 0;
 }
 
-/* 订单列表 */
 .orders-list {
-  /* 订单列表容器 */
+  background: white;
 }
 
 .order-item {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 32rpx;
-  margin-bottom: 24rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s ease;
+  border-bottom: 1rpx solid #f0f0f0;
+  padding: 32rpx 32rpx;
+  transition: background-color 0.2s ease;
 }
 
 .order-item:active {
-  transform: scale(0.98);
+  background-color: #f8f9fa;
 }
 
-.order-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16rpx;
-}
-
-.order-title {
-  flex: 1;
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-right: 16rpx;
-}
-
-.order-status {
-  padding: 8rpx 16rpx;
-  border-radius: 12rpx;
-  font-size: 22rpx;
-  font-weight: 600;
-}
-
-.order-status.success {
-  background: #dcfce7;
-  color: #16a34a;
+.order-item:last-child {
+  border-bottom: none;
 }
 
 .order-info {
@@ -60,30 +33,92 @@
   align-items: center;
 }
 
+.order-left {
+  flex: 1;
+}
+
+.order-title {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 8rpx;
+}
+
 .order-date {
-  font-size: 24rpx;
-  color: #666;
+  font-size: 26rpx;
+  color: #999;
+}
+
+.order-right {
+  text-align: right;
+  flex-shrink: 0;
 }
 
 .order-amount {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8rpx;
+}
+
+.order-status {
+  font-size: 24rpx;
+  font-weight: 500;
+  padding: 6rpx 16rpx;
+  border-radius: 12rpx;
+  color: white;
+  display: inline-block;
+}
+
+.status-pending {
+  background: #fa8c16;
+}
+
+.status-processing {
+  background: #1890ff;
+}
+
+.status-completed {
+  background: #52c41a;
+}
+
+.status-failed {
+  background: #ff4d4f;
+}
+
+.status-cancelled {
+  background: #999;
+}
+
+/* 加载状态 */
+.loading-state {
+  text-align: center;
+  padding: 80rpx 40rpx;
+  background: white;
+}
+
+.loading-text {
   font-size: 28rpx;
-  font-weight: 700;
-  color: #0b3a95;
+  color: #999;
 }
 
 /* 空状态 */
 .empty-state {
   text-align: center;
-  padding: 120rpx 40rpx;
-}
-
-.empty-icon {
-  font-size: 120rpx;
-  margin-bottom: 24rpx;
-  opacity: 0.5;
+  padding: 160rpx 40rpx;
+  background: white;
 }
 
 .empty-text {
-  font-size: 28rpx;
+  font-size: 30rpx;
   color: #999;
+}
+
+/* 加载更多提示 */
+.load-more-tip {
+  text-align: center;
+  padding: 40rpx;
+  font-size: 26rpx;
+  color: #999;
+  background: #f5f7fa;
 }

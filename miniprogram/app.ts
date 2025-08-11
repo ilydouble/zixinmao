@@ -36,22 +36,14 @@ App<IAppOption>({
       console.error('请使用 2.2.3 或以上的基础库以使用云能力')
     } else {
       wx.cloud.init({
-        env: 'zixinmao-6gze9a8pef07503b', // 云开发环境ID，需要替换为实际环境
+        env: 'zixinmao-6gze9a8pef07503b', // 云开发环境ID
         traceUser: true,
       })
     }
 
-    // 检查登录状态（临时注释掉实际登录逻辑，用于调试）
-    // this.checkLoginStatus()
-    
-    // 临时设置为已登录状态，方便调试后续功能
-    this.globalData.userInfo = {
-      openid: 'debug_user_001',
-      nickName: '调试用户',
-      avatarUrl: '',
-      realNameVerified: true
-    }
-    this.globalData.isLoggedIn = true
+
+    // 检查登录状态
+    this.checkLoginStatus()
   },
 
   onShow() {
@@ -61,23 +53,21 @@ App<IAppOption>({
 
   // 检查登录状态
   checkLoginStatus() {
-    // 临时注释掉实际登录检查逻辑
-    /*
-    const userInfo = wx.getStorageSync('userInfo') as UserInfo
-    if (userInfo && userInfo.openid) {
-      this.globalData.userInfo = userInfo
-      this.globalData.isLoggedIn = true
+    // 从本地存储检查登录状态
+    try {
+      const userInfo = wx.getStorageSync('userInfo')
+      if (userInfo && userInfo.openid) {
+        this.globalData.userInfo = userInfo
+        this.globalData.isLoggedIn = true
+      } else {
+        this.globalData.userInfo = null
+        this.globalData.isLoggedIn = false
+      }
+    } catch (error) {
+      console.error('检查登录状态失败:', error)
+      this.globalData.userInfo = null
+      this.globalData.isLoggedIn = false
     }
-    */
-    
-    // 临时设置为已登录状态
-    this.globalData.userInfo = {
-      openid: 'debug_user_001',
-      nickName: '调试用户',
-      avatarUrl: '',
-      realNameVerified: true
-    }
-    this.globalData.isLoggedIn = true
   },
 
   // 检查小程序更新

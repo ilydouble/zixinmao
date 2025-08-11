@@ -1,3 +1,5 @@
 {
-  "navigationBarTitleText": "我的余额"
+  "navigationBarTitleText": "我的余额",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#f5f7fa"
 }

@@ -1,5 +1,6 @@
 <!--home.wxml-->
 <view class="container">
+
   <!-- 顶部安全区占位，避免与状态栏重叠 -->
   <view class="status-bar-spacer header-bg" style="height: {{statusBarHeight}}px;"></view>
 

@@ -1,5 +1,5 @@
 // jianxin.ts - 简信宝页面
-import authService from '../../services/auth'
+import { needRealNameAuth } from '../../utils/auth'
 import { fileApi, reportApi, mockApi } from '../../services/api'
 import { showLoading, hideLoading, showSuccess, showError, isSupportedFileType } from '../../utils/util'
 
@@ -40,7 +40,7 @@ Page({
    * 检查认证状态
    */
   checkAuth() {
-    const needAuth = authService.needRealNameAuth()
+    const needAuth = needRealNameAuth()
     this.setData({ needAuth })
   },
 

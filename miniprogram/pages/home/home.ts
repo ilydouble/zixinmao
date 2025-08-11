@@ -1,5 +1,5 @@
 // home.ts - 首页
-import authService from '../../services/auth'
+import { getCurrentUser, isAuthenticated, needRealNameAuth } from '../../utils/auth'
 
 Page({
   data: {
@@ -32,6 +32,7 @@ Page({
 
     this.checkAuth()
     this.loadUserInfo()
+    this.checkDevMode()
   },
 
   onShow() {
@@ -42,7 +43,8 @@ Page({
    * 检查登录状态
    */
   checkAuth() {
-    if (!authService.isAuthenticated()) {
+    // 如果未登录，跳转到登录页
+    if (!isAuthenticated()) {
       wx.redirectTo({
         url: '/pages/login/login'
       })
@@ -53,7 +55,7 @@ Page({
    * 加载用户信息
    */
   loadUserInfo() {
-    const userInfo = authService.getCurrentUser()
+    const userInfo = getCurrentUser()
     this.setData({ userInfo })
   },
 
@@ -83,7 +85,7 @@ Page({
     const { url } = e.currentTarget.dataset
 
     // 检查是否需要实名认证
-    if ((url.includes('jianxin') || url.includes('zhuanxin')) && authService.needRealNameAuth()) {
+    if ((url.includes('jianxin') || url.includes('zhuanxin')) && needRealNameAuth()) {
       wx.navigateTo({
         url: `/pages/auth/auth?return=${encodeURIComponent(url)}`
       })
@@ -100,6 +102,34 @@ Page({
     const { product } = e.currentTarget.dataset
     wx.navigateTo({
       url: `/pages/product-detail/product-detail?product=${product}`
+    })
+  },
+
+  /**
+   * 检查开发模式
+   */
+  checkDevMode() {
+    // 通过环境或其他方式判断是否为开发模式
+    const accountInfo = wx.getAccountInfoSync()
+    const isDev = accountInfo.miniProgram.envVersion === 'develop'
+    this.setData({ isDev })
+  },
+
+  /**
+   * 跳转到初始化页面
+   */
+  goToInit() {
+    wx.navigateTo({
+      url: '/pages/init/init'
+    })
+  },
+
+  /**
+   * 跳转到测试页面
+   */
+  goToTest() {
+    wx.navigateTo({
+      url: '/pages/test/test'
     })
   }
 })

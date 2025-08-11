@@ -1,33 +1,76 @@
 // balance.ts - 我的余额页面
 Page({
   data: {
-    balance: '256.00',
-    transactions: [
-      {
-        id: 'tx_001',
-        type: 'recharge',
-        title: '充值',
-        amount: '+¥200.00',
-        date: '2023-07-12 14:30',
-        status: 'success'
-      },
-      {
-        id: 'tx_002',
-        type: 'consume',
-        title: '购买征信简版',
-        amount: '-¥9.90',
-        date: '2023-07-10 09:15',
-        status: 'success'
-      },
-      {
-        id: 'tx_003',
-        type: 'consume',
-        title: '购买流水分析',
-        amount: '-¥29.00',
-        date: '2023-07-08 16:45',
-        status: 'success'
+    balance: '0.00',
+    formattedBalance: '¥0.00',
+    transactions: [],
+    loading: false,
+    userInfo: {
+      totalRecharge: 0,
+      totalConsumption: 0
+    }
+  },
+
+  /**
+   * 页面加载
+   */
+  onLoad() {
+    this.loadBalanceData()
+  },
+
+  /**
+   * 页面显示时刷新数据
+   */
+  onShow() {
+    this.loadBalanceData()
+  },
+
+  /**
+   * 下拉刷新
+   */
+  onPullDownRefresh() {
+    this.loadBalanceData()
+    wx.stopPullDownRefresh()
+  },
+
+  /**
+   * 加载余额数据
+   */
+  async loadBalanceData() {
+    if (this.data.loading) return
+
+    this.setData({ loading: true })
+
+    try {
+      const result = await wx.cloud.callFunction({
+        name: 'getUserBalance',
+        data: {
+          limit: 20 // 获取最近20条记录
+        }
+      })
+
+      const response = result.result as any
+
+      if (response.success) {
+        this.setData({
+          balance: response.data.balance.toFixed(2),
+          formattedBalance: response.data.formattedBalance,
+          transactions: response.data.transactions,
+          userInfo: response.data.userInfo,
+          loading: false
+        })
+      } else {
+        throw new Error(response.message)
       }
-    ]
+
+    } catch (error: any) {
+      console.error('加载余额数据失败:', error)
+      wx.showToast({
+        title: error.message || '加载失败',
+        icon: 'error'
+      })
+      this.setData({ loading: false })
+    }
   },
 
   /**
@@ -44,9 +87,30 @@ Page({
    */
   onViewTransaction(e: any) {
     const { transaction } = e.currentTarget.dataset
-    wx.showToast({
-      title: '交易详情功能开发中',
-      icon: 'none'
+
+    // 根据交易类型显示不同信息
+    let title = '交易详情'
+    let content = ''
+
+    if (transaction.type === 'recharge') {
+      title = '充值详情'
+      content = `充值金额：${transaction.amount}\n状态：${transaction.statusText}\n时间：${transaction.date}`
+      if (transaction.orderNo) {
+        content += `\n订单号：${transaction.orderNo}`
+      }
+    } else {
+      title = '消费详情'
+      content = `服务名称：${transaction.title}\n消费金额：${transaction.amount}\n状态：${transaction.statusText}\n时间：${transaction.date}`
+      if (transaction.orderNo) {
+        content += `\n订单号：${transaction.orderNo}`
+      }
+    }
+
+    wx.showModal({
+      title: title,
+      content: content,
+      showCancel: false,
+      confirmText: '确定'
     })
   }
 })

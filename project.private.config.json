@@ -19,5 +19,18 @@
     "checkInvalidKey": true,
     "ignoreDevUnusedFiles": true
   },
-  "libVersion": "3.9.0"
+  "libVersion": "3.9.0",
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "测试模式",
+          "pathName": "pages/test/test",
+          "query": "",
+          "scene": null,
+          "launchMode": "default"
+        }
+      ]
+    }
+  }
 }

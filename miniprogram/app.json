@@ -15,7 +15,8 @@
     "pages/balance/balance",
     "pages/help/help",
     "pages/settings/settings",
-    "pages/product-detail/product-detail"
+    "pages/product-detail/product-detail",
+    "pages/test/test"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -57,6 +58,7 @@
     "t-upload": "miniprogram_npm/tdesign-miniprogram/upload/upload",
     "t-progress": "miniprogram_npm/tdesign-miniprogram/progress/progress",
     "t-tag": "miniprogram_npm/tdesign-miniprogram/tag/tag",
-    "t-avatar": "miniprogram_npm/tdesign-miniprogram/avatar/avatar"
+    "t-avatar": "miniprogram_npm/tdesign-miniprogram/avatar/avatar",
+    "t-popup": "miniprogram_npm/tdesign-miniprogram/popup/popup"
   }
 }

@@ -1,5 +1,5 @@
 // login.ts - 登录页面
-import authService from '../../services/auth'
+import { login, getUserProfile, isAuthenticated } from '../../utils/auth'
 
 Page({
   data: {
@@ -7,8 +7,8 @@ Page({
   },
 
   onLoad() {
-    // 检查是否已登录
-    if (authService.isAuthenticated()) {
+    // 如果已登录，跳转到首页
+    if (isAuthenticated()) {
       wx.switchTab({
         url: '/pages/home/home'
       })
@@ -28,9 +28,9 @@ Page({
     })
 
     try {
-      await authService.login()
+      await login()
       wx.hideLoading()
-      
+
       // 登录成功，跳转到首页
       wx.switchTab({
         url: '/pages/home/home'
@@ -54,7 +54,7 @@ Page({
     if (this.data.loading) return
 
     try {
-      await authService.getUserProfile()
+      await getUserProfile()
       // 获取用户信息成功后自动登录
       await this.onWechatLogin()
     } catch (error: any) {

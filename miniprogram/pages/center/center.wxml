@@ -26,6 +26,25 @@
           />
           <text wx:else class="nickname-text">{{userInfo.nickName}}</text>
         </view>
+
+        <!-- 组织和城市信息 -->
+        <view class="user-location-info">
+          
+ 
+          <!-- 情况4：都没设置 - 显示完整设置提示 -->
+          <view wx:if="{{!userInfo.organizationName &&!userInfo.cityName}}" class="no-location-info">
+            <text class="info-placeholder" data-url="/pages/settings/settings" bind:tap="onNavigateToMenu">
+              点击设置所属组织和城市 →
+            </text>
+          </view>
+          <view wx:else>
+            <text class="info-placeholder">
+              <text class="tag-icon">🏠</text> {{userInfo.organizationName}}
+              <text class="tag-icon">📍</text> {{userInfo.cityName}}
+            </text>
+          </view>
+        </view>
+
         <view class="user-status">
           <text wx:if="{{userInfo.realNameVerified}}" class="verified">✅ 已实名认证</text>
           <text wx:else class="unverified">⚠️ 未实名认证</text>
@@ -45,23 +64,49 @@
     </view>
   </view>
 
-  <!-- 快捷统计 -->
-  <view wx:if="{{isLoggedIn}}" class="stats-section">
-    <view class="stats-grid">
-      <view class="stat-item" data-url="/pages/orders/orders" bind:tap="onNavigateToMenu">
-        <view class="stat-number">3</view>
-        <view class="stat-label">历史订单</view>
+  <!-- 账户信息卡片 -->
+  <view wx:if="{{isLoggedIn}}" class="account-section">
+    <view class="account-card">
+      <view class="account-header">
+        <text class="account-title">账户信息</text>
       </view>
-      <view class="stat-item" data-url="/pages/balance/balance" bind:tap="onNavigateToMenu">
-        <view class="stat-number">¥256</view>
-        <view class="stat-label">账户余额</view>
-      </view>
-      <view class="stat-item" data-url="/pages/help/help" bind:tap="onNavigateToMenu">
-        <view class="stat-number">24h</view>
-        <view class="stat-label">在线客服</view>
+
+      <view class="account-content">
+        <!-- 账户余额 -->
+        <view class="balance-info">
+          <view class="balance-item">
+            <text class="balance-label">账户余额</text>
+            <text class="balance-value">¥{{userInfo.balance || 0}}</text>
+          </view>
+          <view class="balance-actions">
+            <t-button theme="primary" size="small" bind:tap="onRecharge">充值</t-button>
+          </view>
+        </view>
+
+        <!-- 统计信息 -->
+        <view class="stats-grid">
+          <view class="stats-item">
+            <text class="stats-value">¥{{userInfo.totalConsumption || 0}}</text>
+            <text class="stats-label">总订单</text>
+          </view>
+          <view class="stats-item">
+            <text class="stats-value">¥{{userInfo.totalRecharge || 0}}</text>
+            <text class="stats-label">总充值</text>
+          </view>
+          <view class="stats-item">
+            <text class="stats-value">¥{{userInfo.orderStats.totalConsumption || 0}}</text>
+            <text class="stats-label">总消费</text>
+          </view>
+          <view class="stats-item">
+            <text class="stats-value">{{userInfo.orderStats.completedOrders || 0}}</text>
+            <text class="stats-label">已完成</text>
+          </view>
+        </view>
       </view>
     </view>
   </view>
+
+
 
   <!-- 功能菜单 -->
   <view class="menu-section">
@@ -73,6 +118,7 @@
         left-icon="{{item.icon}}"
         arrow
         data-url="{{item.url}}"
+        data-item="{{item}}"
         bind:click="onNavigateToMenu"
       />
     </t-cell-group>
@@ -89,6 +135,8 @@
       退出登录
     </t-button>
   </view>
+
+
 
   <!-- 版本信息 -->
   <view class="version-info">

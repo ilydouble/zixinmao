@@ -78,21 +78,24 @@
 }
 
 .transaction-icon {
+  margin-right: 24rpx;
+}
+
+.icon-circle {
   width: 48rpx;
   height: 48rpx;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 24rpx;
   font-size: 24rpx;
 }
 
-.transaction-icon.recharge {
+.icon-circle.recharge {
   background: #dcfce7;
 }
 
-.transaction-icon.consume {
+.icon-circle.consumption {
   background: #fee2e2;
 }
 
@@ -104,25 +107,40 @@
   font-size: 28rpx;
   color: #1a1a1a;
   margin-bottom: 8rpx;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .transaction-date {
   font-size: 24rpx;
-  color: #666;
+  color: #999;
 }
 
 .transaction-amount {
   font-size: 28rpx;
-  font-weight: 700;
+  font-weight: 600;
+  text-align: right;
 }
 
 .transaction-amount.recharge {
   color: #16a34a;
 }
 
-.transaction-amount.consume {
+.transaction-amount.consumption {
   color: #dc2626;
+}
+
+/* 加载状态 */
+.loading-state {
+  text-align: center;
+  padding: 60rpx 40rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #999;
 }
 
 /* 空状态 */
@@ -143,6 +161,12 @@
 .empty-text {
   font-size: 28rpx;
   color: #999;
+  margin-bottom: 12rpx;
+}
+
+.empty-tip {
+  font-size: 24rpx;
+  color: #ccc;
 }
 
 /* 余额说明 */

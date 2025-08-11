@@ -1,50 +1,241 @@
 // settings.ts - 设置页面
+import { getCurrentUser, updateUserInfo } from '../../utils/auth'
+
+// 组织接口
+interface Organization {
+  id: string
+  name: string
+  code: string
+  type: string
+  description?: string
+}
+
+// 城市接口
+interface City {
+  id: string
+  name: string
+  code: string
+  provinceCode: string
+  provinceName: string
+  level: string
+}
+
 Page({
   data: {
-    settings: {
-      darkMode: 'auto', // auto, light, dark
-      notifications: true,
-      autoUpdate: true
+    userSettings: {
+      organizationId: '',
+      organizationName: '',
+      cityCode: '',
+      cityName: ''
     },
-    darkModeOptions: [
-      { label: '跟随系统', value: 'auto' },
-      { label: '浅色模式', value: 'light' },
-      { label: '深色模式', value: 'dark' }
-    ]
+    organizations: [] as Organization[],
+    cities: [] as City[],
+    showOrgPicker: false,
+    showCityPicker: false,
+    orgPickerValue: [0],
+    cityPickerValue: [0],
+    selectedOrgIndex: 0,
+    selectedCityIndex: 0
+  },
+
+  onLoad() {
+    this.loadUserSettings()
+    this.loadOrganizations()
+    this.loadCities()
   },
 
   /**
-   * 切换深色模式
+   * 加载用户设置
    */
-  onDarkModeChange(e: any) {
-    const { value } = e.detail
+  loadUserSettings() {
+    const userInfo = getCurrentUser()
+    if (userInfo) {
+      this.setData({
+        userSettings: {
+          organizationId: userInfo.organizationId || '',
+          organizationName: userInfo.organizationName || '',
+          cityCode: userInfo.cityCode || '',
+          cityName: userInfo.cityName || ''
+        }
+      })
+    }
+  },
+
+  /**
+   * 加载组织列表
+   */
+  async loadOrganizations() {
+    try {
+      const result = await wx.cloud.callFunction({
+        name: 'getOrganizations',
+        data: {}
+      })
+      const response = result.result as any
+      if (response.success) {
+        this.setData({
+          organizations: response.data
+        })
+      }
+    } catch (error) {
+      console.error('加载组织列表失败:', error)
+    }
+  },
+
+  /**
+   * 加载城市列表
+   */
+  async loadCities() {
+    try {
+      const result = await wx.cloud.callFunction({
+        name: 'getCities',
+        data: {}
+      })
+      const response = result.result as any
+      if (response.success) {
+        this.setData({
+          cities: response.data
+        })
+      }
+    } catch (error) {
+      console.error('加载城市列表失败:', error)
+    }
+  },
+
+  /**
+   * 选择组织
+   */
+  onSelectOrganization() {
     this.setData({
-      'settings.darkMode': this.data.darkModeOptions[value].value
-    })
-    
-    wx.showToast({
-      title: '设置已保存',
-      icon: 'success'
+      showOrgPicker: true
     })
   },
 
   /**
-   * 切换通知设置
+   * 选择城市
    */
-  onNotificationChange(e: any) {
-    const { value } = e.detail
+  onSelectCity() {
     this.setData({
-      'settings.notifications': value.length > 0
+      showCityPicker: true
     })
   },
 
   /**
-   * 切换自动更新
+   * 组织选择器变化
    */
-  onAutoUpdateChange(e: any) {
+  onOrgPickerChange(e: any) {
     const { value } = e.detail
     this.setData({
-      'settings.autoUpdate': value.length > 0
+      orgPickerValue: value,
+      selectedOrgIndex: value[0]
+    })
+  },
+
+  /**
+   * 城市选择器变化
+   */
+  onCityPickerChange(e: any) {
+    const { value } = e.detail
+    this.setData({
+      cityPickerValue: value,
+      selectedCityIndex: value[0]
+    })
+  },
+
+  /**
+   * 确认选择组织
+   */
+  async onOrgConfirm() {
+    const { organizations, selectedOrgIndex } = this.data
+    const selectedOrg = organizations[selectedOrgIndex]
+
+    if (!selectedOrg) return
+
+    try {
+      wx.showLoading({ title: '保存中...' })
+
+      // 使用 updateUserInfo 统一更新用户信息
+     await updateUserInfo({
+        organizationId: selectedOrg.id,
+        organizationName: selectedOrg.name
+      })
+
+      // 更新本地状态
+      this.setData({
+        'userSettings.organizationId': selectedOrg.id,
+        'userSettings.organizationName': selectedOrg.name,
+        showOrgPicker: false
+      })
+
+      wx.showToast({
+        title: '设置已保存',
+        icon: 'success'
+      })
+
+    } catch (error: any) {
+      wx.showToast({
+        title: error.message || '保存失败',
+        icon: 'error'
+      })
+    } finally {
+      wx.hideLoading()
+    }
+  },
+
+  /**
+   * 确认选择城市
+   */
+  async onCityConfirm() {
+    const { cities, selectedCityIndex } = this.data
+    const selectedCity = cities[selectedCityIndex]
+
+    if (!selectedCity) return
+
+    try {
+      wx.showLoading({ title: '保存中...' })
+
+      // 使用 updateUserInfo 统一更新用户信息
+      await updateUserInfo({
+        cityCode: selectedCity.code,
+        cityName: selectedCity.name
+      })
+
+      // 更新本地状态
+      this.setData({
+        'userSettings.cityCode': selectedCity.code,
+        'userSettings.cityName': selectedCity.name,
+        showCityPicker: false
+      })
+
+      wx.showToast({
+        title: '设置已保存',
+        icon: 'success'
+      })
+
+    } catch (error: any) {
+      wx.showToast({
+        title: error.message || '保存失败',
+        icon: 'error'
+      })
+    } finally {
+      wx.hideLoading()
+    }
+  },
+
+  /**
+   * 关闭组织选择器
+   */
+  onOrgPickerClose() {
+    this.setData({
+      showOrgPicker: false
+    })
+  },
+
+  /**
+   * 关闭城市选择器
+   */
+  onCityPickerClose() {
+    this.setData({
+      showCityPicker: false
     })
   },
 
@@ -60,7 +251,7 @@ Page({
           wx.showLoading({
             title: '清除中...'
           })
-          
+
           setTimeout(() => {
             wx.hideLoading()
             wx.showToast({

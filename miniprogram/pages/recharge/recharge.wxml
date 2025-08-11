@@ -1,22 +1,37 @@
 <!--recharge.wxml-->
 <view class="container">
   <view class="recharge-content">
-    <!-- 套餐选择 -->
-    <view class="packages-section">
-      <view class="section-title">选择套餐</view>
-      <view class="packages-grid">
+    <!-- 充值金额选择 -->
+    <view class="amounts-section">
+      <view class="section-title">选择充值金额</view>
+      <view class="amounts-grid">
         <view
-          wx:for="{{packages}}"
+          wx:for="{{rechargeAmounts}}"
           wx:key="id"
-          class="package-item {{selectedPackage === item.id ? 'selected' : ''}}"
-          data-package-id="{{item.id}}"
-          bind:tap="onSelectPackage">
+          class="amount-item {{selectedAmount === item.id ? 'selected' : ''}}"
+          data-amount-id="{{item.id}}"
+          bind:tap="onSelectAmount">
           <view wx:if="{{item.popular}}" class="popular-badge">推荐</view>
-          <view class="package-price">¥{{item.price}}</view>
-          <view class="package-title">{{item.title}}</view>
-          <view class="package-desc">{{item.desc}}</view>
+          <view class="amount-price">{{item.title}}</view>
+          <view class="amount-desc">{{item.desc}}</view>
         </view>
       </view>
+    </view>
+
+    <!-- 自定义金额 -->
+    <view class="custom-amount-section">
+      <view class="section-title">自定义金额</view>
+      <view class="custom-input-wrapper">
+        <text class="currency-symbol">¥</text>
+        <input
+          class="custom-amount-input"
+          type="digit"
+          placeholder="请输入充值金额"
+          value="{{customAmount}}"
+          bind:input="onCustomAmountInput"
+        />
+      </view>
+      <view class="amount-tips">最低充值1元，最高单次充值10000元</view>
     </view>
 
     <!-- 支付方式 -->
@@ -39,16 +54,16 @@
         block
         bind:tap="onPay"
       >
-        立即支付
+        立即充值
       </t-button>
     </view>
 
-    <!-- 服务说明 -->
+    <!-- 充值说明 -->
     <view class="service-note">
-      <view class="note-title">💡 服务说明</view>
+      <view class="note-title">💡 充值说明</view>
       <view class="note-content">
-        • 购买后立即生效，有效期内无限制使用<br/>
-        • 支持7天无理由退款<br/>
+        • 充值金额将立即到账，可用于查询服务<br/>
+        • 支持微信支付，安全便捷<br/>
         • 如有问题请联系客服
       </view>
     </view>

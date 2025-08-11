@@ -1,55 +1,114 @@
 // recharge.ts - 会员充值页面
 Page({
   data: {
-    packages: [
+    // 充值金额选项
+    rechargeAmounts: [
       {
-        id: 'single',
-        title: '单次报告',
-        price: '9.90',
-        desc: '征信简版分析',
+        id: 'amount_50',
+        amount: 50,
+        title: '¥50',
+        desc: '适合轻度使用',
         popular: false
       },
       {
-        id: 'monthly',
-        title: '月卡会员',
-        price: '29',
-        desc: '流水分析 + 简版征信',
+        id: 'amount_100',
+        amount: 100,
+        title: '¥100',
+        desc: '推荐金额',
         popular: true
       },
       {
-        id: 'quarterly',
-        title: '季卡会员',
-        price: '99',
-        desc: '全功能无限制使用',
+        id: 'amount_200',
+        amount: 200,
+        title: '¥200',
+        desc: '更多优惠',
+        popular: false
+      },
+      {
+        id: 'amount_500',
+        amount: 500,
+        title: '¥500',
+        desc: '大额充值',
         popular: false
       }
     ],
-    selectedPackage: 'monthly'
+    selectedAmount: 'amount_100',
+    customAmount: '', // 自定义金额
+    useCustomAmount: false // 是否使用自定义金额
   },
 
   /**
-   * 选择套餐
+   * 选择充值金额
    */
-  onSelectPackage(e: any) {
-    const { packageId } = e.currentTarget.dataset
+  onSelectAmount(e: any) {
+    const { amountId } = e.currentTarget.dataset
     this.setData({
-      selectedPackage: packageId
+      selectedAmount: amountId,
+      useCustomAmount: false,
+      customAmount: ''
     })
+  },
+
+  /**
+   * 输入自定义金额
+   */
+  onCustomAmountInput(e: any) {
+    const value = e.detail.value
+    this.setData({
+      customAmount: value,
+      useCustomAmount: value.length > 0,
+      selectedAmount: ''
+    })
+  },
+
+  /**
+   * 获取当前选择的金额
+   */
+  getCurrentAmount() {
+    if (this.data.useCustomAmount && this.data.customAmount) {
+      return parseFloat(this.data.customAmount)
+    }
+
+    const selectedItem = this.data.rechargeAmounts.find(item => item.id === this.data.selectedAmount)
+    return selectedItem ? selectedItem.amount : 0
   },
 
   /**
    * 立即支付
    */
   onPay() {
-    const { selectedPackage, packages } = this.data
-    const selectedPkg = packages.find(pkg => pkg.id === selectedPackage)
-    
+    const amount = this.getCurrentAmount()
+
+    if (!amount || amount <= 0) {
+      wx.showToast({
+        title: '请选择充值金额',
+        icon: 'error'
+      })
+      return
+    }
+
+    if (amount < 1) {
+      wx.showToast({
+        title: '充值金额不能少于1元',
+        icon: 'error'
+      })
+      return
+    }
+
+    if (amount > 10000) {
+      wx.showToast({
+        title: '单次充值不能超过10000元',
+        icon: 'error'
+      })
+      return
+    }
+
     wx.showModal({
-      title: '确认支付',
-      content: `确认购买 ${selectedPkg?.title} (¥${selectedPkg?.price})？`,
+      title: '确认充值',
+      content: `确认充值 ¥${amount.toFixed(2)} 到账户余额？`,
       success: (res) => {
         if (res.confirm) {
-          this.processPayment()
+          this.processPayment(amount)
         }
       }
     })
@@ -58,23 +117,56 @@ Page({
   /**
    * 处理支付
    */
-  processPayment() {
-    wx.showLoading({
-      title: '支付中...'
-    })
-    
-    // 模拟支付过程
-    setTimeout(() => {
-      wx.hideLoading()
-      wx.showToast({
-        title: '支付成功',
-        icon: 'success'
+  async processPayment(amount: number) {
+    try {
+      wx.showLoading({
+        title: '处理中...'
       })
-      
-      // 延迟返回
-      setTimeout(() => {
-        wx.navigateBack()
-      }, 1500)
-    }, 2000)
+
+      // 调用云函数创建充值订单
+      const result = await wx.cloud.callFunction({
+        name: 'createRechargeOrder',
+        data: {
+          amount: amount,
+          paymentMethod: 'wechat_pay'
+        }
+      })
+
+      wx.hideLoading()
+
+      const response = result.result as any
+
+      if (response.success) {
+        // 充值成功
+        wx.showModal({
+          title: '充值成功',
+          content: `充值 ¥${amount} 已到账\n当前余额：¥${response.data.newBalance.toFixed(2)}`,
+          showCancel: false,
+          confirmText: '确定',
+          success: () => {
+            // 返回到余额页面
+            wx.navigateBack()
+          }
+        })
+      } else {
+        // 充值失败
+        wx.showModal({
+          title: '充值失败',
+          content: response.message || '充值过程中出现错误，请重试',
+          showCancel: false,
+          confirmText: '确定'
+        })
+      }
+
+    } catch (error: any) {
+      wx.hideLoading()
+      console.error('充值失败:', error)
+      wx.showModal({
+        title: '充值失败',
+        content: '网络错误，请检查网络连接后重试',
+        showCancel: false,
+        confirmText: '确定'
+      })
+    }
   }
 })

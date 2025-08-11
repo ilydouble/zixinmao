@@ -1,39 +1,22 @@
 <!--settings.wxml-->
 <view class="container">
   <view class="settings-content">
-    <!-- 外观设置 -->
+    <!-- 个人设置 -->
     <view class="settings-section">
-      <view class="section-title">外观设置</view>
+      <view class="section-title">个人设置</view>
       <t-cell-group>
-        <t-cell title="深色模式" arrow>
-          <picker 
-            mode="selector" 
-            range="{{darkModeOptions}}" 
-            range-key="label"
-            value="{{settings.darkMode}}"
-            bind:change="onDarkModeChange"
-          >
-            <view class="picker-text">
-              {{darkModeOptions[settings.darkMode] ? darkModeOptions[settings.darkMode].label : '跟随系统'}}
-            </view>
-          </picker>
+        <!-- 所属组织 -->
+        <t-cell title="所属组织" arrow bind:click="onSelectOrganization">
+          <view class="picker-text">
+            {{userSettings.organizationName || '请选择组织'}}
+          </view>
         </t-cell>
-      </t-cell-group>
-    </view>
 
-    <!-- 通知设置 -->
-    <view class="settings-section">
-      <view class="section-title">通知设置</view>
-      <t-cell-group>
-        <t-cell title="推送通知">
-          <checkbox-group bind:change="onNotificationChange">
-            <checkbox value="enable" checked="{{settings.notifications}}" />
-          </checkbox-group>
-        </t-cell>
-        <t-cell title="自动更新">
-          <checkbox-group bind:change="onAutoUpdateChange">
-            <checkbox value="enable" checked="{{settings.autoUpdate}}" />
-          </checkbox-group>
+        <!-- 所属城市 -->
+        <t-cell title="所属城市" arrow bind:click="onSelectCity">
+          <view class="picker-text">
+            {{userSettings.cityName || '请选择城市'}}
+          </view>
         </t-cell>
       </t-cell-group>
     </view>
@@ -64,4 +47,40 @@
       <view class="copyright">© 2023 资信猫团队</view>
     </view>
   </view>
+
+  <!-- 组织选择弹窗 -->
+  <t-popup visible="{{showOrgPicker}}" placement="bottom" bind:visible-change="onOrgPickerClose">
+    <view class="picker-popup">
+      <view class="picker-header">
+        <view class="picker-cancel" bind:tap="onOrgPickerClose">取消</view>
+        <view class="picker-title">选择组织</view>
+        <view class="picker-confirm" bind:tap="onOrgConfirm">确定</view>
+      </view>
+      <picker-view class="picker-view" value="{{orgPickerValue}}" bind:change="onOrgPickerChange">
+        <picker-view-column>
+          <view wx:for="{{organizations}}" wx:key="id" class="picker-item">
+            {{item.name}}
+          </view>
+        </picker-view-column>
+      </picker-view>
+    </view>
+  </t-popup>
+
+  <!-- 城市选择弹窗 -->
+  <t-popup visible="{{showCityPicker}}" placement="bottom" bind:visible-change="onCityPickerClose">
+    <view class="picker-popup">
+      <view class="picker-header">
+        <view class="picker-cancel" bind:tap="onCityPickerClose">取消</view>
+        <view class="picker-title">选择城市</view>
+        <view class="picker-confirm" bind:tap="onCityConfirm">确定</view>
+      </view>
+      <picker-view class="picker-view" value="{{cityPickerValue}}" bind:change="onCityPickerChange">
+        <picker-view-column>
+          <view wx:for="{{cities}}" wx:key="id" class="picker-item">
+            {{item.name}}
+          </view>
+        </picker-view-column>
+      </picker-view>
+    </view>
+  </t-popup>
 </view>

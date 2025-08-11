@@ -3,28 +3,41 @@
   <view class="orders-content">
     <!-- 订单列表 -->
     <view wx:if="{{orders.length > 0}}" class="orders-list">
-      <view 
-        wx:for="{{orders}}" 
+      <view
+        wx:for="{{orders}}"
         wx:key="id"
         class="order-item"
         data-order="{{item}}"
         bind:tap="onViewOrder"
       >
-        <view class="order-header">
-          <view class="order-title">{{item.title}}</view>
-          <view class="order-status success">{{item.status}}</view>
-        </view>
         <view class="order-info">
-          <view class="order-date">{{item.date}}</view>
-          <view class="order-amount">{{item.amount}}</view>
+          <view class="order-left">
+            <view class="order-title">{{item.productName}}</view>
+            <view class="order-date">{{item.formattedDate}}</view>
+          </view>
+          <view class="order-right">
+            <view class="order-amount">{{item.formattedAmount}}</view>
+            <view class="order-status status-{{item.status}}">
+              {{item.statusText}}
+            </view>
+          </view>
         </view>
       </view>
     </view>
 
+    <!-- 加载状态 -->
+    <view wx:if="{{loading}}" class="loading-state">
+      <view class="loading-text">加载中...</view>
+    </view>
+
     <!-- 空状态 -->
-    <view wx:else class="empty-state">
-      <view class="empty-icon">🧾</view>
-      <view class="empty-text">暂无订单记录</view>
+    <view wx:elif="{{orders.length === 0}}" class="empty-state">
+      <view class="empty-text">没有更多订单了</view>
+    </view>
+
+    <!-- 加载更多提示 -->
+    <view wx:if="{{orders.length > 0 && !hasMore}}" class="load-more-tip">
+      没有更多订单了
     </view>
   </view>
 </view>

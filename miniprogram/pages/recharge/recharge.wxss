@@ -18,28 +18,28 @@
   margin-bottom: 24rpx;
 }
 
-/* 套餐区域 */
-.packages-section {
+/* 充值金额区域 */
+.amounts-section {
   margin-bottom: 32rpx;
 }
 
-.packages-grid {
+.amounts-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 16rpx;
 }
 
-.package-item {
+.amount-item {
   background: #fff;
   border: 2rpx solid #e5e7eb;
   border-radius: 16rpx;
-  padding: 24rpx 16rpx;
+  padding: 32rpx 24rpx;
   text-align: center;
   position: relative;
   transition: all 0.3s ease;
 }
 
-.package-item.selected {
+.amount-item.selected {
   border-color: #0b3a95;
   background: #f6f8ff;
 }
@@ -56,24 +56,53 @@
   font-weight: 600;
 }
 
-.package-price {
-  font-size: 36rpx;
+.amount-price {
+  font-size: 40rpx;
   font-weight: 700;
   color: #0b3a95;
-  margin-bottom: 8rpx;
+  margin-bottom: 12rpx;
 }
 
-.package-title {
-  font-size: 26rpx;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 8rpx;
-}
-
-.package-desc {
-  font-size: 22rpx;
+.amount-desc {
+  font-size: 24rpx;
   color: #666;
-  line-height: 1.3;
+  line-height: 1.4;
+}
+
+/* 自定义金额区域 */
+.custom-amount-section {
+  margin-bottom: 32rpx;
+}
+
+.custom-input-wrapper {
+  background: #fff;
+  border: 2rpx solid #e5e7eb;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.currency-symbol {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #0b3a95;
+  margin-right: 12rpx;
+}
+
+.custom-amount-input {
+  flex: 1;
+  font-size: 32rpx;
+  color: #1a1a1a;
+  border: none;
+  outline: none;
+}
+
+.amount-tips {
+  font-size: 24rpx;
+  color: #999;
+  text-align: center;
 }
 
 /* 支付方式 */

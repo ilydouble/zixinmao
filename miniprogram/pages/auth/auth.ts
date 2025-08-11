@@ -1,6 +1,6 @@
 // auth.ts - 实名认证页面
-import authService from '../../services/auth'
 import { showLoading, hideLoading, showSuccess, showError } from '../../utils/util'
+import { realNameAuth, needRealNameAuth } from '../../utils/auth'
 
 Page({
   data: {
@@ -26,7 +26,7 @@ Page({
     }
 
     // 检查是否已认证
-    if (!authService.needRealNameAuth()) {
+    if (!needRealNameAuth()) {
       this.redirectToReturn()
     }
   },
@@ -108,10 +108,10 @@ Page({
     showLoading('认证中...')
     
     try {
-      await authService.realNameAuth(this.data.formData)
+      const { realName, idCard, phone } = this.data.formData
+      await realNameAuth(realName, idCard, phone)
       hideLoading()
-      showSuccess('实名认证成功')
-      
+
       // 延迟跳转
       setTimeout(() => {
         this.redirectToReturn()

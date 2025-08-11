@@ -1,5 +1,5 @@
 // index.ts - 入口页面
-import authService from '../../services/auth'
+import { isAuthenticated } from '../../utils/auth'
 
 Page({
   data: {
@@ -16,7 +16,7 @@ Page({
   async checkAuthAndRedirect() {
     try {
       // 检查本地登录状态
-      const isLoggedIn = authService.checkLoginStatus()
+      const isLoggedIn = isAuthenticated()
 
       if (isLoggedIn) {
         // 已登录，跳转到首页（使用 switchTab）

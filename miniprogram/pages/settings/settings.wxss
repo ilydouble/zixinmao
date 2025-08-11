@@ -52,16 +52,43 @@
   font-size: 24rpx;
 }
 
-/* 复选框样式调整 */
-checkbox {
-  transform: scale(0.8);
+/* 选择器弹窗 */
+.picker-popup {
+  background: white;
+  border-radius: 24rpx 24rpx 0 0;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
-checkbox .wx-checkbox-input {
-  border-radius: 6rpx;
+.picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx 40rpx;
+  border-bottom: 1rpx solid #eee;
 }
 
-checkbox .wx-checkbox-input.wx-checkbox-input-checked {
-  background-color: #0b3a95;
-  border-color: #0b3a95;
+.picker-cancel,
+.picker-confirm {
+  font-size: 32rpx;
+  color: #0b3a95;
+  padding: 16rpx;
+}
+
+.picker-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.picker-view {
+  height: 400rpx;
+}
+
+.picker-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80rpx;
+  font-size: 32rpx;
+  color: #1a1a1a;
 }

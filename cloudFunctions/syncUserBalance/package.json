@@ -1,0 +1,9 @@
+{
+  "name": "syncUserBalance",
+  "version": "1.0.0",
+  "description": "同步用户余额",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

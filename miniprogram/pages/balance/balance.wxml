@@ -4,7 +4,7 @@
     <!-- 余额卡片 -->
     <view class="balance-card">
       <view class="balance-title">账户余额</view>
-      <view class="balance-amount">¥{{balance}}</view>
+      <view class="balance-amount">{{formattedBalance}}</view>
       <view class="balance-desc">可用余额</view>
       <view class="balance-actions">
         <t-button theme="primary" size="medium" bind:tap="onRecharge">
@@ -13,21 +13,29 @@
       </view>
     </view>
 
-    <!-- 交易记录 -->
+    <!-- 最近账变 -->
     <view class="transactions-section">
       <view class="section-title">最近账变</view>
-      
-      <view wx:if="{{transactions.length > 0}}" class="transactions-list">
-        <view 
-          wx:for="{{transactions}}" 
+
+      <!-- 加载状态 -->
+      <view wx:if="{{loading}}" class="loading-state">
+        <view class="loading-text">加载中...</view>
+      </view>
+
+      <!-- 交易记录列表 -->
+      <view wx:elif="{{transactions.length > 0}}" class="transactions-list">
+        <view
+          wx:for="{{transactions}}"
           wx:key="id"
           class="transaction-item"
           data-transaction="{{item}}"
           bind:tap="onViewTransaction"
         >
-          <view class="transaction-icon {{item.type}}">
-            <text wx:if="{{item.type === 'recharge'}}">⬆️</text>
-            <text wx:else>⬇️</text>
+          <view class="transaction-icon">
+            <view class="icon-circle {{item.type}}">
+              <text wx:if="{{item.type === 'recharge'}}">💰</text>
+              <text wx:else>📊</text>
+            </view>
           </view>
           <view class="transaction-info">
             <view class="transaction-title">{{item.title}}</view>
@@ -41,6 +49,7 @@
       <view wx:else class="empty-state">
         <view class="empty-icon">💰</view>
         <view class="empty-text">暂无交易记录</view>
+        <view class="empty-tip">完成充值或消费后记录将显示在这里</view>
       </view>
     </view>
 

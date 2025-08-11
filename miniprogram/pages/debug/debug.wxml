@@ -1,0 +1,39 @@
+<!--debug.wxml-->
+<view class="container">
+  <view class="debug-section">
+    <view class="debug-title">调试工具</view>
+    
+    <view class="debug-actions">
+      <t-button
+        theme="primary"
+        size="large"
+        block
+        bind:tap="onInitDatabase"
+      >
+        初始化数据库
+      </t-button>
+      
+      <t-button
+        theme="light"
+        size="large"
+        block
+        bind:tap="onRefreshUserInfo"
+      >
+        刷新用户信息
+      </t-button>
+      
+      <t-button
+        theme="light"
+        size="large"
+        block
+        bind:tap="onViewOrders"
+      >
+        查看订单列表
+      </t-button>
+    </view>
+    
+    <view class="debug-info">
+      <text class="info-text">{{debugInfo}}</text>
+    </view>
+  </view>
+</view>
