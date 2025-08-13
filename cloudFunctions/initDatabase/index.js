@@ -88,7 +88,7 @@ exports.main = async (event, context) => {
       }
     }
 
-    // 7. 创建 organizations 集合（组织信息）
+    // 7. 创建 organizations 集合（企业信息）
     try {
       await db.createCollection('organizations')
       results.push('organizations 集合创建成功')
@@ -100,7 +100,43 @@ exports.main = async (event, context) => {
       }
     }
 
-    // 8. 创建 cities 集合（城市信息）
+    // 8. 创建 company_admins 集合（企业管理员）
+    try {
+      await db.createCollection('company_admins')
+      results.push('company_admins 集合创建成功')
+    } catch (error) {
+      if (error.errCode === -1) {
+        results.push('company_admins 集合已存在')
+      } else {
+        results.push(`company_admins 集合创建失败: ${error.message}`)
+      }
+    }
+
+    // 9. 创建 admin_logs 集合（管理员操作日志）
+    try {
+      await db.createCollection('admin_logs')
+      results.push('admin_logs 集合创建成功')
+    } catch (error) {
+      if (error.errCode === -1) {
+        results.push('admin_logs 集合已存在')
+      } else {
+        results.push(`admin_logs 集合创建失败: ${error.message}`)
+      }
+    }
+
+    // 10. 创建 system_config 集合（系统配置）
+    try {
+      await db.createCollection('system_config')
+      results.push('system_config 集合创建成功')
+    } catch (error) {
+      if (error.errCode === -1) {
+        results.push('system_config 集合已存在')
+      } else {
+        results.push(`system_config 集合创建失败: ${error.message}`)
+      }
+    }
+
+    // 11. 创建 cities 集合（城市信息）
     try {
       await db.createCollection('cities')
       results.push('cities 集合创建成功')
@@ -143,23 +179,156 @@ async function initBaseData(results) {
         {
           name: '西安海之源科技服务有限公司',
           code: 'HAIYUAN_TECH',
-          type: 'financial',
-          description: '金融服务公司',
+          type: 'company',
+          description: '默认根企业，为未选择企业的用户提供服务',
+          legalPerson: '',
+          businessLicense: '',
+          contactPhone: '',
+          contactEmail: '',
+          address: '',
+          adminUsers: [],
+          coinPrice: 0,
+          status: 'active',
+          sort: 0,
+          isDefault: true,
+          createdAt: new Date(),
+          approvedAt: new Date(),
+          approvedBy: 'system'
+        },
+        {
+          name: '阿里巴巴集团',
+          code: 'ALIBABA',
+          type: 'company',
+          description: '阿里巴巴集团控股有限公司',
+          legalPerson: '',
+          businessLicense: '',
+          contactPhone: '',
+          contactEmail: '',
+          address: '',
+          adminUsers: [],
+          coinPrice: 0,
           status: 'active',
           sort: 1,
-          createdAt: new Date()
+          isDefault: false,
+          createdAt: new Date(),
+          approvedAt: new Date(),
+          approvedBy: 'system'
+        },
+        {
+          name: '腾讯科技',
+          code: 'TENCENT',
+          type: 'company',
+          description: '深圳市腾讯计算机系统有限公司',
+          legalPerson: '',
+          businessLicense: '',
+          contactPhone: '',
+          contactEmail: '',
+          address: '',
+          adminUsers: [],
+          coinPrice: 0,
+          status: 'active',
+          sort: 2,
+          isDefault: false,
+          createdAt: new Date(),
+          approvedAt: new Date(),
+          approvedBy: 'system'
+        },
+        {
+          name: '百度公司',
+          code: 'BAIDU',
+          type: 'company',
+          description: '北京百度网讯科技有限公司',
+          legalPerson: '',
+          businessLicense: '',
+          contactPhone: '',
+          contactEmail: '',
+          address: '',
+          adminUsers: [],
+          coinPrice: 0,
+          status: 'active',
+          sort: 3,
+          isDefault: false,
+          createdAt: new Date(),
+          approvedAt: new Date(),
+          approvedBy: 'system'
+        },
+        {
+          name: '京东集团',
+          code: 'JD',
+          type: 'company',
+          description: '北京京东世纪贸易有限公司',
+          legalPerson: '',
+          businessLicense: '',
+          contactPhone: '',
+          contactEmail: '',
+          address: '',
+          adminUsers: [],
+          coinPrice: 0,
+          status: 'active',
+          sort: 4,
+          isDefault: false,
+          createdAt: new Date(),
+          approvedAt: new Date(),
+          approvedBy: 'system'
+        },
+        {
+          name: '美团公司',
+          code: 'MEITUAN',
+          type: 'company',
+          description: '北京三快在线科技有限公司',
+          legalPerson: '',
+          businessLicense: '',
+          contactPhone: '',
+          contactEmail: '',
+          address: '',
+          adminUsers: [],
+          coinPrice: 0,
+          status: 'active',
+          sort: 5,
+          isDefault: false,
+          createdAt: new Date(),
+          approvedAt: new Date(),
+          approvedBy: 'system'
         }
       ]
 
       for (const org of organizations) {
         await db.collection('organizations').add({ data: org })
       }
-      results.push('组织基础数据初始化完成')
+      results.push('企业基础数据初始化完成')
     } else {
-      results.push('组织数据已存在，跳过初始化')
+      results.push('企业数据已存在，跳过初始化')
     }
   } catch (error) {
-    results.push(`组织数据初始化失败: ${error.message}`)
+    results.push(`企业数据初始化失败: ${error.message}`)
+  }
+
+  // 初始化企业管理员数据
+  try {
+    const adminCount = await db.collection('company_admins').count()
+    if (adminCount.total === 0) {
+      const companyAdmins = [
+        {
+          username: 'haiyuan_admin',
+          password: 'admin123456', // 实际应用中需要加密
+          organizationId: '', // 需要在创建企业后关联
+          organizationName: '西安海之源科技服务有限公司',
+          permissions: ['user_management', 'price_setting', 'data_statistics'],
+          status: 'active',
+          createdAt: new Date(),
+          lastLoginAt: null
+        }
+      ]
+
+      for (const admin of companyAdmins) {
+        await db.collection('company_admins').add({ data: admin })
+      }
+      results.push('企业管理员数据初始化完成')
+    } else {
+      results.push('企业管理员数据已存在，跳过初始化')
+    }
+  } catch (error) {
+    results.push(`企业管理员数据初始化失败: ${error.message}`)
   }
 
   // 初始化城市数据
@@ -316,6 +485,72 @@ async function initBaseData(results) {
     }
   } catch (error) {
     results.push(`充值记录数据初始化失败: ${error.message}`)
+  }
+
+  // 初始化系统配置
+  try {
+    const configCount = await db.collection('system_config').count()
+    if (configCount.total === 0) {
+      const bcrypt = require('bcryptjs')
+      const defaultPassword = 'admin123456'
+      const hashedPassword = await bcrypt.hash(defaultPassword, 10)
+
+      const systemConfigs = [
+        {
+          key: 'root_password',
+          value: hashedPassword,
+          type: 'string',
+          description: 'Root管理员密码',
+          category: 'auth',
+          updatedBy: 'system',
+          updatedAt: new Date()
+        },
+        {
+          key: 'base_price_jianxin',
+          value: 15.0,
+          type: 'number',
+          description: '简信宝基础价格',
+          category: 'price',
+          updatedBy: 'system',
+          updatedAt: new Date()
+        },
+        {
+          key: 'base_price_zhuanxin',
+          value: 25.0,
+          type: 'number',
+          description: '专信宝基础价格',
+          category: 'price',
+          updatedBy: 'system',
+          updatedAt: new Date()
+        },
+        {
+          key: 'system_name',
+          value: '资信猫管理系统',
+          type: 'string',
+          description: '系统名称',
+          category: 'system',
+          updatedBy: 'system',
+          updatedAt: new Date()
+        }
+      ]
+
+      for (const config of systemConfigs) {
+        await db.collection('system_config').add({ data: config })
+      }
+
+      results.push('系统配置初始化完成')
+      results.push(`Root默认密码: ${defaultPassword}`)
+    } else {
+      results.push('系统配置已存在，跳过初始化')
+    }
+  } catch (error) {
+    results.push(`系统配置初始化失败: ${error.message}`)
+  }
+
+  return {
+    success: true,
+    message: '数据库初始化完成',
+    results: results
   }
 }
 

@@ -1,0 +1,40 @@
+{
+  "name": "zixinmao-admin",
+  "version": "1.0.0",
+  "description": "资信猫管理端",
+  "main": "server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "dev:test": "concurrently \"npm run server:test\" \"npm run client:dev\"",
+    "server:dev": "nodemon server/server.js",
+    "server:test": "nodemon server/test-server.js",
+    "client:dev": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "start": "node server/server.js",
+    "install:all": "npm install && cd client && npm install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "dotenv": "^16.3.1",
+    "wx-server-sdk": "~2.6.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "admin",
+    "management",
+    "vue",
+    "express"
+  ],
+  "author": "ZiXinMao Team",
+  "license": "MIT"
+}

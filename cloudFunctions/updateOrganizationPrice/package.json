@@ -1,0 +1,9 @@
+{
+  "name": "updateOrganizationPrice",
+  "version": "1.0.0",
+  "description": "更新企业资信币价格",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -31,6 +31,17 @@ exports.main = async (event, context) => {
     const currentTime = new Date()
 
     if (userQuery.data.length === 0) {
+      // 获取默认企业（根企业）
+      const defaultOrgQuery = await db.collection('organizations').where({
+        isDefault: true,
+        status: 'active'
+      }).get()
+
+      let defaultOrg = null
+      if (defaultOrgQuery.data.length > 0) {
+        defaultOrg = defaultOrgQuery.data[0]
+      }
+
       // 新用户，创建用户记录
       const newUser = {
         openid: OPENID,
@@ -52,8 +63,9 @@ exports.main = async (event, context) => {
         totalConsumption: 0,
         memberLevel: 'basic',
         memberExpireTime: null,
-        organizationId: '',
-        organizationName: '',
+        // 默认关联到根企业
+        organizationId: defaultOrg ? defaultOrg._id : '',
+        organizationName: defaultOrg ? defaultOrg.name : '',
         cityCode: '',
         cityName: '',
         status: 'active',
