@@ -20,6 +20,8 @@ Page({
     reportProgress: 0,
     reportStatus: '',
     currentReportId: '',
+    isPolling: false, // 添加轮询状态标记
+    pollStartTime: 0, // 轮询开始时间
 
     // 历史报告
     reportList: [] as any[],
@@ -32,8 +34,17 @@ Page({
   },
 
   onShow() {
+    console.log('📱 专信宝页面显示，检查是否需要恢复轮询')
     this.checkAuth()
     this.loadReportList()
+
+    // 检查是否有正在生成的报告需要恢复轮询
+    this.checkAndResumePolling()
+  },
+
+  onHide() {
+    console.log('📱 专信宝页面隐藏')
+    // 页面隐藏时不需要特殊处理，轮询会继续在后台运行
   },
 
   /**
@@ -200,8 +211,10 @@ Page({
           reportStatus: '文件上传成功，开始深度AI分析...'
         })
 
-        // 开始轮询进度
-        this.pollProgress()
+        // 延迟10秒后开始轮询，给AI服务一些处理时间
+        setTimeout(() => {
+          this.pollProgress()
+        }, 10000)
 
         // 清除选中文件
         this.setData({ selectedFile: null })
@@ -237,14 +250,17 @@ Page({
   },
 
   /**
-   * 轮询进度
+   * 检查并恢复轮询
    */
-  async pollProgress() {
-    const { currentReportId } = this.data
+  async checkAndResumePolling() {
+    const { currentReportId, generating } = this.data
 
-    if (!currentReportId || !this.data.generating) {
+    if (!currentReportId) {
+      console.log('📱 专信宝：没有当前报告ID，无需恢复轮询')
       return
     }
+
+    console.log(`📱 专信宝：检查报告状态以决定是否恢复轮询: ${currentReportId}`)
 
     try {
       const result = await wx.cloud.callFunction({
@@ -255,17 +271,153 @@ Page({
         }
       })
 
-      if (result.result && (result.result as any).success) {
-        const statusData = (result.result as any).data
+      const response = result.result as any
+
+      if (response && response.success) {
+        const statusData = response.data
+
+        console.log(`📱 专信宝：当前报告状态:`, {
+          status: statusData.status,
+          progress: statusData.progress,
+          generating: generating
+        })
+
+        if (statusData.status === 'processing' || statusData.status === 'pending') {
+          // 报告仍在处理中，恢复轮询
+          console.log('📱 专信宝：报告仍在处理中，恢复轮询')
+
+          this.setData({
+            generating: true,
+            reportProgress: statusData.progress || 0,
+            reportStatus: statusData.stageText || statusData.currentStage || '处理中...'
+          })
+
+          // 延迟启动轮询，避免与现有轮询冲突
+          setTimeout(() => {
+            this.pollProgress()
+          }, 2000)
+
+        } else if (statusData.status === 'completed') {
+          // 报告已完成，更新状态并刷新列表
+          console.log('📱 专信宝：报告已完成，更新状态')
+
+          this.setData({
+            generating: false,
+            reportProgress: 100,
+            reportStatus: '已完成',
+            currentReportId: ''
+          })
+
+          // 刷新报告列表
+          this.loadReportList()
+
+          // 显示完成提示
+          showSuccess('专业征信报告生成完成！')
+
+        } else if (statusData.status === 'failed') {
+          // 报告失败，清除状态
+          console.log('📱 专信宝：报告处理失败，清除状态')
+
+          this.setData({
+            generating: false,
+            reportProgress: 0,
+            reportStatus: '',
+            currentReportId: ''
+          })
+
+        }
+
+      } else if (response && response.error === 'REPORT_NOT_FOUND') {
+        // 报告不存在，可能已被清理
+        console.log('📱 专信宝：报告记录不存在，清除状态')
 
         this.setData({
-          reportProgress: statusData.progress,
-          reportStatus: statusData.stageText || statusData.currentStage
+          generating: false,
+          reportProgress: 0,
+          reportStatus: '',
+          currentReportId: ''
+        })
+
+      }
+
+    } catch (error) {
+      console.error('📱 专信宝：检查报告状态失败:', error)
+    }
+  },
+
+  /**
+   * 轮询进度
+   */
+  async pollProgress() {
+    const { currentReportId, generating, isPolling, pollStartTime } = this.data
+
+    if (!currentReportId || !generating) {
+      console.log('停止轮询：无报告ID或未在生成中')
+      this.setData({ isPolling: false })
+      return
+    }
+
+    if (isPolling) {
+      console.log('轮询已在进行中，跳过此次调用')
+      return
+    }
+
+    // 检查轮询超时（15分钟）
+    const maxPollTime = 15 * 60 * 1000 // 15分钟
+    const currentTime = Date.now()
+
+    if (pollStartTime && (currentTime - pollStartTime) > maxPollTime) {
+      console.log('⏰ 专信宝轮询超时，停止轮询')
+      this.setData({
+        generating: false,
+        isPolling: false,
+        reportProgress: 0,
+        reportStatus: '处理超时，请重试',
+        currentReportId: '',
+        pollStartTime: 0
+      })
+      showError('专业征信报告生成超时，请重试')
+      return
+    }
+
+    this.setData({ isPolling: true })
+    const elapsedSeconds = pollStartTime ? Math.round((currentTime - pollStartTime) / 1000) : 0
+    console.log(`🔄 专信宝轮询报告状态: ${currentReportId} (已轮询 ${elapsedSeconds}秒)`)
+
+    try {
+      const result = await wx.cloud.callFunction({
+        name: 'getReports',
+        data: {
+          action: 'getReportStatus',
+          reportId: currentReportId
+        }
+      })
+
+      const response = result.result as any
+
+      if (response && response.success) {
+        const statusData = response.data
+
+        console.log(`📊 状态更新:`, {
+          status: statusData.status,
+          progress: statusData.progress,
+          stage: statusData.currentStage,
+          taskStatus: statusData.taskStatus
+        })
+
+        this.setData({
+          reportProgress: statusData.progress || 0,
+          reportStatus: statusData.stageText || statusData.currentStage || '处理中...'
         })
 
         if (statusData.status === 'completed') {
           // 生成完成
-          this.setData({ generating: false })
+          console.log('✅ 报告生成完成')
+          this.setData({
+            generating: false,
+            isPolling: false,
+            currentReportId: ''
+          })
           showSuccess('专业报告生成完成！')
 
           // 刷新报告列表
@@ -273,28 +425,47 @@ Page({
 
         } else if (statusData.status === 'failed') {
           // 生成失败
-          this.setData({ generating: false })
+          console.log('❌ 报告生成失败')
+          this.setData({
+            generating: false,
+            isPolling: false,
+            currentReportId: ''
+          })
           showError(statusData.errorMessage || '报告生成失败')
 
         } else {
-          // 继续轮询
+          // 继续轮询，根据任务状态调整轮询间隔
+          let pollInterval = 5000 // 默认5秒
+
+          if (statusData.taskStatus === 'pending') {
+            pollInterval = 10000 // 排队中，10秒轮询
+            this.setData({ reportStatus: '任务排队中，请耐心等待...' })
+          } else if (statusData.taskStatus === 'processing') {
+            pollInterval = 8000 // 处理中，8秒轮询
+            this.setData({ reportStatus: 'AI正在分析中，预计需要3-5分钟...' })
+          }
+
+          console.log(`🔄 继续轮询，间隔: ${pollInterval}ms`)
+          this.setData({ isPolling: false }) // 重置轮询状态
           setTimeout(() => {
             this.pollProgress()
-          }, 3000)
+          }, pollInterval)
         }
       } else {
         // 检查是否是报告不存在的错误
-        if ((result.result as any)?.error === 'REPORT_NOT_FOUND') {
-          console.log('报告记录不存在，停止轮询')
+        if (response && response.error === 'REPORT_NOT_FOUND') {
+          console.log('❌ 报告记录不存在，停止轮询')
           this.setData({
             generating: false,
+            isPolling: false,
             reportProgress: 0,
-            reportStatus: '处理失败，已自动清理'
+            reportStatus: '处理失败，已自动清理',
+            currentReportId: ''
           })
           showProcessingFailedDialog()
           return // 停止轮询
         } else {
-          throw new Error((result.result as any)?.error || '获取状态失败')
+          throw new Error(response?.error || '获取状态失败')
         }
       }
     } catch (error) {
@@ -306,12 +477,17 @@ Page({
         console.log('报告记录已被删除，停止轮询')
         this.setData({
           generating: false,
+          isPolling: false,
           reportProgress: 0,
-          reportStatus: '处理失败，已自动清理'
+          reportStatus: '处理失败，已自动清理',
+          currentReportId: ''
         })
         showProcessingFailedDialog()
       } else {
-        this.setData({ generating: false })
+        this.setData({
+          generating: false,
+          isPolling: false
+        })
         showError('获取进度失败，请重试')
       }
     }

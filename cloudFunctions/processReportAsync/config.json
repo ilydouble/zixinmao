@@ -2,7 +2,7 @@
   "permissions": {
     "openapi": []
   },
-  "timeout": 300,
+  "timeout": 60,
   "envVariables": {},
   "vpc": {
     "vpcId": "",

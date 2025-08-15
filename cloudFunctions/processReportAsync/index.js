@@ -29,25 +29,58 @@ exports.main = async (event, context) => {
     const fileBuffer = await downloadFile(fileId)
     console.log(`📁 文件下载完成，大小: ${fileBuffer.length} 字节`)
 
-    // 3. 调用AI分析
-    console.log(`🤖 开始AI分析...`)
+    // 3. 准备AI分析，但不在主线程中等待
+    console.log(`🤖 准备提交AI分析任务...`)
     await updateReportStatus(reportId, 'processing', 'AI_ANALYSIS', 50)
-    const analysisResult = await analyzeWithAI(fileBuffer, reportType, reportId)
-    console.log(`🤖 AI分析完成`)
-    
-    // 4. 生成报告文件
-    await updateReportStatus(reportId, 'processing', 'GENERATING_REPORTS', 80)
-    const reportFiles = await generateReportFiles(analysisResult, reportId, reportType)
-    
-    // 5. 更新完成状态
-    await updateReportStatus(reportId, 'completed', 'COMPLETED', 100, reportFiles)
-    
-    console.log(`报告处理完成: ${reportId}`)
-    
+
+    // 异步启动AI分析，不等待结果
+    console.log(`🚀 异步启动AI分析任务: ${reportId}`)
+
+    // 使用 setTimeout 而不是 setImmediate，确保异步任务能正确执行
+    setTimeout(async () => {
+      try {
+        console.log(`🤖 [异步任务] 开始AI分析: ${reportId}`)
+
+        // 更新状态为AI分析中
+        await updateReportStatus(reportId, 'processing', 'AI_ANALYZING', 60)
+        console.log(`📊 [异步任务] 状态已更新为AI分析中: ${reportId}`)
+
+        const analysisStartTime = Date.now()
+        const analysisResult = await analyzeWithAI(fileBuffer, reportType, reportId)
+        const analysisEndTime = Date.now()
+
+        console.log(`🤖 [异步任务] AI分析完成: ${reportId}, 耗时: ${analysisEndTime - analysisStartTime}ms`)
+
+        // 4. 生成报告文件
+        console.log(`📄 [异步任务] 开始生成报告文件: ${reportId}`)
+        await updateReportStatus(reportId, 'processing', 'GENERATING_REPORTS', 80)
+        const reportFiles = await generateReportFiles(analysisResult, reportId, reportType)
+        console.log(`📄 [异步任务] 报告文件生成完成: ${reportId}`)
+
+        // 5. 更新完成状态
+        console.log(`✅ [异步任务] 更新完成状态: ${reportId}`)
+        await updateReportStatus(reportId, 'completed', 'COMPLETED', 100, reportFiles)
+
+        console.log(`🎉 [异步任务] 报告处理完成: ${reportId}`)
+
+      } catch (error) {
+        console.error(`❌ [异步任务] AI分析失败: ${reportId}`, {
+          message: error.message,
+          stack: error.stack
+        })
+
+        // 处理失败时删除报告记录和相关文件
+        await cleanupFailedReport(reportId, fileId, error.message)
+      }
+    }, 100) // 100ms 延迟启动
+
+    // 立即返回，不等待AI分析完成
+    console.log(`✅ 任务已提交，异步处理中: ${reportId}`)
+
     return {
       success: true,
       reportId: reportId,
-      message: '报告处理完成'
+      message: '文件处理完成，AI分析已启动，请稍后查看结果'
     }
     
   } catch (error) {
@@ -79,6 +112,33 @@ async function downloadFile(fileId) {
 }
 
 /**
+ * 检测文件MIME类型
+ */
+function detectMimeType(fileId) {
+  try {
+    // 从文件ID或路径中提取扩展名
+    const extension = fileId.toLowerCase().split('.').pop()
+
+    const mimeTypes = {
+      'pdf': 'application/pdf',
+      'doc': 'application/msword',
+      'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'xls': 'application/vnd.ms-excel',
+      'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'txt': 'text/plain',
+      'jpg': 'image/jpeg',
+      'jpeg': 'image/jpeg',
+      'png': 'image/png'
+    }
+
+    return mimeTypes[extension] || 'application/pdf' // 默认为PDF
+  } catch (error) {
+    console.warn(`无法检测文件类型: ${fileId}`, error)
+    return 'application/pdf'
+  }
+}
+
+/**
  * 使用AI分析文件
  */
 async function analyzeWithAI(fileBuffer, reportType, reportId) {
@@ -90,10 +150,14 @@ async function analyzeWithAI(fileBuffer, reportType, reportId) {
     // 将文件转换为base64
     const fileBase64 = fileBuffer.toString('base64')
 
+    // 检测文件MIME类型
+    const mimeType = detectMimeType(reportDoc.data.input?.fileName || '') || 'application/pdf'
+    console.log(`检测到文件类型: ${mimeType}`)
+
     // 构建请求数据
     const requestData = {
       file_base64: fileBase64,
-      mime_type: "application/pdf",
+      mime_type: mimeType,
       report_type: reportType,
       custom_prompt: customPrompt
     }
@@ -109,39 +173,46 @@ async function analyzeWithAI(fileBuffer, reportType, reportId) {
 
     console.log(`开始调用AI分析服务: ${reportId}, 类型: ${reportType}`)
 
-    // 提交任务到AI分析服务队列
+    // 调用AI分析服务同步接口
     const response = await axios.post(
-      `${AI_ANALYSIS_SERVICE.url}/analyze`,
+      `${AI_ANALYSIS_SERVICE.url}/analyze/sync`,
       requestData,
       {
         headers: {
           'Content-Type': 'application/json'
         },
-        timeout: 30000 // 提交任务只需要30秒超时
+        timeout: 300000 // 5分钟超时，足够AI处理
       }
     )
 
-    if (response.status === 200 && response.data.success) {
-      const taskId = response.data.task_id
-      console.log(`AI分析任务已提交: ${reportId}, task_id: ${taskId}`)
+    // 更新响应时间
+    await db.collection('reports').doc(reportId).update({
+      data: {
+        'algorithm.responseTime': new Date(),
+        'metadata.updatedAt': new Date()
+      }
+    })
 
-      // 保存任务ID和提交信息
+    if (response.status === 200 && response.data.success) {
+      const analysisResult = response.data.analysis_result
+      console.log(`AI分析完成: ${reportId}, 处理时间: ${response.data.processing_time}s`)
+
+      // 保存处理时间信息
       await db.collection('reports').doc(reportId).update({
         data: {
-          'algorithm.taskId': taskId,
-          'algorithm.taskSubmitTime': new Date(),
-          'algorithm.queuePosition': response.data.queue_position,
-          'algorithm.estimatedWaitTime': response.data.estimated_wait_time,
+          'algorithm.processingTime': response.data.processing_time,
+          'algorithm.serviceRequestId': response.data.request_id,
           'metadata.updatedAt': new Date()
         }
       })
 
-      // 启动任务监控
-      return await monitorAnalysisTask(taskId, reportId)
+      return analysisResult
     } else {
-      const errorMsg = response.data.message || 'AI分析服务任务提交失败'
+      const errorMsg = response.data.error_message || 'AI分析服务返回失败'
       throw new Error(errorMsg)
     }
+
+
 
   } catch (error) {
     console.error(`AI分析失败: ${reportId}`, {
@@ -158,122 +229,48 @@ async function analyzeWithAI(fileBuffer, reportType, reportId) {
     })
 
     // 检查重试次数，如果超过最大重试次数则删除记录
-    const reportDoc = await db.collection('reports').doc(reportId).get()
-    const currentRetryCount = reportDoc.data?.algorithm?.retryCount || 0
-    const maxRetries = 2 // 最大重试2次
+    try {
+      const reportDoc = await db.collection('reports').doc(reportId).get()
 
-    if (currentRetryCount >= maxRetries) {
-      console.log(`AI分析重试次数已达上限，删除报告记录: ${reportId}`)
-      // 不再重试，直接抛出错误让上层处理删除
-      throw new Error(`AI分析失败且重试次数已达上限: ${error.message}`)
-    } else {
-      // 更新重试次数
-      await db.collection('reports').doc(reportId).update({
-        data: {
-          'algorithm.retryCount': db.command.inc(1),
-          'algorithm.lastError': error.message,
-          'algorithm.errorDetails': {
-            code: error.code,
-            status: error.response?.status,
-            url: error.config?.url
-          },
-          'metadata.updatedAt': new Date()
-        }
-      })
+      if (!reportDoc.exists) {
+        console.log(`报告记录不存在，可能已被删除: ${reportId}`)
+        throw new Error(`报告记录不存在: ${error.message}`)
+      }
 
+      const currentRetryCount = reportDoc.data?.algorithm?.retryCount || 0
+      const maxRetries = 2 // 最大重试2次
+
+      if (currentRetryCount >= maxRetries) {
+        console.log(`AI分析重试次数已达上限，删除报告记录: ${reportId}`)
+        // 不再重试，直接抛出错误让上层处理删除
+        throw new Error(`AI分析失败且重试次数已达上限: ${error.message}`)
+      } else {
+        // 更新重试次数
+        await db.collection('reports').doc(reportId).update({
+          data: {
+            'algorithm.retryCount': db.command.inc(1),
+            'algorithm.lastError': error.message,
+            'algorithm.errorDetails': {
+              code: error.code,
+              status: error.response?.status,
+              url: error.config?.url,
+              timestamp: new Date()
+            },
+            'metadata.updatedAt': new Date()
+          }
+        })
+
+        throw new Error(`AI分析失败: ${error.message}`)
+      }
+    } catch (dbError) {
+      console.error(`访问数据库时发生错误: ${reportId}`, dbError)
+      // 如果数据库访问失败，直接抛出原始错误
       throw new Error(`AI分析失败: ${error.message}`)
     }
   }
 }
 
-/**
- * 监控AI分析任务状态
- */
-async function monitorAnalysisTask(taskId, reportId) {
-  const maxWaitTime = 600000 // 最大等待10分钟
-  const checkInterval = 10000 // 每10秒检查一次
-  const startTime = Date.now()
 
-  console.log(`开始监控AI分析任务: ${taskId}, reportId: ${reportId}`)
-
-  while (Date.now() - startTime < maxWaitTime) {
-    try {
-      // 检查任务状态
-      const statusResponse = await axios.get(
-        `${AI_ANALYSIS_SERVICE.url}/task/${taskId}`,
-        { timeout: 10000 }
-      )
-
-      if (statusResponse.status === 200) {
-        const taskStatus = statusResponse.data
-        const status = taskStatus.status
-
-        console.log(`任务状态检查: ${taskId}, status: ${status}`)
-
-        // 更新任务状态到数据库
-        await db.collection('reports').doc(reportId).update({
-          data: {
-            'algorithm.taskStatus': status,
-            'algorithm.lastCheckTime': new Date(),
-            'metadata.updatedAt': new Date()
-          }
-        })
-
-        if (status === 'completed') {
-          // 任务完成
-          const result = taskStatus.result
-          if (result && result.success) {
-            console.log(`AI分析任务完成: ${taskId}, 处理时间: ${taskStatus.processing_time}s`)
-
-            // 保存完成信息
-            await db.collection('reports').doc(reportId).update({
-              data: {
-                'algorithm.responseTime': new Date(),
-                'algorithm.processingTime': taskStatus.processing_time,
-                'algorithm.waitTime': taskStatus.wait_time,
-                'algorithm.taskCompleted': true,
-                'metadata.updatedAt': new Date()
-              }
-            })
-
-            return result.analysis_result
-          } else {
-            throw new Error(result?.error_message || '任务完成但分析失败')
-          }
-        } else if (status === 'failed') {
-          // 任务失败，直接抛出错误让上层删除记录
-          const errorMsg = taskStatus.error_message || '任务处理失败'
-          console.error(`AI分析任务失败: ${taskId}, 错误: ${errorMsg}`)
-          throw new Error(errorMsg)
-        } else if (status === 'cancelled') {
-          // 任务被取消，直接抛出错误让上层删除记录
-          console.log(`AI分析任务被取消: ${taskId}`)
-          throw new Error('分析任务被取消')
-        }
-        // 如果是 pending 或 processing，继续等待
-      } else {
-        console.warn(`获取任务状态失败: ${taskId}, status: ${statusResponse.status}`)
-      }
-
-      // 等待下次检查
-      await new Promise(resolve => setTimeout(resolve, checkInterval))
-
-    } catch (error) {
-      if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
-        console.warn(`连接AI服务失败，继续重试: ${error.message}`)
-        await new Promise(resolve => setTimeout(resolve, checkInterval))
-        continue
-      } else {
-        console.error(`监控任务状态异常: ${taskId}`, error)
-        throw error
-      }
-    }
-  }
-
-  // 超时，直接抛出错误让上层删除记录
-  console.error(`AI分析任务监控超时: ${taskId}`)
-  throw new Error('AI分析任务超时')
-}
 
 /**
  * 生成报告文件
@@ -377,30 +374,53 @@ function generateHTMLReport(analysisResult, reportType) {
  * 更新报告状态
  */
 async function updateReportStatus(reportId, status, stage, progress, reportFiles = null, errorMessage = null) {
+  console.log(`📊 [状态更新] 开始更新报告状态: ${reportId}`, {
+    status,
+    stage,
+    progress,
+    hasReportFiles: !!reportFiles,
+    errorMessage
+  })
+
   const updateData = {
+    // 新的扁平化结构，兼容前端轮询
+    status: status,
+    currentStep: stage,
+    progress: progress,
+    // 保留旧结构以兼容
     'processing.status': status,
     'processing.currentStage': stage,
     'processing.progress': progress,
     'processing.updatedAt': new Date(),
     'metadata.updatedAt': new Date()
   }
-  
+
   if (errorMessage) {
+    updateData.errorMessage = errorMessage
     updateData['processing.errorMessage'] = errorMessage
   }
-  
+
   if (status === 'completed' || status === 'failed') {
     updateData['processing.endTime'] = new Date()
+    updateData['metadata.completedAt'] = new Date()
   }
-  
+
   if (reportFiles) {
+    updateData.reportFiles = reportFiles
     updateData['output.reportFiles'] = reportFiles
     updateData['output.summary'] = '报告生成完成'
+    console.log(`📄 [状态更新] 包含报告文件: ${Object.keys(reportFiles).length} 个`)
   }
-  
-  await db.collection('reports').doc(reportId).update({
-    data: updateData
-  })
+
+  try {
+    await db.collection('reports').doc(reportId).update({
+      data: updateData
+    })
+    console.log(`✅ [状态更新] 状态更新成功: ${reportId} -> ${status}`)
+  } catch (error) {
+    console.error(`❌ [状态更新] 状态更新失败: ${reportId}`, error)
+    throw error
+  }
 }
 
 /**

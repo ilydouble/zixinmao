@@ -156,17 +156,8 @@ async function getReportStatus(reportId, userId) {
   try {
     const reportDoc = await db.collection('reports')
       .doc(reportId)
-      .field({
-        userId: true,
-        'processing.status': true,
-        'processing.progress': true,
-        'processing.currentStage': true,
-        'processing.errorMessage': true,
-        'processing.estimatedTimeRemaining': true,
-        'output.reportFiles': true
-      })
       .get()
-    
+
     if (!reportDoc.data) {
       return {
         success: false,
@@ -174,28 +165,48 @@ async function getReportStatus(reportId, userId) {
         message: '报告记录不存在，可能已被自动清理'
       }
     }
-    
+
     const report = reportDoc.data
-    
+
     // 验证用户权限
     if (report.userId !== userId) {
       throw new Error('无权访问此报告')
     }
-    
-    return {
-      success: true,
-      data: {
-        status: report.processing.status,
-        progress: report.processing.progress,
-        currentStage: report.processing.currentStage,
-        errorMessage: report.processing.errorMessage,
-        estimatedTimeRemaining: report.processing.estimatedTimeRemaining,
-        hasFiles: !!(report.output.reportFiles && report.output.reportFiles.jsonUrl),
-        stageText: getStageText(report.processing.currentStage)
-      }
-    }
+
+    // 现在使用异步处理模式，直接返回当前状态
+    console.log(`获取报告状态: ${reportId}, 当前状态: ${report.status || report.processing?.status}`)
+
+    return buildStatusResponse(report)
+
   } catch (error) {
     throw new Error(`获取报告状态失败: ${error.message}`)
+  }
+}
+
+/**
+ * 构建状态响应
+ */
+function buildStatusResponse(report) {
+  // 兼容新旧数据结构
+  const status = report.status || report.processing?.status || 'unknown'
+  const progress = report.progress || report.processing?.progress || 0
+  const currentStage = report.currentStep || report.processing?.currentStage || 'UNKNOWN'
+  const errorMessage = report.errorMessage || report.processing?.errorMessage
+  const reportFiles = report.reportFiles || report.output?.reportFiles
+
+  return {
+    success: true,
+    data: {
+      status: status,
+      progress: progress,
+      currentStage: currentStage,
+      errorMessage: errorMessage,
+      estimatedTimeRemaining: report.algorithm?.estimatedTimeRemaining,
+      hasFiles: !!(reportFiles && (reportFiles.json || reportFiles.jsonUrl)),
+      stageText: getStageText(currentStage),
+      taskId: report.algorithm?.taskId,
+      taskStatus: report.algorithm?.taskStatus
+    }
   }
 }
 
