@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "openapi": []
+  },
+  "timeout": 300,
+  "envVariables": {},
+  "vpc": {
+    "vpcId": "",
+    "subnetId": ""
+  },
+  "memorySize": 512,
+  "runtime": "Nodejs16.13"
+}

@@ -32,10 +32,12 @@
           data-link="{{item.link}}"
           bind:tap="onBannerTap"
         >
-          <view class="banner-content">
-            <view class="banner-title">{{item.title}}</view>
-            <view class="banner-desc">{{item.desc}}</view>
-          </view>
+          <image
+            class="banner-image"
+            src="{{item.image}}"
+            mode="aspectFill"
+            lazy-load
+          />
         </view>
       </swiper-item>
     </swiper>

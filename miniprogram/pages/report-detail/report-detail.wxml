@@ -1,0 +1,147 @@
+<!--report-detail.wxml-->
+<view class="container">
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <t-loading theme="circular" size="40rpx" text="加载中..." />
+  </view>
+
+  <!-- 报告内容 -->
+  <view wx:else class="report-container">
+    <!-- 报告头部信息 -->
+    <view class="report-header">
+      <view class="header-top">
+        <view class="file-info">
+          <text class="file-name">{{reportInfo.fileName}}</text>
+          <text class="upload-time">上传时间：{{reportInfo.uploadTime}}</text>
+        </view>
+        
+        <view class="status-info">
+          <t-tag 
+            wx:if="{{reportInfo.status === 'completed'}}"
+            theme="success" 
+            variant="light"
+          >
+            已完成
+          </t-tag>
+          <t-tag 
+            wx:elif="{{reportInfo.status === 'processing'}}"
+            theme="warning" 
+            variant="light"
+          >
+            处理中 {{reportInfo.progress}}%
+          </t-tag>
+          <t-tag 
+            wx:else
+            theme="danger" 
+            variant="light"
+          >
+            处理失败
+          </t-tag>
+        </view>
+      </view>
+      
+      <!-- 标签 -->
+      <view wx:if="{{reportInfo.tags.length > 0}}" class="tags-container">
+        <t-tag 
+          wx:for="{{reportInfo.tags}}" 
+          wx:key="index"
+          theme="primary" 
+          variant="outline"
+          size="small"
+        >
+          {{item}}
+        </t-tag>
+      </view>
+      
+      <!-- 处理时间 -->
+      <view wx:if="{{reportInfo.processingTime}}" class="processing-time">
+        <text>处理耗时：{{reportInfo.processingTime}}</text>
+      </view>
+    </view>
+
+    <!-- 报告内容 -->
+    <view class="report-content">
+      <view class="content-header">
+        <text class="content-title">分析结果</text>
+      </view>
+      
+      <view wx:if="{{reportContent}}" class="content-body">
+        <text class="content-text">{{reportContent}}</text>
+      </view>
+      
+      <view wx:else class="empty-content">
+        <t-empty 
+          icon="file" 
+          description="暂无分析结果"
+        />
+      </view>
+    </view>
+
+    <!-- 下载区域 -->
+    <view wx:if="{{reportInfo.status === 'completed'}}" class="download-section">
+      <view class="section-title">
+        <text>下载报告</text>
+      </view>
+      
+      <view class="download-buttons">
+        <t-button 
+          theme="primary" 
+          variant="outline"
+          size="medium"
+          loading="{{downloading}}"
+          data-type="json"
+          bind:tap="onDownloadReport"
+        >
+          <t-icon name="download" size="32rpx" />
+          JSON格式
+        </t-button>
+        
+        <t-button 
+          theme="primary" 
+          variant="outline"
+          size="medium"
+          loading="{{downloading}}"
+          data-type="pdf"
+          bind:tap="onDownloadReport"
+        >
+          <t-icon name="download" size="32rpx" />
+          PDF格式
+        </t-button>
+        
+        <t-button 
+          theme="primary" 
+          variant="outline"
+          size="medium"
+          loading="{{downloading}}"
+          data-type="html"
+          bind:tap="onDownloadReport"
+        >
+          <t-icon name="download" size="32rpx" />
+          HTML格式
+        </t-button>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <t-button 
+        theme="default" 
+        variant="outline"
+        size="large"
+        bind:tap="onRefresh"
+      >
+        <t-icon name="refresh" size="32rpx" />
+        刷新
+      </t-button>
+      
+      <t-button 
+        theme="primary"
+        size="large"
+        open-type="share"
+      >
+        <t-icon name="share" size="32rpx" />
+        分享报告
+      </t-button>
+    </view>
+  </view>
+</view>

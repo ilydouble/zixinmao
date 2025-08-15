@@ -7,17 +7,21 @@ Page({
     banners: [
       {
         id: 1,
-        title: '银行流水智能分析',
-        desc: '专业的流水分析报告，助力贷款申请',
-        image: '/images/banner1.jpg',
+        title: '流水宝',
+        image: '/images/banner1.png',
         link: '/pages/liushui/liushui'
       },
       {
         id: 2,
-        title: '征信报告解读',
-        desc: '深度解析征信数据，优化信用状况',
-        image: '/images/banner2.jpg',
+        title: '简信宝',
+        image: '/images/banner2.png',
         link: '/pages/jianxin/jianxin'
+      },
+      {
+        id: 3,
+        title: '资信猫',
+        image: '/images/banner3.png',
+        link: '' // 整体介绍
       }
     ],
     currentBanner: 0,
@@ -73,8 +77,25 @@ Page({
    */
   onBannerTap(e: any) {
     const { link } = e.currentTarget.dataset
+
     if (link) {
+      // 检查是否需要实名认证（征信相关功能）
+      if ((link.includes('jianxin') || link.includes('zhuanxin')) && needRealNameAuth()) {
+        wx.navigateTo({
+          url: `/pages/auth/auth?return=${encodeURIComponent(link)}`
+        })
+        return
+      }
+
       wx.navigateTo({ url: link })
+    } else {
+      // 整体介绍Banner，显示产品介绍
+      wx.showModal({
+        title: '资信猫',
+        content: '智能金融服务平台\n\n• 银行流水智能分析\n• 征信报告专业解读\n• 一站式金融数据服务\n\n让信用更有价值！',
+        showCancel: false,
+        confirmText: '了解更多'
+      })
     }
   },
 

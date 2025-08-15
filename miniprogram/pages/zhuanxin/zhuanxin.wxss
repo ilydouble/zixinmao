@@ -39,10 +39,137 @@
 
 /* 报告项样式调整 */
 .report-tag {
-  background: #7c3aed;
-  color: #fff;
-  padding: 4rpx 12rpx;
-  border-radius: 12rpx;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  color: white;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
   font-size: 20rpx;
+  font-weight: bold;
+  text-shadow: 0 1rpx 2rpx rgba(0, 0, 0, 0.2);
   margin-right: 16rpx;
+}
+
+/* 专信宝特有的醒目状态样式 */
+.report-item {
+  position: relative;
+}
+
+/* 失败状态的超醒目红色标签 */
+.failed-badge {
+  position: absolute;
+  top: -12rpx;
+  right: -12rpx;
+  background: linear-gradient(135deg, #ff4d4f, #cf1322);
+  color: white;
+  padding: 12rpx 20rpx;
+  border-radius: 25rpx;
+  font-size: 22rpx;
+  font-weight: bold;
+  box-shadow: 0 6rpx 20rpx rgba(255, 77, 79, 0.5);
+  z-index: 10;
+  animation: shake 1s infinite;
+  border: 2rpx solid white;
+}
+
+.failed-text {
+  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.3);
+}
+
+/* 处理中状态的进度标签 */
+.processing-badge {
+  position: absolute;
+  top: -12rpx;
+  right: -12rpx;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  color: white;
+  padding: 12rpx 20rpx;
+  border-radius: 25rpx;
+  font-size: 22rpx;
+  font-weight: bold;
+  box-shadow: 0 6rpx 20rpx rgba(124, 58, 237, 0.5);
+  z-index: 10;
+  border: 2rpx solid white;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+.processing-text {
+  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.3);
+}
+
+/* 已完成状态的成功标签 */
+.completed-badge {
+  position: absolute;
+  top: -12rpx;
+  right: -12rpx;
+  background: linear-gradient(135deg, #52c41a, #389e0d);
+  color: white;
+  padding: 12rpx 20rpx;
+  border-radius: 25rpx;
+  font-size: 22rpx;
+  font-weight: bold;
+  box-shadow: 0 6rpx 20rpx rgba(82, 196, 26, 0.5);
+  z-index: 10;
+  border: 2rpx solid white;
+}
+
+.completed-text {
+  text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.3);
+}
+
+/* 失败报告的整体样式超醒目 */
+.report-item.failed {
+  background: linear-gradient(135deg, #fff2f0, #ffebe8);
+  border: 3rpx solid #ff4d4f;
+  border-radius: 20rpx;
+  margin: 12rpx 0;
+  box-shadow: 0 8rpx 24rpx rgba(255, 77, 79, 0.25);
+  transform: scale(1.03);
+  position: relative;
+}
+
+.report-item.failed::before {
+  content: '';
+  position: absolute;
+  top: -3rpx;
+  left: -3rpx;
+  right: -3rpx;
+  bottom: -3rpx;
+  background: linear-gradient(45deg, #ff4d4f, #cf1322, #ff4d4f);
+  border-radius: 20rpx;
+  z-index: -1;
+  animation: borderGlow 2s linear infinite;
+}
+
+/* 处理中报告的样式 */
+.report-item.processing {
+  background: linear-gradient(135deg, #f6f3ff, #ede9fe);
+  border: 3rpx solid #7c3aed;
+  border-radius: 20rpx;
+  margin: 12rpx 0;
+  box-shadow: 0 8rpx 24rpx rgba(124, 58, 237, 0.25);
+  transform: scale(1.02);
+}
+
+/* 震动动画 */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2rpx); }
+  75% { transform: translateX(2rpx); }
+}
+
+/* 发光动画 */
+@keyframes glow {
+  from {
+    box-shadow: 0 6rpx 20rpx rgba(124, 58, 237, 0.5);
+  }
+  to {
+    box-shadow: 0 6rpx 30rpx rgba(124, 58, 237, 0.8);
+  }
+}
+
+/* 边框发光动画 */
+@keyframes borderGlow {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
 }

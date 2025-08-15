@@ -1,0 +1,10 @@
+{
+  "name": "testAIService",
+  "version": "1.0.0",
+  "description": "测试AI分析服务连接",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "axios": "^0.27.2"
+  }
+}

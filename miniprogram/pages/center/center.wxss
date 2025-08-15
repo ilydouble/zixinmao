@@ -209,6 +209,22 @@
   margin: 24rpx;
 }
 
+.menu-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 16rpx;
+  padding-left: 8rpx;
+}
+
+/* 余额操作按钮 */
+.balance-actions {
+  display: flex;
+  gap: 16rpx;
+  flex-wrap: wrap;
+  margin-top: 16rpx;
+}
+
 /* 退出登录 */
 .logout-section {
   margin: 40rpx 24rpx 24rpx;

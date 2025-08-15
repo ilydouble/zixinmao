@@ -30,6 +30,26 @@
       >
         查看订单列表
       </t-button>
+
+      <t-button
+        theme="warning"
+        size="large"
+        block
+        bind:tap="onTestAIService"
+        loading="{{aiTesting}}"
+      >
+        {{aiTesting ? '测试中...' : '测试AI服务'}}
+      </t-button>
+
+      <t-button
+        theme="warning"
+        size="large"
+        block
+        bind:tap="onTestReportProcessing"
+        loading="{{reportTesting}}"
+      >
+        {{reportTesting ? '测试中...' : '测试报告处理'}}
+      </t-button>
     </view>
     
     <view class="debug-info">

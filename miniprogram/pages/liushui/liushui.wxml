@@ -9,11 +9,13 @@
 
   <!-- 上传区域 -->
   <view class="card upload-card">
-    <view wx:if="{{!selectedFile}}" class="upload-area" bind:tap="onChooseFile">
-      <view class="upload-icon">☁️</view>
-      <view class="upload-text">拖拽或点击上传文件至此处</view>
-      <view class="upload-desc">支持 PDF/JPEG/PNG，最大 10MB</view>
-      <t-button theme="primary" size="medium" style="margin-top: 20rpx;">
+    <view wx:if="{{!selectedFile}}" class="upload-area">
+      <view class="upload-content" bind:tap="onChooseFile">
+        <view class="upload-icon">☁️</view>
+        <view class="upload-text">点击选择银行流水文件</view>
+        <view class="upload-desc">支持 PDF 文档或图片截图，最大 10MB</view>
+      </view>
+      <t-button theme="primary" size="medium" style="margin-top: 20rpx;" bind:tap="onChooseFile">
         选择文件
       </t-button>
     </view>
@@ -42,6 +44,16 @@
     <view wx:if="{{generating}}" class="progress-section">
       <view class="progress-text">{{reportStatus}} {{reportProgress}}%</view>
       <t-progress percentage="{{reportProgress}}" theme="primary" />
+      <view class="cancel-section">
+        <t-button
+          theme="default"
+          size="medium"
+          bind:tap="onCancelAnalysis"
+          class="cancel-btn"
+        >
+          终止分析
+        </t-button>
+      </view>
     </view>
 
     <!-- 开始分析按钮 -->
@@ -76,19 +88,41 @@
 
     <!-- 报告列表 -->
     <view wx:if="{{reportList.length > 0}}" class="report-list">
-      <view 
-        wx:for="{{reportList}}" 
+      <view
+        wx:for="{{reportList}}"
         wx:key="id"
-        class="report-item"
-        data-report="{{item}}"
-        bind:tap="onViewReport"
+        class="report-item {{item.status === 'failed' ? 'failed' : ''}} {{item.status === 'processing' ? 'processing' : ''}}"
       >
-        <view class="report-icon">🧾</view>
-        <view class="report-info">
+        <view class="report-icon">
+          <text wx:if="{{item.status === 'completed'}}">🧾</text>
+          <text wx:elif="{{item.status === 'processing'}}">⏳</text>
+          <text wx:elif="{{item.status === 'failed'}}">❌</text>
+          <text wx:else>📄</text>
+        </view>
+        <view class="report-info" data-report="{{item}}" bind:tap="onViewReport">
           <view class="report-title">{{item.title}}</view>
           <view class="report-date">{{item.date}}</view>
+          <view wx:if="{{item.status === 'processing'}}" class="report-status processing">
+            处理中 {{item.progress}}%
+          </view>
+          <view wx:elif="{{item.status === 'failed'}}" class="report-status failed">
+            处理失败 - 点击重新生成
+          </view>
+          <view wx:elif="{{item.status === 'completed'}}" class="report-status completed">
+            已完成 - 点击查看
+          </view>
         </view>
-        <view class="report-arrow">→</view>
+        <view class="report-actions">
+          <!-- 处理中的报告显示终止按钮 -->
+          <view wx:if="{{item.status === 'processing'}}" class="action-btn cancel-action" data-report="{{item}}" catchtap="onCancelReportFromList">
+            终止
+          </view>
+          <!-- 其他状态显示箭头 -->
+          <view wx:else class="report-arrow" data-report="{{item}}" bind:tap="onViewReport">
+            <text wx:if="{{item.status === 'failed'}}">🔄</text>
+            <text wx:else>→</text>
+          </view>
+        </view>
       </view>
     </view>
 

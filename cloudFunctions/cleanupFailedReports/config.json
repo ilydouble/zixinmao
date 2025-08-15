@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "openapi": [
+      "cloudbase.uploadFile",
+      "cloudbase.deleteFile",
+      "cloudbase.getTempFileURL",
+      "cloudbase.downloadFile"
+    ]
+  },
+  "triggers": [],
+  "timeout": 300,
+  "envVariables": {},
+  "vpc": {
+    "vpcId": "",
+    "subnetId": ""
+  },
+  "memorySize": 256,
+  "runtime": "Nodejs16.13"
+}

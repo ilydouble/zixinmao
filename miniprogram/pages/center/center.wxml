@@ -108,14 +108,32 @@
 
 
 
-  <!-- 功能菜单 -->
+  <!-- 常用功能菜单 -->
   <view class="menu-section">
     <t-cell-group>
       <t-cell
-        wx:for="{{menuItems}}"
+        wx:for="{{commonMenuItems}}"
         wx:key="id"
         title="{{item.title}}"
         left-icon="{{item.icon}}"
+        arrow
+        data-url="{{item.url}}"
+        data-item="{{item}}"
+        bind:click="onNavigateToMenu"
+      />
+    </t-cell-group>
+  </view>
+
+  <!-- 测试功能菜单 -->
+  <view class="menu-section">
+    <view class="menu-title">🔧 开发测试</view>
+    <t-cell-group>
+      <t-cell
+        wx:for="{{testMenuItems}}"
+        wx:key="id"
+        title="{{item.title}}"
+        left-icon="{{item.icon}}"
+        note="{{item.description}}"
         arrow
         data-url="{{item.url}}"
         data-item="{{item}}"

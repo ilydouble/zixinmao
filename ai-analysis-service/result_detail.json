@@ -1,0 +1,862 @@
+{
+  "summary": {
+    "report_info": {
+      "report_date": "2025-03-13",
+      "subject_name": "王刚",
+      "id_number": "610422********120013",
+      "query_reason": "本人查询",
+      "report_number": "202503786289"
+    },
+    "personal_info": {
+      "gender": "男",
+      "birth_date": "1974-04-12",
+      "marital_status": "已婚",
+      "education": "未提供",
+      "residence_address": "未提供"
+    },
+    "credit_overview": {
+      "credit_score": 700,
+      "credit_level": "A级 (一般)",
+      "total_accounts": 53,
+      "total_credit_limit": 1190000.0,
+      "total_balance": 1009561.0,
+      "credit_card_limit": 37000.0,
+      "loan_total_amount": 1153000.0,
+      "score_breakdown": {
+        "base_score": 600,
+        "payment_history_score": 120,
+        "utilization_score": -60,
+        "history_length_score": 50,
+        "account_mix_score": 30,
+        "inquiry_score": -40,
+        "final_score": 700
+      }
+    }
+  },
+  "account_details": {
+    "credit_cards": [
+      {
+        "institution": "中国建设银行股份有限公司咸阳分行",
+        "account_number": "********3792",
+        "account_status": "未结清",
+        "open_date": "2017-03-23",
+        "credit_limit": 25000.0,
+        "used_amount": 25153.0,
+        "current_balance": 25153.0,
+        "last_payment_date": "2025-02",
+        "payment_status": "正常"
+      },
+      {
+        "institution": "中国工商银行股份有限公司陕西省分行西安分行",
+        "account_number": "********4371",
+        "account_status": "未结清",
+        "open_date": "2022-12-30",
+        "credit_limit": 0.0,
+        "used_amount": 36108.0,
+        "current_balance": 36108.0,
+        "last_payment_date": "2025-02",
+        "payment_status": "正常 (含大额专项分期余额)"
+      },
+      {
+        "institution": "中信银行股份有限公司信用卡中心",
+        "account_number": "********6718",
+        "account_status": "未结清",
+        "open_date": "2023-08-18",
+        "credit_limit": 12000.0,
+        "used_amount": 77618.0,
+        "current_balance": 77618.0,
+        "last_payment_date": "2025-02",
+        "payment_status": "正常 (含大额专项分期余额)"
+      },
+      {
+        "institution": "长安银行股份有限公司",
+        "account_number": "未提供",
+        "account_status": "已销户",
+        "open_date": "2021-06-22",
+        "credit_limit": 0.0,
+        "used_amount": 0.0,
+        "current_balance": 0.0,
+        "last_payment_date": "2024-10",
+        "payment_status": "销户"
+      },
+      {
+        "institution": "上海浦东发展银行股份有限公司信用卡中心",
+        "account_number": "未提供",
+        "account_status": "尚未激活",
+        "open_date": "2024-07-02",
+        "credit_limit": 0.0,
+        "used_amount": 0.0,
+        "current_balance": 0.0,
+        "last_payment_date": "N/A",
+        "payment_status": "尚未激活"
+      }
+    ],
+    "loans": [
+      {
+        "institution": "中国工商银行股份有限公司咸阳分行",
+        "loan_type": "个人住房商业贷款",
+        "account_number": "未提供",
+        "loan_amount": 270000.0,
+        "remaining_balance": 108925.0,
+        "monthly_payment": "未提供",
+        "loan_term": "至2030-01-05",
+        "interest_rate": "未提供",
+        "start_date": "2015-01-05",
+        "payment_status": "正常"
+      },
+      {
+        "institution": "中信银行股份有限公司西安明德门支行",
+        "loan_type": "其他个人消费贷款",
+        "account_number": "未提供",
+        "loan_amount": 184300.0,
+        "remaining_balance": 122867.0,
+        "monthly_payment": "未提供",
+        "loan_term": "至2026-08-24",
+        "interest_rate": "未提供",
+        "start_date": "2023-08-24",
+        "payment_status": "正常"
+      },
+      {
+        "institution": "兴业消费金融股份公司",
+        "loan_type": "其他个人消费贷款",
+        "account_number": "未提供",
+        "loan_amount": 70000.0,
+        "remaining_balance": 52946.0,
+        "monthly_payment": "未提供",
+        "loan_term": "至2026-07-05",
+        "interest_rate": "未提供",
+        "start_date": "2024-07-05",
+        "payment_status": "正常"
+      },
+      {
+        "institution": "中国工商银行股份有限公司陕西省分行西安分行",
+        "loan_type": "其他个人消费贷款",
+        "account_number": "未提供",
+        "loan_amount": 150000.0,
+        "remaining_balance": 150000.0,
+        "monthly_payment": "未提供",
+        "loan_term": "至2027-07-24",
+        "interest_rate": "未提供",
+        "start_date": "2024-07-24",
+        "payment_status": "正常"
+      },
+      {
+        "institution": "中国工商银行股份有限公司陕西省分行西安分行",
+        "loan_type": "其他个人消费贷款",
+        "account_number": "未提供",
+        "loan_amount": 150000.0,
+        "remaining_balance": 150000.0,
+        "monthly_payment": "未提供",
+        "loan_term": "至2027-07-24",
+        "interest_rate": "未提供",
+        "start_date": "2024-07-24",
+        "payment_status": "正常"
+      },
+      {
+        "institution": "四川新网银行股份有限公司",
+        "loan_type": "其他个人消费贷款 (授信)",
+        "account_number": "未提供",
+        "loan_amount": 50800.0,
+        "remaining_balance": 0.0,
+        "monthly_payment": "未提供",
+        "loan_term": "至2026-02-22",
+        "interest_rate": "未提供",
+        "start_date": "2022-07-03",
+        "payment_status": "正常 (额度循环使用)"
+      },
+      {
+        "institution": "长安银行股份有限公司",
+        "loan_type": "其他个人消费贷款 (授信)",
+        "account_number": "未提供",
+        "loan_amount": 30000.0,
+        "remaining_balance": 0.0,
+        "monthly_payment": "未提供",
+        "loan_term": "至2025-06-13",
+        "interest_rate": "未提供",
+        "start_date": "2022-08-14",
+        "payment_status": "正常 (额度循环使用)"
+      },
+      {
+        "institution": "中国建设银行股份有限公司西安和平路支行",
+        "loan_type": "其他个人消费贷款 (授信)",
+        "account_number": "未提供",
+        "loan_amount": 97800.0,
+        "remaining_balance": 97800.0,
+        "monthly_payment": "未提供",
+        "loan_term": "至2026-08-19",
+        "interest_rate": "未提供",
+        "start_date": "2023-08-19",
+        "payment_status": "正常 (额度循环使用)"
+      },
+      {
+        "institution": "陕西秦农农村商业银行股份有限公司未央支行",
+        "loan_type": "其他个人消费贷款 (授信)",
+        "account_number": "未提供",
+        "loan_amount": 80000.0,
+        "remaining_balance": 80000.0,
+        "monthly_payment": "未提供",
+        "loan_term": "至2025-09-27",
+        "interest_rate": "未提供",
+        "start_date": "2023-09-28",
+        "payment_status": "正常 (额度循环使用)"
+      },
+      {
+        "institution": "南银法巴消费金融有限公司",
+        "loan_type": "其他个人消费贷款 (授信)",
+        "account_number": "未提供",
+        "loan_amount": 70000.0,
+        "remaining_balance": 58144.0,
+        "monthly_payment": "未提供",
+        "loan_term": "至2029-03-18",
+        "interest_rate": "未提供",
+        "start_date": "2024-03-18",
+        "payment_status": "正常 (额度循环使用)"
+      },
+      {
+        "institution": "重庆蚂蚁消费金融有限公司",
+        "loan_type": "其他个人消费贷款 (授信)",
+        "account_number": "未提供",
+        "loan_amount": 100.0,
+        "remaining_balance": 0.0,
+        "monthly_payment": "未提供",
+        "loan_term": "至2026-12-01",
+        "interest_rate": "未提供",
+        "start_date": "2024-12-17",
+        "payment_status": "正常 (额度循环使用)"
+      }
+    ]
+  },
+  "payment_history": {
+    "overdue_records": [],
+    "payment_statistics": {
+      "total_overdue_count": 0,
+      "max_overdue_days": 0,
+      "recent_overdue_count": 0,
+      "on_time_payment_rate": 1.0
+    }
+  },
+  "query_records": {
+    "recent_queries": [
+      {
+        "query_date": "2025-03-12",
+        "query_institution": "重庆蚂蚁消费金融有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2025-03-04",
+        "query_institution": "南银法巴消费金融有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2025-03-04",
+        "query_institution": "本人",
+        "query_reason": "本人查询(自助查询机)"
+      },
+      {
+        "query_date": "2025-02-24",
+        "query_institution": "陕西秦农农村商业银行股份有限公司",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2025-02-24",
+        "query_institution": "上海浦东发展银行股份有限公司",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2025-02-13",
+        "query_institution": "浙商银行股份有限公司",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2025-02-12",
+        "query_institution": "中信银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2025-01-17",
+        "query_institution": "宁夏银行股份有限公司",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2025-01-13",
+        "query_institution": "中国农业银行股份有限公司西安分行",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2025-01-13",
+        "query_institution": "交通银行股份有限公司陕西省分行",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2025-01-07",
+        "query_institution": "上海浦东发展银行股份有限公司",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2025-01-06",
+        "query_institution": "本人",
+        "query_reason": "本人查询(自助查询机)"
+      },
+      {
+        "query_date": "2025-01-01",
+        "query_institution": "陕西秦农农村商业银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-12-25",
+        "query_institution": "中信银行股份有限公司信用卡中心",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-12-02",
+        "query_institution": "南银法巴消费金融有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-11-16",
+        "query_institution": "中国建设银行股份有限公司咸阳分行",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-11-14",
+        "query_institution": "中信银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-10-25",
+        "query_institution": "中信银行股份有限公司信用卡中心",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-10-15",
+        "query_institution": "中国建设银行股份有限公司咸阳分行",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-09-25",
+        "query_institution": "中信银行股份有限公司信用卡中心",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-09-19",
+        "query_institution": "陕西秦农农村商业银行股份有限公司未央支行",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2024-09-17",
+        "query_institution": "中国建设银行股份有限公司咸阳分行",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-09-16",
+        "query_institution": "中国建设银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-09-10",
+        "query_institution": "中国农业银行股份有限公司西安分行",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2024-09-05",
+        "query_institution": "南银法巴消费金融有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-09-02",
+        "query_institution": "四川新网银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-08-19",
+        "query_institution": "中国建设银行股份有限公司西安和平路支行",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2024-08-18",
+        "query_institution": "中信银行股份有限公司",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2024-08-18",
+        "query_institution": "深圳前海微众银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-08-18",
+        "query_institution": "重庆美团三快小额贷款有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-08-18",
+        "query_institution": "中国建设银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-08-18",
+        "query_institution": "中信银行股份有限公司信用卡中心",
+        "query_reason": "信用卡审批"
+      },
+      {
+        "query_date": "2024-08-18",
+        "query_institution": "招商银行股份有限公司",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2024-08-16",
+        "query_institution": "中信银行股份有限公司西安分行",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2024-08-16",
+        "query_institution": "中国建设银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-08-16",
+        "query_institution": "本人",
+        "query_reason": "本人查询(自助查询机)"
+      },
+      {
+        "query_date": "2024-08-14",
+        "query_institution": "长安银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-08-12",
+        "query_institution": "中邮消费金融有限公司",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2024-08-12",
+        "query_institution": "中国工商银行股份有限公司银行卡业务部(牡丹卡中心)",
+        "query_reason": "信用卡审批"
+      },
+      {
+        "query_date": "2024-07-24",
+        "query_institution": "中国工商银行股份有限公司",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2024-07-17",
+        "query_institution": "中国建设银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-07-12",
+        "query_institution": "四川新网银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-07-03",
+        "query_institution": "兴业消费金融股份公司",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2024-07-01",
+        "query_institution": "上海浦东发展银行股份有限公司信用卡中心",
+        "query_reason": "信用卡审批"
+      },
+      {
+        "query_date": "2024-06-25",
+        "query_institution": "本人",
+        "query_reason": "本人查询(自助查询机)"
+      },
+      {
+        "query_date": "2024-06-25",
+        "query_institution": "招联消费金融股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-06-25",
+        "query_institution": "中国农业银行股份有限公司西安分行",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2024-06-25",
+        "query_institution": "中信银行股份有限公司信用卡中心",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-06-25",
+        "query_institution": "南银法巴消费金融有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-06-25",
+        "query_institution": "中信银行股份有限公司",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2024-06-17",
+        "query_institution": "重庆蚂蚁消费金融有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-06-07",
+        "query_institution": "长安银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-06-05",
+        "query_institution": "长安银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-05-24",
+        "query_institution": "中银消费金融有限公司",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2024-05-15",
+        "query_institution": "中国建设银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-05-08",
+        "query_institution": "深圳前海微众银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-04-26",
+        "query_institution": "本人",
+        "query_reason": "本人查询(商业银行网上银行)"
+      },
+      {
+        "query_date": "2024-04-25",
+        "query_institution": "中信银行股份有限公司信用卡中心",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-04-16",
+        "query_institution": "中信银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-04-14",
+        "query_institution": "重庆蚂蚁消费金融有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-03-25",
+        "query_institution": "中国工商银行股份有限公司陕西省分行西安分行",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2024-03-25",
+        "query_institution": "本人",
+        "query_reason": "本人查询(自助查询机)"
+      },
+      {
+        "query_date": "2024-03-22",
+        "query_institution": "四川新网银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-03-18",
+        "query_institution": "南银法巴消费金融有限公司",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2024-03-18",
+        "query_institution": "本人",
+        "query_reason": "本人查询(自助查询机)"
+      },
+      {
+        "query_date": "2024-03-15",
+        "query_institution": "长安银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-03-01",
+        "query_institution": "四川新网银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-02-18",
+        "query_institution": "深圳前海微众银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-02-14",
+        "query_institution": "深圳前海微众银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-02-13",
+        "query_institution": "中国建设银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-01-23",
+        "query_institution": "中信银行股份有限公司信用卡中心",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-01-17",
+        "query_institution": "中信银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2024-01-15",
+        "query_institution": "中国建设银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-12-31",
+        "query_institution": "陕西秦农农村商业银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-12-21",
+        "query_institution": "长安银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-12-16",
+        "query_institution": "中国建设银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-12-09",
+        "query_institution": "长安银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-12-01",
+        "query_institution": "上海浦东发展银行股份有限公司信用卡中心",
+        "query_reason": "信用卡审批"
+      },
+      {
+        "query_date": "2023-11-29",
+        "query_institution": "中国建设银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-11-20",
+        "query_institution": "招联消费金融股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-11-20",
+        "query_institution": "重庆美团三快小额贷款有限公司",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2023-11-18",
+        "query_institution": "深圳前海微众银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-11-16",
+        "query_institution": "四川新网银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-11-14",
+        "query_institution": "深圳市大数融资担保有限公司",
+        "query_reason": "担保资格审查"
+      },
+      {
+        "query_date": "2023-11-14",
+        "query_institution": "平安银行股份有限公司",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2023-10-25",
+        "query_institution": "中信银行股份有限公司信用卡中心",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-09-19",
+        "query_institution": "陕西秦农农村商业银行股份有限公司未央支行",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2023-09-18",
+        "query_institution": "本人",
+        "query_reason": "本人查询(自助查询机)"
+      },
+      {
+        "query_date": "2023-09-16",
+        "query_institution": "中国建设银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-08-18",
+        "query_institution": "中信银行股份有限公司信用卡中心",
+        "query_reason": "信用卡审批"
+      },
+      {
+        "query_date": "2023-08-18",
+        "query_institution": "招商银行股份有限公司",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2023-08-18",
+        "query_institution": "中国建设银行股份有限公司西安和平路支行",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2023-08-18",
+        "query_institution": "中信银行股份有限公司",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2023-08-18",
+        "query_institution": "深圳前海微众银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-08-18",
+        "query_institution": "重庆美团三快小额贷款有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-08-18",
+        "query_institution": "中国建设银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-08-18",
+        "query_institution": "本人",
+        "query_reason": "本人查询(自助查询机)"
+      },
+      {
+        "query_date": "2023-08-17",
+        "query_institution": "中国建设银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-08-17",
+        "query_institution": "招联消费金融股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-08-16",
+        "query_institution": "长安银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-08-14",
+        "query_institution": "中国建设银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-07-23",
+        "query_institution": "四川新网银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-07-21",
+        "query_institution": "长安银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-06-03",
+        "query_institution": "浙江网商银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-05-18",
+        "query_institution": "招联消费金融股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-05-13",
+        "query_institution": "四川新网银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-05-08",
+        "query_institution": "重庆美团三快小额贷款有限公司",
+        "query_reason": "贷款审批"
+      },
+      {
+        "query_date": "2023-05-08",
+        "query_institution": "本人",
+        "query_reason": "本人查询(自助查询机)"
+      },
+      {
+        "query_date": "2023-04-25",
+        "query_institution": "长安银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-04-14",
+        "query_institution": "浙江网商银行股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-04-08",
+        "query_institution": "招联消费金融股份有限公司",
+        "query_reason": "贷后管理"
+      },
+      {
+        "query_date": "2023-03-24",
+        "query_institution": "四川新网银行股份有限公司",
+        "query_reason": "贷后管理"
+      }
+    ],
+    "query_statistics": {
+      "total_queries_6m": 23,
+      "total_queries_12m": 65,
+      "hard_inquiry_count": 26
+    }
+  },
+  "risk_assessment": {
+    "overall_risk_level": "中",
+    "risk_score": 65,
+    "risk_factors": [
+      {
+        "factor": "信用使用率过高",
+        "severity": "高",
+        "description": "活跃循环信用账户的平均使用率高达113.78%，远超健康水平，表明信用额度紧张，可能存在还款压力。"
+      },
+      {
+        "factor": "近期查询次数过多",
+        "severity": "中高",
+        "description": "近6个月有23次查询记录，其中9次为硬查询（贷款/信用卡审批），近12个月有65次查询，其中26次为硬查询。短期内频繁的硬查询可能暗示借款人存在资金需求急迫或在多家机构申请但未能获批的情况，对信用评分有负面影响。"
+      }
+    ],
+    "positive_factors": [
+      {
+        "factor": "良好还款历史",
+        "impact": "高",
+        "description": "报告期内无任何逾期记录，体现了良好的还款意愿和能力。"
+      },
+      {
+        "factor": "信用历史悠久",
+        "impact": "高",
+        "description": "信用历史长度超过10年，累积了丰富的信用记录，有助于信用评分稳定。"
+      },
+      {
+        "factor": "账户类型多样性",
+        "impact": "中",
+        "description": "拥有住房贷款、多种消费贷款（包括分期和循环授信）和信用卡，信用账户类型丰富，表明具备管理不同信用产品的能力。"
+      }
+    ],
+    "recommendations": [
+      {
+        "category": "信用使用",
+        "suggestion": "尽快降低信用卡（循环授信）的使用率，建议将使用率控制在30%以下，例如通过增加还款或申请提高信用额度（在不增加消费的前提下）。",
+        "priority": "高"
+      },
+      {
+        "category": "信用申请",
+        "suggestion": "未来6-12个月内，避免不必要的贷款和信用卡申请，减少硬查询次数，让信用记录有恢复期。",
+        "priority": "高"
+      },
+      {
+        "category": "还款管理",
+        "suggestion": "继续保持当前良好的还款习惯，确保所有账单按时足额偿还。",
+        "priority": "中"
+      }
+    ]
+  },
+  "trend_analysis": {
+    "credit_utilization_trend": "高位运行",
+    "payment_behavior_trend": "稳定良好",
+    "account_growth_trend": "近期账户数量及查询次数增长较快"
+  }
+}

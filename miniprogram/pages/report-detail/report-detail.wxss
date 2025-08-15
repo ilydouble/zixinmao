@@ -1,0 +1,205 @@
+/* report-detail.wxss */
+.container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+}
+
+.report-container {
+  padding: 32rpx;
+}
+
+/* 报告头部 */
+.report-header {
+  background: white;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24rpx;
+}
+
+.file-info {
+  flex: 1;
+}
+
+.file-name {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12rpx;
+  word-break: break-all;
+}
+
+.upload-time {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.status-info {
+  margin-left: 24rpx;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-bottom: 16rpx;
+}
+
+.processing-time {
+  font-size: 24rpx;
+  color: #666;
+  text-align: center;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #eee;
+}
+
+/* 报告内容 */
+.report-content {
+  background: white;
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.content-header {
+  padding: 32rpx 32rpx 0;
+  border-bottom: 1rpx solid #eee;
+}
+
+.content-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.content-body {
+  padding: 32rpx;
+}
+
+.content-text {
+  font-size: 28rpx;
+  line-height: 1.6;
+  color: #333;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.empty-content {
+  padding: 80rpx 32rpx;
+  text-align: center;
+}
+
+/* 下载区域 */
+.download-section {
+  background: white;
+  border-radius: 16rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+  margin-bottom: 24rpx;
+}
+
+.section-title text {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.download-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.download-buttons .t-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 32rpx;
+}
+
+.action-buttons .t-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+}
+
+/* 响应式设计 */
+@media (max-width: 750rpx) {
+  .header-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .status-info {
+    margin-left: 0;
+    margin-top: 16rpx;
+  }
+  
+  .download-buttons {
+    gap: 12rpx;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 16rpx;
+  }
+}
+
+/* 动画效果 */
+.report-container {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 加载状态 */
+.loading-container {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

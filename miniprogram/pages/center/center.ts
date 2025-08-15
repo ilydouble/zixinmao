@@ -9,7 +9,8 @@ Page({
     // 状态栏高度（用于自定义导航栏安全区）
     statusBarHeight: 0,
     refreshing: false,
-    menuItems: [
+    // 常用功能菜单
+    commonMenuItems: [
       {
         id: 'orders',
         icon: '🧾',
@@ -45,34 +46,58 @@ Page({
         icon: '⚙️',
         title: '设置',
         url: '/pages/settings/settings'
+      }
+    ],
+
+    // 测试功能菜单
+    testMenuItems: [
+      {
+        id: 'testAlgorithm',
+        icon: '🧪',
+        title: '算法接口测试',
+        url: '',
+        action: 'testAlgorithm',
+        description: '测试流水分析算法功能'
       },
       {
         id: 'debug',
         icon: '🔧',
-        title: '调试工具',
+        title: '基础初始化',
         url: '',
-        action: 'debug'
+        action: 'debug',
+        description: '初始化项目基础数据'
+      },
+      {
+        id: 'initReports',
+        icon: '📋',
+        title: '报告数据初始化',
+        url: '',
+        action: 'initReports',
+        description: '初始化报告相关数据'
       },
       {
         id: 'sync',
         icon: '🔄',
         title: '同步余额',
         url: '',
-        action: 'sync'
+        action: 'sync',
+        description: '同步用户余额信息'
       },
       {
         id: 'check',
         icon: '📊',
         title: '查看记录',
         url: '',
-        action: 'check'
+        action: 'check',
+        description: '查看系统运行记录'
       },
       {
         id: 'testAvatar',
         icon: '🖼️',
         title: '测试头像',
         url: '',
-        action: 'testAvatar'
+        action: 'testAvatar',
+        description: '测试头像上传功能'
       }
     ]
   },
@@ -272,12 +297,16 @@ Page({
 
     if (item.action === 'debug') {
       this.onInitDatabase()
+    } else if (item.action === 'initReports') {
+      this.onInitReports()
     } else if (item.action === 'sync') {
       this.onSyncBalance()
     } else if (item.action === 'check') {
       this.onCheckRecords()
     } else if (item.action === 'testAvatar') {
       this.onTestAvatar()
+    } else if (item.action === 'testAlgorithm') {
+      this.testAlgorithm()
     } else if (url) {
       wx.navigateTo({ url })
     }
@@ -289,7 +318,7 @@ Page({
   async onInitDatabase() {
     try {
       wx.showLoading({
-        title: '初始化中...'
+        title: '基础初始化中...'
       })
 
       const result = await wx.cloud.callFunction({
@@ -301,7 +330,7 @@ Page({
       const response = result.result as any
       if (response?.success) {
         wx.showToast({
-          title: '初始化成功',
+          title: '基础初始化成功',
           icon: 'success'
         })
 
@@ -309,7 +338,7 @@ Page({
         this.loadUserInfo()
       } else {
         wx.showToast({
-          title: response.message || '初始化失败',
+          title: response.message || '基础初始化失败',
           icon: 'error'
         })
       }
@@ -317,8 +346,75 @@ Page({
       wx.hideLoading()
       console.error('初始化数据库失败:', error)
       wx.showToast({
-        title: '初始化失败',
+        title: '基础初始化失败',
         icon: 'error'
+      })
+    }
+  },
+
+  /**
+   * 初始化报告数据（调试功能）
+   */
+  async onInitReports() {
+    try {
+      // 先确认操作
+      const confirmResult = await new Promise<boolean>((resolve) => {
+        wx.showModal({
+          title: '确认初始化',
+          content: '将为用户 ogbda1wnM7p73VGSgfQD4lUMsQKo 创建测试报告数据，包含5个测试报告。是否继续？',
+          confirmText: '确认',
+          cancelText: '取消',
+          success: (res) => {
+            resolve(res.confirm)
+          }
+        })
+      })
+
+      if (!confirmResult) {
+        return
+      }
+
+      wx.showLoading({
+        title: '正在初始化报告数据...'
+      })
+
+      const result = await wx.cloud.callFunction({
+        name: 'initDataSetReport'
+      })
+
+      wx.hideLoading()
+
+      const response = result.result as any
+      if (response?.success) {
+        // 显示详细的成功信息
+        const details = response.details || []
+        const detailText = details.slice(0, 6).join('\n')
+
+        wx.showModal({
+          title: '报告数据初始化成功',
+          content: `${response.message}\n\n${detailText}`,
+          showCancel: false,
+          confirmText: '确定'
+        })
+
+        // 刷新用户信息
+        this.loadUserInfo()
+      } else {
+        wx.showModal({
+          title: '初始化失败',
+          content: response.error || '报告数据初始化失败',
+          showCancel: false,
+          confirmText: '确定'
+        })
+      }
+    } catch (error) {
+      wx.hideLoading()
+      console.error('初始化报告数据失败:', error)
+      wx.showModal({
+        title: '初始化失败',
+        content: '报告数据初始化失败，请检查网络连接或稍后重试',
+        showCancel: false,
+        confirmText: '确定'
       })
     }
   },
@@ -555,6 +651,78 @@ Page({
       wx.showModal({
         title: '测试失败',
         content: `错误: ${error.message}`,
+        showCancel: false,
+        confirmText: '确定'
+      })
+    }
+  },
+
+  /**
+   * 测试算法接口
+   */
+  async testAlgorithm() {
+    wx.showLoading({
+      title: '测试中...',
+      mask: true
+    })
+
+    try {
+      console.log('开始测试流水分析算法接口')
+
+      // 调用测试云函数
+      const result = await wx.cloud.callFunction({
+        name: 'testAlgorithm',
+        data: {
+          reportType: 'flow',
+          testMode: 'mock'
+        }
+      })
+
+      wx.hideLoading()
+
+      if (result.result && (result.result as any).success) {
+        const testResult = result.result as any
+        let message = `✅ 算法接口测试成功！\n\n`
+        message += `📊 测试结果:\n`
+        message += `- 报告类型: 流水分析\n`
+        message += `- 测试模式: 模拟测试\n`
+        message += `- 处理状态: ${testResult.result?.status || 'N/A'}\n`
+        message += `- 处理时间: ${testResult.result?.processingTime || 'N/A'}\n`
+
+        if (testResult.result?.data) {
+          message += `\n📋 分析结果:\n`
+          message += `- 分析类型: ${testResult.result.data.analysisType}\n`
+
+          if (testResult.result.data.summary) {
+            message += `- 分析评分: ${testResult.result.data.summary.analysisScore || 'N/A'}\n`
+            message += `- 风险等级: ${testResult.result.data.summary.riskLevel || 'N/A'}\n`
+          }
+        }
+
+        wx.showModal({
+          title: '算法测试结果',
+          content: message,
+          showCancel: false,
+          confirmText: '确定'
+        })
+      } else {
+        throw new Error((result.result as any)?.error || '测试失败')
+      }
+
+    } catch (error: any) {
+      wx.hideLoading()
+      console.error('算法接口测试失败:', error)
+
+      let errorMessage = `❌ 算法接口测试失败！\n\n`
+      errorMessage += `错误信息: ${error.message}\n\n`
+      errorMessage += `请检查:\n`
+      errorMessage += `1. testAlgorithm 云函数是否已部署\n`
+      errorMessage += `2. 云函数权限配置是否正确\n`
+      errorMessage += `3. 网络连接是否正常`
+
+      wx.showModal({
+        title: '测试失败',
+        content: errorMessage,
         showCancel: false,
         confirmText: '确定'
       })

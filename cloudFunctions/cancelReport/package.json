@@ -1,0 +1,9 @@
+{
+  "name": "cancelReport",
+  "version": "1.0.0",
+  "description": "终止并删除正在处理的报告",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

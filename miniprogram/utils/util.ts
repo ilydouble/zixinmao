@@ -70,6 +70,17 @@ export const showError = (title: string = '操作失败') => {
 }
 
 /**
+ * 显示普通提示
+ */
+export const showToast = (title: string, icon: 'success' | 'error' | 'loading' | 'none' = 'none') => {
+  wx.showToast({
+    title,
+    icon,
+    duration: 2000
+  })
+}
+
+/**
  * 显示确认对话框
  */
 export const showConfirm = (content: string, title: string = '提示'): Promise<boolean> => {
@@ -164,4 +175,17 @@ export const deepClone = <T>(obj: T): T => {
     return clonedObj
   }
   return obj
+}
+
+/**
+ * 显示处理失败的详细对话框
+ */
+export const showProcessingFailedDialog = () => {
+  wx.showModal({
+    title: '处理失败',
+    content: '文档处理失败，可能的原因：\n1. 文档格式不支持\n2. 文档内容无法识别\n3. 网络连接问题\n\n失败的记录已自动清理，请检查文档后重新上传。',
+    showCancel: false,
+    confirmText: '我知道了',
+    confirmColor: '#007AFF'
+  })
 }

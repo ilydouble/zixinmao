@@ -36,3 +36,79 @@
   color: #9a3412;
   opacity: 0.8;
 }
+
+/* 简信宝特有的醒目状态样式 */
+.report-item {
+  position: relative;
+}
+
+/* 失败状态的醒目红色标签 */
+.failed-badge {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  background: linear-gradient(135deg, #ff4d4f, #cf1322);
+  color: white;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 20rpx;
+  font-weight: bold;
+  box-shadow: 0 4rpx 12rpx rgba(255, 77, 79, 0.4);
+  z-index: 10;
+  animation: pulse 2s infinite;
+}
+
+.failed-text {
+  text-shadow: 0 1rpx 2rpx rgba(0, 0, 0, 0.2);
+}
+
+/* 处理中状态的进度标签 */
+.processing-badge {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  background: linear-gradient(135deg, #faad14, #d48806);
+  color: white;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 20rpx;
+  font-weight: bold;
+  box-shadow: 0 4rpx 12rpx rgba(250, 173, 20, 0.4);
+  z-index: 10;
+}
+
+.processing-text {
+  text-shadow: 0 1rpx 2rpx rgba(0, 0, 0, 0.2);
+}
+
+/* 失败报告的整体样式更醒目 */
+.report-item.failed {
+  background: linear-gradient(135deg, #fff2f0, #ffebe8);
+  border: 2rpx solid #ff4d4f;
+  border-radius: 16rpx;
+  margin: 8rpx 0;
+  box-shadow: 0 4rpx 16rpx rgba(255, 77, 79, 0.15);
+  transform: scale(1.02);
+}
+
+/* 处理中报告的样式 */
+.report-item.processing {
+  background: linear-gradient(135deg, #fff7e6, #ffecc7);
+  border: 2rpx solid #faad14;
+  border-radius: 16rpx;
+  margin: 8rpx 0;
+  box-shadow: 0 4rpx 16rpx rgba(250, 173, 20, 0.15);
+}
+
+/* 脉冲动画 */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

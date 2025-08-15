@@ -1,0 +1,9 @@
+{
+  "name": "handleAnalysisCallback",
+  "version": "1.0.0",
+  "description": "处理AI分析完成的回调通知",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

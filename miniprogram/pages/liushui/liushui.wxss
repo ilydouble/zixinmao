@@ -38,11 +38,20 @@
 
 .upload-area {
   text-align: center;
-  padding: 60rpx 40rpx;
+  padding: 40rpx;
   border: 2rpx dashed #d9d9d9;
   border-radius: 12rpx;
   background: #fafafa;
   transition: all 0.3s ease;
+}
+
+.upload-content {
+  padding: 20rpx;
+  cursor: pointer;
+}
+
+.upload-content:active {
+  opacity: 0.8;
 }
 
 .upload-area:active {
@@ -128,6 +137,18 @@
   text-align: center;
 }
 
+.cancel-section {
+  margin-top: 24rpx;
+  text-align: center;
+}
+
+.cancel-btn {
+  background-color: #ff4d4f !important;
+  border-color: #ff4d4f !important;
+  color: white !important;
+  min-width: 200rpx;
+}
+
 /* 操作区域 */
 .action-section {
   margin-top: 32rpx;
@@ -177,6 +198,73 @@
   background-color: #f8fafc;
 }
 
+/* 报告状态样式 */
+.report-item.processing {
+  background: linear-gradient(135deg, #fff7e6, #ffecc7);
+  border: 2rpx solid #faad14;
+  border-radius: 16rpx;
+  margin: 8rpx 0;
+  box-shadow: 0 4rpx 16rpx rgba(250, 173, 20, 0.15);
+}
+
+.report-item.failed {
+  background: linear-gradient(135deg, #fff2f0, #ffebe8);
+  border: 2rpx solid #ff4d4f;
+  border-radius: 16rpx;
+  margin: 8rpx 0;
+  box-shadow: 0 4rpx 16rpx rgba(255, 77, 79, 0.15);
+  transform: scale(1.02);
+  animation: pulse 2s infinite;
+}
+
+.report-status {
+  font-size: 24rpx;
+  margin-top: 8rpx;
+  padding: 6rpx 12rpx;
+  border-radius: 12rpx;
+  display: inline-block;
+  font-weight: 500;
+}
+
+.report-status.processing {
+  background: linear-gradient(135deg, #faad14, #d48806);
+  color: white;
+  box-shadow: 0 2rpx 8rpx rgba(250, 173, 20, 0.3);
+}
+
+.report-status.failed {
+  background: linear-gradient(135deg, #ff4d4f, #cf1322);
+  color: white;
+  box-shadow: 0 2rpx 8rpx rgba(255, 77, 79, 0.3);
+  animation: shake 0.5s ease-in-out;
+}
+
+.report-status.completed {
+  background: linear-gradient(135deg, #52c41a, #389e0d);
+  color: white;
+  box-shadow: 0 2rpx 8rpx rgba(82, 196, 26, 0.3);
+}
+
+/* 脉冲动画 */
+@keyframes pulse {
+  0% {
+    transform: scale(1.02);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: scale(1.02);
+  }
+}
+
+/* 震动动画 */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2rpx); }
+  75% { transform: translateX(2rpx); }
+}
+
 .report-icon {
   width: 48rpx;
   height: 48rpx;
@@ -203,9 +291,31 @@
   color: #666;
 }
 
+.report-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80rpx;
+}
+
 .report-arrow {
   color: #ccc;
   font-size: 24rpx;
+}
+
+.action-btn {
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  text-align: center;
+  min-width: 60rpx;
+}
+
+.cancel-action {
+  background-color: #ff4d4f;
+  color: white;
+  border: 1rpx solid #ff4d4f;
 }
 
 /* 空状态 */
