@@ -200,17 +200,30 @@ class RequestQueue:
             logger.info(f"开始处理任务: {task_id}, 工作协程: {worker_name}")
             
             # 创建处理协程
-            from .ai_service import AIAnalysisService
-            ai_service = AIAnalysisService()
+            # from service.ai_service import AIAnalysisService
+            # ai_service = AIAnalysisService()
             
-            processing_coro = ai_service.analyze_document(
+            # processing_coro = ai_service.analyze_document(
+            #     file_base64=task.request_data["file_base64"],
+            #     mime_type=task.request_data["mime_type"],
+            #     report_type=task.request_data["report_type"],
+            #     custom_prompt=task.request_data.get("custom_prompt"),
+            #     request_id=task_id
+            # )
+
+            from service.report_service import ReportService
+            report_service = ReportService()
+            processing_coro = report_service.generate_report(
                 file_base64=task.request_data["file_base64"],
                 mime_type=task.request_data["mime_type"],
                 report_type=task.request_data["report_type"],
                 custom_prompt=task.request_data.get("custom_prompt"),
-                request_id=task_id
+                request_id=task_id,
+                name=task.request_data["name"],
+                id_card=task.request_data["id_card"],
+                mobile_no=task.request_data["mobile_no"],
             )
-            
+
             processing_task = asyncio.create_task(processing_coro)
             self.processing_tasks[task_id] = processing_task
             
@@ -221,13 +234,14 @@ class RequestQueue:
             task.completed_at = time.time()
             task.result = result
             
-            if result.get('success'):
+            if result.success:
                 task.status = TaskStatus.COMPLETED
                 self._stats["completed_requests"] += 1
                 logger.info(f"任务处理成功: {task_id}, 耗时: {task.processing_time:.2f}s")
+                task.result = result.model_dump()  # 将Pydantic模型转换为字典
             else:
                 task.status = TaskStatus.FAILED
-                task.error_message = result.get('error_message', '未知错误')
+                task.error_message = result.message  # 直接访问message属性
                 self._stats["failed_requests"] += 1
                 logger.error(f"任务处理失败: {task_id}, 错误: {task.error_message}")
         

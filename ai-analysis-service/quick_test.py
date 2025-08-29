@@ -33,6 +33,9 @@ async def quick_test():
     file_base64 = base64.b64encode(pdf_content).decode('utf-8')
     print(f"🔄 base64编码长度: {len(file_base64)} 字符")
     
+    with open("cuiyi.txt", 'w', encoding='utf-8') as f:
+        json.dump(file_base64, f, ensure_ascii=False, indent=2)
+
     # 测试征信分析（简版和详版，都使用cuiyi.pdf）
     test_cases = [
         {"type": "simple", "name": "简版征信分析"},

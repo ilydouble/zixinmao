@@ -1,196 +1,193 @@
 {
-  "report_date": "2025-03-13",
-  "subject_name": "王刚",
-  "id_number": "610422******0013",
-  "query_reason": "自我查询",
-  "credit_score": 350,
-  "credit_level": "C级",
   "summary": {
+    "report_info": {
+      "report_date": "2025-03-13",
+      "subject_name": "王刚",
+      "id_number": "610422********13",
+      "query_reason": "本人查询 (了解自身信用状况)"
+    },
     "credit_overview": {
-      "total_accounts": 16,
-      "total_credit_limit": 1246108,
-      "used_amount": 959561
-    },
-    "score_breakdown": {
-      "base_score": 600,
-      "payment_history_score": -200,
-      "utilization_score": -50,
-      "inquiry_score": -50,
-      "account_count_score": 50,
-      "final_score": 350
-    },
+      "credit_score": 650,
+      "credit_level": "A级",
+      "total_accounts": 53,
+      "total_credit_limit": 1190000,
+      "score_breakdown": {
+        "base_score": 600,
+        "payment_history_score": 100,
+        "utilization_score": -50,
+        "inquiry_score": -50,
+        "final_score": 650
+      }
+    }
+  },
+  "account_summary": {
     "credit_cards": {
       "total_cards": 5,
-      "total_limit": 93108,
+      "total_limit": 37000,
       "used_amount": 138879,
-      "utilization_rate": 1.4916
+      "utilization_rate": 3.753486
     },
     "loans": {
-      "total_loans": 11,
+      "total_loans": 48,
       "total_amount": 1153000,
       "remaining_balance": 820682
-    },
+    }
+  },
+  "payment_history": {
     "overdue_summary": {
-      "current_overdue": 15,
-      "max_overdue_days": "90天以上",
-      "overdue_amount": "未披露"
+      "current_overdue": 0,
+      "max_overdue_days": 0,
+      "overdue_amount": 0
     },
     "payment_behavior": {
-      "on_time_rate": "低，有多笔逾期记录",
-      "recent_queries": 8,
+      "on_time_rate": 1.0,
+      "recent_queries": 22,
       "query_institutions": [
-        "Chongqing Ant CF",
-        "CITIC Bank",
-        "Nanvin Farber",
-        "Shaanxi Qinong Bank",
-        "SPDB",
-        "Zheshang Bank",
-        "Ningxia Bank",
-        "ABC Xi'an"
+        "重庆蚂蚁消费金融有限公司",
+        "南银法巴消费金融有限公司",
+        "陕西秦农农村商业银行股份有限公司",
+        "上海浦东发展银行股份有限公司",
+        "浙商银行股份有限公司",
+        "中信银行股份有限公司",
+        "宁夏银行股份有限公司",
+        "中国农业银行股份有限公司",
+        "交通银行股份有限公司",
+        "中国建设银行股份有限公司"
       ]
     }
   },
   "risk_assessment": {
-    "risk_level": "高",
+    "risk_level": "中",
     "risk_factors": [
-      "Extensive history of severe delinquencies (multiple accounts, including 90+ days overdue).",
-      "High credit utilization (overall 77%, credit cards 149%).",
-      "Multiple accounts significantly over-limit.",
-      "High number of recent hard inquiries."
+      "信用卡使用率极高（逾期透支）",
+      "近期硬查询次数频繁（近6个月20次）",
+      "多笔消费贷款活跃且部分余额较高",
+      "部分信用卡存在超额使用情况"
     ],
     "positive_factors": [
-      "Diverse credit portfolio (mortgage, consumer loans, credit cards).",
-      "Long credit history (e.g., mortgage from 2015).",
-      "Revolving accounts L6, L7, L11 have 0 balance."
+      "无逾期记录",
+      "信用历史较长",
+      "账户类型多样化"
     ],
     "recommendations": [
-      "Prioritize paying off overdue balances immediately.",
-      "Reduce credit card and loan balances, especially those over-limit.",
-      "Avoid applying for new credit in the near future to reduce inquiry count.",
-      "Consolidate debts if possible to manage repayments more effectively.",
-      "Regularly monitor credit report for accuracy."
+      "立即降低信用卡使用率，避免超额透支",
+      "减少短期内新的信贷申请，以降低查询次数",
+      "定期检查征信报告，确保信息准确",
+      "合理规划债务，确保按时还款"
     ]
   },
   "detailed_accounts": [
     {
       "account_type": "Credit Card",
-      "institution": "CCB",
-      "status": "Active",
-      "limit": 25000,
+      "institution": "中国建设银行股份有限公司",
+      "account_status": "Active (Over-limit)",
+      "credit_limit": 25000,
       "balance": 25153,
-      "overdue_info": "根据报告概要，该账户存在严重逾期记录。"
+      "overdue_info": "None"
     },
     {
       "account_type": "Credit Card",
-      "institution": "ICBC",
-      "status": "Active",
-      "limit": 0,
+      "institution": "中国工商银行股份有限公司",
+      "account_status": "Active (Balance)",
+      "credit_limit": 0,
       "balance": 36108,
-      "overdue_info": "根据报告概要，该账户存在严重逾期记录。"
+      "overdue_info": "None"
     },
     {
       "account_type": "Credit Card",
-      "institution": "CITIC",
-      "status": "Active",
-      "limit": 12000,
+      "institution": "中信银行股份有限公司",
+      "account_status": "Active (Over-limit)",
+      "credit_limit": 12000,
       "balance": 77618,
-      "overdue_info": "根据报告概要，该账户存在严重逾期记录。"
+      "overdue_info": "None"
     },
     {
-      "account_type": "Credit Card",
-      "institution": "SPDB",
-      "status": "Not Activated",
-      "limit": 20000,
+      "account_type": "Personal Housing Commercial Loan",
+      "institution": "中国工商银行股份有限公司",
+      "account_status": "Active",
+      "credit_limit": 270000,
+      "balance": 108925,
+      "overdue_info": "None"
+    },
+    {
+      "account_type": "Other Personal Consumption Loan",
+      "institution": "中信银行股份有限公司",
+      "account_status": "Active",
+      "credit_limit": 184300,
+      "balance": 122867,
+      "overdue_info": "None"
+    },
+    {
+      "account_type": "Other Personal Consumption Loan",
+      "institution": "兴业消费金融股份公司",
+      "account_status": "Active",
+      "credit_limit": 70000,
+      "balance": 52946,
+      "overdue_info": "None"
+    },
+    {
+      "account_type": "Other Personal Consumption Loan",
+      "institution": "中国工商银行股份有限公司",
+      "account_status": "Active",
+      "credit_limit": 150000,
+      "balance": 150000,
+      "overdue_info": "None"
+    },
+    {
+      "account_type": "Other Personal Consumption Loan",
+      "institution": "中国工商银行股份有限公司",
+      "account_status": "Active",
+      "credit_limit": 150000,
+      "balance": 150000,
+      "overdue_info": "None"
+    },
+    {
+      "account_type": "Other Personal Consumption Loan (Revolving)",
+      "institution": "四川新网银行股份有限公司",
+      "account_status": "Active",
+      "credit_limit": 50800,
       "balance": 0,
-      "overdue_info": "根据报告概要，该账户存在严重逾期记录。"
+      "overdue_info": "None"
     },
     {
-      "account_type": "Loan",
-      "institution": "ICBC (Housing)",
-      "status": "Active",
-      "original_amount": 270000,
-      "remaining_balance": 108925,
-      "overdue_info": "根据报告概要，该账户存在严重逾期记录。"
-    },
-    {
-      "account_type": "Loan",
-      "institution": "CITIC (Consumer)",
-      "status": "Active",
-      "original_amount": 184300,
-      "remaining_balance": 122867,
-      "overdue_info": "根据报告概要，该账户存在严重逾期记录。"
-    },
-    {
-      "account_type": "Loan",
-      "institution": "Hingye CF (Consumer)",
-      "status": "Active",
-      "original_amount": 70000,
-      "remaining_balance": 52946,
-      "overdue_info": "根据报告概要，该账户存在严重逾期记录。"
-    },
-    {
-      "account_type": "Loan",
-      "institution": "ICBC (Consumer)",
-      "status": "Active",
-      "original_amount": 150000,
-      "remaining_balance": 150000,
-      "overdue_info": "根据报告概要，该账户存在严重逾期记录。"
-    },
-    {
-      "account_type": "Loan",
-      "institution": "ICBC (Consumer)",
-      "status": "Active",
-      "original_amount": 150000,
-      "remaining_balance": 150000,
-      "overdue_info": "根据报告概要，该账户存在严重逾期记录。"
-    },
-    {
-      "account_type": "Loan",
-      "institution": "XW Bank (Revolving)",
-      "status": "Active",
-      "limit": 50800,
+      "account_type": "Other Personal Consumption Loan (Revolving)",
+      "institution": "长安银行股份有限公司",
+      "account_status": "Active",
+      "credit_limit": 30000,
       "balance": 0,
-      "overdue_info": "根据报告概要，该账户存在严重逾期记录。"
+      "overdue_info": "None"
     },
     {
-      "account_type": "Loan",
-      "institution": "Chang'an Bank (Revolving)",
-      "status": "Active",
-      "limit": 30000,
-      "balance": 0,
-      "overdue_info": "根据报告概要，该账户存在严重逾期记录。"
-    },
-    {
-      "account_type": "Loan",
-      "institution": "CCB (Revolving)",
-      "status": "Active",
-      "limit": 97800,
+      "account_type": "Other Personal Consumption Loan (Revolving)",
+      "institution": "中国建设银行股份有限公司",
+      "account_status": "Active",
+      "credit_limit": 97800,
       "balance": 97800,
-      "overdue_info": "根据报告概要，该账户存在严重逾期记录。"
+      "overdue_info": "None"
     },
     {
-      "account_type": "Loan",
-      "institution": "Qinong Bank (Revolving)",
-      "status": "Active",
-      "limit": 80000,
+      "account_type": "Other Personal Consumption Loan (Revolving)",
+      "institution": "陕西秦农农村商业银行股份有限公司",
+      "account_status": "Active",
+      "credit_limit": 80000,
       "balance": 80000,
-      "overdue_info": "根据报告概要，该账户存在严重逾期记录。"
+      "overdue_info": "None"
     },
     {
-      "account_type": "Loan",
-      "institution": "Nanvin Farber (Revolving)",
-      "status": "Active",
-      "limit": 70000,
+      "account_type": "Other Personal Consumption Loan (Revolving)",
+      "institution": "南银法巴消费金融有限公司",
+      "account_status": "Active",
+      "credit_limit": 70000,
       "balance": 58144,
-      "overdue_info": "根据报告概要，该账户存在严重逾期记录。"
+      "overdue_info": "None"
     },
     {
-      "account_type": "Loan",
-      "institution": "Ant CF (Revolving)",
-      "status": "Active",
-      "limit": 100,
+      "account_type": "Other Personal Consumption Loan (Revolving)",
+      "institution": "重庆蚂蚁消费金融有限公司",
+      "account_status": "Active",
+      "credit_limit": 100,
       "balance": 0,
-      "overdue_info": "根据报告概要，该账户存在严重逾期记录。"
+      "overdue_info": "None"
     }
   ]
 }

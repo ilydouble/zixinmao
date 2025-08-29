@@ -1,3 +1,8 @@
+import sys
+from pathlib import Path
+# 添加项目根目录到 sys.path
+sys.path.append(str(Path(__file__).resolve().parent))
+
 import time
 import uuid
 from datetime import datetime
@@ -6,20 +11,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 import sys
 
-from .config import settings
-from .models import (
-    AnalysisRequest, AnalysisResponse, HealthResponse,
-    TaskSubmitResponse, TaskStatusResponse, QueueStatsResponse, LogStatsResponse
-)
-from .ai_service import AIAnalysisService
-from .queue_manager import request_queue, TaskStatus
-from .log_manager import algorithm_logger
+from config.settings import settings
+from models.report_model import *
+from service.ai_service import AIAnalysisService
+from utils.queue_manager import request_queue, TaskStatus
+from utils.log_manager import algorithm_logger
+from utils.prompts import PROMPT_TEMPLATES
+from models.basemodel import *
+from service.report_service import *
 
 # 配置日志
 logger.remove()
 logger.add(
     sys.stdout,
-    level=settings.log_level,
+    level=settings.log.level,
     format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
 )
 
@@ -54,8 +59,8 @@ async def startup_event():
     await request_queue.start()
 
     # 初始化日志目录
-    if settings.enable_algorithm_logging:
-        logger.info(f"算法日志已启用，日志目录: {settings.log_dir}")
+    if settings.log.algorithm_enable:
+        logger.info(f"算法日志已启用，日志目录: {settings.log.dir}")
 
 
 @app.on_event("shutdown")
@@ -126,7 +131,7 @@ async def health_check():
             "allowed_mime_types": settings.allowed_mime_types,
             "max_concurrent_tasks": settings.max_concurrent_tasks,
             "max_queue_size": settings.max_queue_size,
-            "algorithm_logging_enabled": settings.enable_algorithm_logging
+            "algorithm_enable": settings.log.algorithm_enable
         }
     }
 
@@ -148,14 +153,14 @@ async def submit_analysis_task(request: AnalysisRequest, http_request: Request):
 
         # 验证文件大小（base64编码后的大小约为原文件的1.33倍）
         estimated_file_size = len(request.file_base64) * 3 // 4
-        if estimated_file_size > settings.max_file_size:
+        if estimated_file_size > settings.file.max_file_size:
             raise HTTPException(
                 status_code=413,
-                detail=f"文件大小超过限制 ({settings.max_file_size // (1024*1024)}MB)"
+                detail=f"文件大小超过限制 ({settings.file.max_file_size // (1024*1024)}MB)"
             )
 
         # 验证MIME类型
-        if request.mime_type not in settings.allowed_mime_types:
+        if request.mime_type not in settings.file.allowed_mime_types:
             raise HTTPException(
                 status_code=400,
                 detail=f"不支持的文件类型: {request.mime_type}"
@@ -173,7 +178,7 @@ async def submit_analysis_task(request: AnalysisRequest, http_request: Request):
         task_id = await request_queue.add_task(task_data)
 
         # 记录请求开始日志
-        if settings.enable_algorithm_logging:
+        if settings.log.algorithm_enable:
             await algorithm_logger.log_request_start(task_id, task_data)
 
         # 计算预估等待时间
@@ -228,14 +233,14 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
 
         # 验证文件大小
         estimated_file_size = len(request.file_base64) * 3 // 4
-        if estimated_file_size > settings.max_file_size:
+        if estimated_file_size > settings.file.max_file_size:
             raise HTTPException(
                 status_code=413,
-                detail=f"文件大小超过限制 ({settings.max_file_size // (1024*1024)}MB)"
+                detail=f"文件大小超过限制 ({settings.file.max_file_size // (1024*1024)}MB)"
             )
 
         # 验证MIME类型
-        if request.mime_type not in settings.allowed_mime_types:
+        if request.mime_type not in settings.file.allowed_mime_types:
             raise HTTPException(
                 status_code=400,
                 detail=f"不支持的文件类型: {request.mime_type}"
@@ -247,7 +252,7 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
                    f"request_id: {request_id}")
 
         # 记录请求开始日志
-        if settings.enable_algorithm_logging:
+        if settings.log.algorithm_enable:
             task_data = {
                 "file_base64": request.file_base64,
                 "mime_type": request.mime_type,
@@ -268,7 +273,7 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
         processing_time = time.time() - start_time
 
         # 记录请求完成日志
-        if settings.enable_algorithm_logging:
+        if settings.log.algorithm_enable:
             await algorithm_logger.log_request_complete(request_id, result, processing_time)
 
         if result['success']:
@@ -292,7 +297,7 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
         logger.error(f"同步分析文档时发生错误: {str(e)} | request_id: {request_id}")
 
         # 记录错误日志
-        if settings.enable_algorithm_logging:
+        if settings.log.algorithm_enable:
             await algorithm_logger.log_error(request_id, "sync_analysis_error", str(e))
 
         raise HTTPException(
@@ -367,7 +372,7 @@ async def get_log_stats(hours: int = 24):
     Args:
         hours: 统计时间范围（小时）
     """
-    if not settings.enable_algorithm_logging:
+    if not settings.log.algorithm_enable:
         raise HTTPException(
             status_code=404,
             detail="算法日志功能未启用"
@@ -393,7 +398,7 @@ async def get_recent_logs(log_type: str = "request", limit: int = 100):
         log_type: 日志类型 (request/error/stats)
         limit: 返回记录数量限制
     """
-    if not settings.enable_algorithm_logging:
+    if not settings.log.algorithm_enable:
         raise HTTPException(
             status_code=404,
             detail="算法日志功能未启用"
@@ -422,7 +427,6 @@ async def get_prompt_template(report_type: str):
     Args:
         report_type: 报告类型 (flow/simple/detail)
     """
-    from .prompts import PROMPT_TEMPLATES
 
     if report_type not in PROMPT_TEMPLATES:
         raise HTTPException(
@@ -435,13 +439,124 @@ async def get_prompt_template(report_type: str):
         "prompt_template": PROMPT_TEMPLATES[report_type]
     }
 
+@app.post("/analysis", response_model=TaskSubmitResponse)
+async def generate_report(request: AnalysisRequest, http_request: Request):
+    """
+    提交文档分析任务到队列
+
+    接收文件的base64编码和相关参数，将任务加入队列等待处理
+    """
+    try:
+        # 验证请求参数
+        if not request.file_base64:
+            raise HTTPException(
+                status_code=400,
+                detail="文件内容不能为空"
+            )
+
+        # 验证文件大小（base64编码后的大小约为原文件的1.33倍）
+        estimated_file_size = len(request.file_base64) * 3 // 4
+        if estimated_file_size > settings.file.max_file_size:
+            raise HTTPException(
+                status_code=413,
+                detail=f"文件大小超过限制 ({settings.file.max_file_size // (1024*1024)}MB)"
+            )
+
+        # 验证MIME类型
+        if request.mime_type not in settings.file.allowed_mime_types:
+            raise HTTPException(
+                status_code=400,
+                detail=f"不支持的文件类型: {request.mime_type}"
+            )
+
+        # 准备任务数据
+        task_data = {
+            "file_base64": request.file_base64,
+            "mime_type": request.mime_type,
+            "report_type": request.report_type.value,
+            "custom_prompt": request.custom_prompt,
+            "name": request.name,
+            "id_card": request.id_card,
+            "mobile_no": request.mobile_no
+        }
+
+        # 添加任务到队列
+        task_id = await request_queue.add_task(task_data)
+
+        # 记录请求开始日志
+        if settings.log.algorithm_enable:
+            await algorithm_logger.log_request_start(task_id, task_data)
+
+        # 计算预估等待时间
+        queue_stats = request_queue.get_queue_stats()
+        estimated_wait_time = queue_stats["current_queue_size"] * 30  # 假设每个任务平均30秒
+
+        logger.info(f"任务已提交到队列: {task_id} | "
+                   f"类型: {request.report_type} | "
+                   f"文件大小: {estimated_file_size // 1024}KB | "
+                   f"队列位置: {queue_stats['current_queue_size']}")
+
+        return TaskSubmitResponse(
+            success=True,
+            task_id=task_id,
+            message="任务已成功提交到处理队列",
+            estimated_wait_time=estimated_wait_time,
+            queue_position=queue_stats["current_queue_size"]
+        )
+
+    except HTTPException:
+        raise
+    except RuntimeError as e:
+        # 队列相关错误
+        raise HTTPException(
+            status_code=503,
+            detail=f"服务暂时不可用: {str(e)}"
+        )
+    except Exception as e:
+        logger.error(f"提交分析任务时发生错误: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"服务器内部错误: {str(e)}"
+        )
+
+@app.post("/analysis/report")
+async def generate_analysis_report(request: AnalysisRequest):
+    """
+    生成个人征信报告接口
+
+    接收文件的base64编码和相关参数，直接生成分析报告
+    """
+    try:
+        from service.report_service import ReportService
+        report_service = ReportService()
+        
+        # 生成唯一请求ID
+        request_id = str(uuid.uuid4())
+        
+        # 调用异步方法时添加await
+        result = await report_service.generate_report(
+            file_base64=request.file_base64,
+            mime_type=request.mime_type,
+            report_type=request.report_type,
+            custom_prompt=request.custom_prompt,
+            request_id=request_id,
+            name=request.name,
+            id_card=request.id_card,
+            mobile_no=request.mobile_no,
+        )
+        
+        # 将Pydantic模型转换为字典以便FastAPI序列化
+        return result.model_dump()
+    except Exception as e:
+        return None
+
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
         "app.main:app",
-        host=settings.host,
-        port=settings.port,
-        reload=settings.debug,
-        log_level=settings.log_level.lower()
+        host=settings.app.host,
+        port=settings.app.port,
+        reload=settings.app.debug,
+        log_level=settings.log.level.lower()
     )

@@ -1,0 +1,50 @@
+2025-08-29 16:04:48 - database - INFO - logger.py:184 - 数据库连接成功 - 115.190.121.59/tianyuan_cache
+2025-08-29 16:04:48 - database - INFO - logger.py:204 - 表创建成功 - big_data
+2025-08-29 16:04:48 - api_database_service - INFO - logger.py:121 - [database_service] 数据库初始化完成
+2025-08-29 16:04:48 - api_report_generate - INFO - logger.py:121 - [report_generate] 开始大数据分析查询流程
+2025-08-29 16:04:48 - api_report_generate - INFO - logger.py:121 - [report_generate] 步骤1: 从big_data表查询缓存数据
+2025-08-29 16:04:48 - database - INFO - logger.py:212 - 数据查询成功 - big_data, 记录数: 1
+2025-08-29 16:04:48 - api_database_service - INFO - logger.py:121 - [database_service] 从big_data表中找到缓存数据: 丁涛, 18391316453, 610523199206168471
+2025-08-29 16:04:48 - api_report_generate - INFO - logger.py:121 - [report_generate] 缓存命中 - 丁涛-18391316453-610523199206168471
+2025-08-29 16:04:48 - api_report_generate - INFO - logger.py:121 - [report_generate] 构建响应数据
+2025-08-29 16:04:48 - api_report_generate - INFO - logger.py:121 - [report_generate] 大数据分析完成
+2025-08-29 16:10:03 - database - INFO - logger.py:184 - 数据库连接成功 - 115.190.121.59/tianyuan_cache
+2025-08-29 16:10:03 - database - INFO - logger.py:204 - 表创建成功 - big_data
+2025-08-29 16:10:03 - api_database_service - INFO - logger.py:121 - [database_service] 数据库初始化完成
+2025-08-29 16:10:03 - api_report_generate - INFO - logger.py:121 - [report_generate] 开始大数据分析查询流程
+2025-08-29 16:10:03 - api_report_generate - INFO - logger.py:121 - [report_generate] 步骤1: 从big_data表查询缓存数据
+2025-08-29 16:10:03 - database - INFO - logger.py:212 - 数据查询成功 - big_data, 记录数: 1
+2025-08-29 16:10:03 - api_database_service - INFO - logger.py:121 - [database_service] 从big_data表中找到缓存数据: 丁涛, 18391316453, 610523199206168471
+2025-08-29 16:10:03 - api_report_generate - INFO - logger.py:121 - [report_generate] 缓存命中 - 丁涛-18391316453-610523199206168471
+2025-08-29 16:10:03 - api_report_generate - INFO - logger.py:121 - [report_generate] 构建响应数据
+2025-08-29 16:10:03 - api_report_generate - INFO - logger.py:121 - [report_generate] 大数据分析完成
+2025-08-29 16:16:40 - database - INFO - logger.py:184 - 数据库连接成功 - 115.190.121.59/tianyuan_cache
+2025-08-29 16:16:40 - database - INFO - logger.py:204 - 表创建成功 - big_data
+2025-08-29 16:16:40 - api_database_service - INFO - logger.py:121 - [database_service] 数据库初始化完成
+2025-08-29 16:16:40 - api_report_generate - INFO - logger.py:121 - [report_generate] 开始大数据分析查询流程
+2025-08-29 16:16:40 - api_report_generate - INFO - logger.py:121 - [report_generate] 步骤1: 从big_data表查询缓存数据
+2025-08-29 16:16:41 - database - INFO - logger.py:212 - 数据查询成功 - big_data, 记录数: 1
+2025-08-29 16:16:41 - api_database_service - INFO - logger.py:121 - [database_service] 从big_data表中找到缓存数据: 丁涛, 18391316453, 610523199206168471
+2025-08-29 16:16:41 - api_report_generate - INFO - logger.py:121 - [report_generate] 缓存命中 - 丁涛-18391316453-610523199206168471
+2025-08-29 16:16:41 - api_report_generate - INFO - logger.py:121 - [report_generate] 构建响应数据
+2025-08-29 16:16:41 - api_report_generate - INFO - logger.py:121 - [report_generate] 大数据分析完成
+2025-08-29 16:27:50 - database - INFO - logger.py:184 - 数据库连接成功 - 115.190.121.59/tianyuan_cache
+2025-08-29 16:27:50 - database - INFO - logger.py:204 - 表创建成功 - big_data
+2025-08-29 16:27:50 - api_database_service - INFO - logger.py:121 - [database_service] 数据库初始化完成
+2025-08-29 16:27:50 - api_report_generate - INFO - logger.py:121 - [report_generate] 开始大数据分析查询流程
+2025-08-29 16:27:50 - api_report_generate - INFO - logger.py:121 - [report_generate] 步骤1: 从big_data表查询缓存数据
+2025-08-29 16:27:51 - database - INFO - logger.py:212 - 数据查询成功 - big_data, 记录数: 1
+2025-08-29 16:27:51 - api_database_service - INFO - logger.py:121 - [database_service] 从big_data表中找到缓存数据: 丁涛, 18391316453, 610523199206168471
+2025-08-29 16:27:51 - api_report_generate - INFO - logger.py:121 - [report_generate] 缓存命中 - 丁涛-18391316453-610523199206168471
+2025-08-29 16:27:51 - api_report_generate - INFO - logger.py:121 - [report_generate] 构建响应数据
+2025-08-29 16:27:51 - api_report_generate - INFO - logger.py:121 - [report_generate] 大数据分析完成
+2025-08-29 16:29:59 - database - INFO - logger.py:184 - 数据库连接成功 - 115.190.121.59/tianyuan_cache
+2025-08-29 16:29:59 - database - INFO - logger.py:204 - 表创建成功 - big_data
+2025-08-29 16:29:59 - api_database_service - INFO - logger.py:121 - [database_service] 数据库初始化完成
+2025-08-29 16:29:59 - api_report_generate - INFO - logger.py:121 - [report_generate] 开始大数据分析查询流程
+2025-08-29 16:29:59 - api_report_generate - INFO - logger.py:121 - [report_generate] 步骤1: 从big_data表查询缓存数据
+2025-08-29 16:29:59 - database - INFO - logger.py:212 - 数据查询成功 - big_data, 记录数: 1
+2025-08-29 16:29:59 - api_database_service - INFO - logger.py:121 - [database_service] 从big_data表中找到缓存数据: 丁涛, 18391316453, 610523199206168471
+2025-08-29 16:29:59 - api_report_generate - INFO - logger.py:121 - [report_generate] 缓存命中 - 丁涛-18391316453-610523199206168471
+2025-08-29 16:29:59 - api_report_generate - INFO - logger.py:121 - [report_generate] 构建响应数据
+2025-08-29 16:29:59 - api_report_generate - INFO - logger.py:121 - [report_generate] 大数据分析完成
