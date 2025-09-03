@@ -5,13 +5,16 @@ import { validateFile } from '../../utils/fileValidator'
 
 Page({
   data: {
+    // 顶部状态栏高度（用于自定义导航栏安全区）
+    statusBarHeight: 0,
+
     // 认证状态
     needAuth: false,
-    
+
     // 上传状态
     uploading: false,
     uploadProgress: 0,
-    
+
     // 文件信息
     selectedFile: null as any,
 
@@ -21,6 +24,7 @@ Page({
     reportStatus: '',
     currentReportId: '',
     pollStartTime: 0, // 轮询开始时间
+    lastStatusUpdateTime: 0, // 最后状态更新时间
 
     // 历史报告
     reportList: [] as any[],
@@ -28,6 +32,15 @@ Page({
   },
 
   onLoad() {
+    // 读取系统状态栏高度，避免自定义导航栏与系统时间/信号重叠
+    try {
+      const systemInfo = wx.getSystemInfoSync()
+      const statusBarHeight = (systemInfo && (systemInfo as any).statusBarHeight) ? (systemInfo as any).statusBarHeight : 0
+      this.setData({ statusBarHeight })
+    } catch (e) {}
+
+    // 隐藏左上角返回按钮，避免异步任务被中断
+    wx.hideHomeButton()
     this.checkAuth()
     this.loadReportList()
   },
@@ -285,6 +298,85 @@ Page({
 
 
   /**
+   * 检查报告是否卡住
+   */
+  async checkIfStuck(statusData: any): Promise<boolean> {
+    const { lastStatusUpdateTime, pollStartTime } = this.data
+    const currentTime = Date.now()
+
+    // 如果是AI分析阶段且状态超过5分钟没变化，认为卡住了
+    if (statusData.currentStage === 'AI_ANALYZING' || statusData.currentStage === 'AI_ANALYSIS') {
+      const stuckTime = 5 * 60 * 1000 // 5分钟
+
+      if (lastStatusUpdateTime && (currentTime - lastStatusUpdateTime) > stuckTime) {
+        console.log(`⚠️ 简信宝：AI分析阶段卡住超过5分钟`)
+        return true
+      }
+
+      // 或者总轮询时间超过10分钟且还在AI分析阶段
+      if (pollStartTime && (currentTime - pollStartTime) > 10 * 60 * 1000) {
+        console.log(`⚠️ 简信宝：AI分析阶段总时间超过10分钟`)
+        return true
+      }
+    }
+
+    return false
+  },
+
+  /**
+   * 恢复卡住的报告
+   */
+  async recoverStuckReport(reportId: string) {
+    try {
+      console.log(`🔄 简信宝：尝试恢复卡住的报告: ${reportId}`)
+
+      showToast('检测到处理异常，正在尝试恢复...', 'loading')
+
+      const result = await wx.cloud.callFunction({
+        name: 'recoverReport',
+        data: {
+          reportId: reportId
+        }
+      })
+
+      const response = result.result as any
+
+      if (response && response.success) {
+        console.log('✅ 简信宝：报告恢复成功:', response.message)
+
+        if (response.status === 'completed') {
+          // 报告已完成
+          this.setData({
+            generating: false,
+            reportProgress: 100,
+            reportStatus: '已完成',
+            currentReportId: '',
+            pollStartTime: 0
+          })
+          showSuccess('简版征信报告生成完成！')
+          this.loadReportList()
+
+        } else if (response.needResubmit) {
+          // 需要重新提交
+          showToast('正在重新处理，请稍候...', 'loading')
+
+        } else {
+          // 继续等待
+          showToast('恢复成功，继续处理中...', 'success')
+        }
+
+      } else {
+        console.error('❌ 简信宝：报告恢复失败:', response?.error)
+        showError('恢复失败: ' + (response?.error || '未知错误'))
+      }
+
+    } catch (error) {
+      console.error('❌ 简信宝：恢复报告异常:', error)
+      showError('恢复异常，请稍后重试')
+    }
+  },
+
+  /**
    * 检查并恢复轮询
    */
   async checkAndResumePolling() {
@@ -432,8 +524,16 @@ Page({
 
         this.setData({
           reportProgress: statusData.progress || 0,
-          reportStatus: statusData.stageText || statusData.currentStage || '处理中...'
+          reportStatus: statusData.stageText || statusData.currentStage || '处理中...',
+          lastStatusUpdateTime: Date.now()
         })
+
+        // 检查是否卡住了
+        if (await this.checkIfStuck(statusData)) {
+          console.log('🔄 简信宝：检测到报告卡住，尝试恢复...')
+          await this.recoverStuckReport(currentReportId)
+          return // 恢复后直接返回，等待下次轮询
+        }
 
         if (statusData.status === 'completed') {
           // 生成完成
@@ -721,5 +821,31 @@ Page({
     wx.navigateTo({
       url: '/pages/zhuanxin/zhuanxin'
     })
+  },
+
+  /**
+   * 回到首页
+   */
+  goHome() {
+    // 如果正在生成报告，给用户提示
+    if (this.data.generating) {
+      wx.showModal({
+        title: '提示',
+        content: '简版征信报告正在生成中，离开页面不会中断处理，您可以稍后回来查看结果',
+        confirmText: '继续离开',
+        cancelText: '留在此页',
+        success: (res) => {
+          if (res.confirm) {
+            wx.switchTab({
+              url: '/pages/index/index'
+            })
+          }
+        }
+      })
+    } else {
+      wx.switchTab({
+        url: '/pages/index/index'
+      })
+    }
   }
 })

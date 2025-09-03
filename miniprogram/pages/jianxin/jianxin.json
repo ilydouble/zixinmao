@@ -1,3 +1,4 @@
 {
-  "navigationBarTitleText": "简信宝"
+  "navigationBarTitleText": "简信宝",
+  "navigationStyle": "custom"
 }
