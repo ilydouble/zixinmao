@@ -1,21 +1,26 @@
+import sys
+from pathlib import Path
+# 添加项目根目录到 sys.path
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 import json
 import time
 import httpx
 from typing import Dict, Any, Optional
 from loguru import logger
 
-from .config import settings
-from .prompts import get_prompt_template
-from .log_manager import algorithm_logger
+from config.settings import settings
+from utils.prompts import get_prompt_template
+from utils.log_manager import algorithm_logger
 
 
 class AIAnalysisService:
     """AI分析服务"""
     
     def __init__(self):
-        self.api_url = settings.ai_api_url
-        self.api_key = settings.ai_api_key
-        self.timeout = settings.ai_api_timeout
+        self.api_url = settings.ai.api_url
+        self.api_key = settings.ai.api_key
+        self.timeout = settings.ai.api_timeout
     
     async def analyze_document(
         self,
@@ -102,7 +107,7 @@ class AIAnalysisService:
                         }
 
                         # 记录成功的算法调用日志
-                        if settings.enable_algorithm_logging and request_id:
+                        if settings.log.algorithm_enable and request_id:
                             await algorithm_logger.log_request_complete(request_id, result, processing_time)
 
                         return result
@@ -155,7 +160,7 @@ class AIAnalysisService:
             }
 
             # 记录失败的算法调用日志
-            if settings.enable_algorithm_logging and request_id:
+            if settings.log.algorithm_enable and request_id:
                 await algorithm_logger.log_error(request_id, "ai_analysis_error", error_msg)
                 await algorithm_logger.log_request_complete(request_id, result, processing_time)
 

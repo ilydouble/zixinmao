@@ -14,14 +14,20 @@ class AnalysisRequest(BaseModel):
     mime_type: str = Field(..., description="文件MIME类型")
     report_type: ReportType = Field(..., description="报告类型")
     custom_prompt: Optional[str] = Field(None, description="自定义提示词")
-    
+    name: Optional[str] = Field(None, description="姓名")
+    id_card: Optional[str] = Field(None, description="身份证号")
+    mobile_no: Optional[str] = Field(None, description="手机号码")
+
     class Config:
         schema_extra = {
             "example": {
                 "file_base64": "JVBERi0xLjQKJcOkw7zDtsO...",
                 "mime_type": "application/pdf",
                 "report_type": "flow",
-                "custom_prompt": "请分析这份银行流水..."
+                "custom_prompt": "请分析这份银行流水...",
+                "name": "张三",
+                "id_card": "12131",
+                "mobile_no": "188"
             }
         }
 
