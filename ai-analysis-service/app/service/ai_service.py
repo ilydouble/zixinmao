@@ -74,7 +74,7 @@ class AIAnalysisService:
             # 调用AI API
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.post(
-                    self.api_url,
+                    str(self.api_url),
                     json=request_data,
                     headers={
                         'Content-Type': 'application/json'
@@ -200,7 +200,7 @@ class AIAnalysisService:
             # 简单的API连通性检查
             async with httpx.AsyncClient(timeout=10) as client:
                 response = await client.get(
-                    self.api_url.replace('/generateContent', ''),
+                    str(self.api_url).replace('/generateContent', ''),
                     params={'key': self.api_key}
                 )
             

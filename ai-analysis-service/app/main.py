@@ -126,11 +126,11 @@ async def health_check():
             }
         },
         "config": {
-            "ai_api_url": settings.ai_api_url,
-            "max_file_size": settings.max_file_size,
-            "allowed_mime_types": settings.allowed_mime_types,
-            "max_concurrent_tasks": settings.max_concurrent_tasks,
-            "max_queue_size": settings.max_queue_size,
+            "ai_api_url": settings.ai.api_url,
+            "max_file_size": settings.file.max_file_size,
+            "allowed_mime_types": settings.file.allowed_mime_types,
+            "max_concurrent_tasks": settings.queue.max_concurrent_tasks,
+            "max_queue_size": settings.queue.max_queue_size,
             "algorithm_enable": settings.log.algorithm_enable
         }
     }
@@ -171,7 +171,10 @@ async def submit_analysis_task(request: AnalysisRequest, http_request: Request):
             "file_base64": request.file_base64,
             "mime_type": request.mime_type,
             "report_type": request.report_type.value,
-            "custom_prompt": request.custom_prompt
+            "custom_prompt": request.custom_prompt,
+            "name":None,
+            "id_card": None,
+            "mobile_no": None
         }
 
         # 添加任务到队列
@@ -257,7 +260,10 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
                 "file_base64": request.file_base64,
                 "mime_type": request.mime_type,
                 "report_type": request.report_type.value,
-                "custom_prompt": request.custom_prompt
+                "custom_prompt": request.custom_prompt,
+                "name":None,
+                "id_card": None,
+                "mobile_no": None
             }
             await algorithm_logger.log_request_start(request_id, task_data)
 

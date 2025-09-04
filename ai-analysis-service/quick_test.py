@@ -42,7 +42,8 @@ async def quick_test():
         {"type": "detail", "name": "详版征信分析"}
     ]
     
-    service_url = "http://38.60.251.79:8002"
+    # service_url = "http://38.60.251.79:8002"
+    service_url = "http://127.0.0.1:8000"
     
     async with httpx.AsyncClient(timeout=300) as client:
         # 健康检查
