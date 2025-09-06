@@ -1,14 +1,27 @@
-node_modules
+# 依赖和构建
+node_modules/
+dist/
+miniprogram_npm/
+
+# 环境变量
 .env
 .env.local
 .env.development
 .env.production
-miniprogram_npm
-dist
-.wxml
-.vscode
-.idea
-.Ds_Store
+
+# 编辑器 & 系统文件
+.vscode/
+.idea/
+.DS_Store
+
+# Python 临时文件
 *.pyc
 *.pyo
 *.pyd
+
+# 日志或临时数据
+*.log
+*.jsonl
+
+# 如果确实要忽略构建生成的小程序文件
+# /dist/**/*.wxml

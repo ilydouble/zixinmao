@@ -8,7 +8,6 @@ class ReportType(str, Enum):
     SIMPLE = "simple"  # 简版征信
     DETAIL = "detail"  # 详版征信
 
-
 class AnalysisRequest(BaseModel):
     file_base64: str = Field(..., description="文件的base64编码")
     mime_type: str = Field(..., description="文件MIME类型")
@@ -28,6 +27,31 @@ class AnalysisRequest(BaseModel):
                 "name": "张三",
                 "id_card": "12131",
                 "mobile_no": "188"
+            }
+        }
+
+class FileType(str, Enum):
+    FLOW = "social"  # 社保
+    SIMPLE = "fund"  # 公积金
+    DETAIL = "income"  # 个税
+
+class IncomeRequest(BaseModel):
+    file_base64: str = Field(..., description="文件的base64编码")
+    mime_type: str = Field(..., description="文件MIME类型")
+    file_type: FileType = Field(..., description="文件类型")
+    # name: Optional[str] = Field(None, description="姓名")
+    # id_card: Optional[str] = Field(None, description="身份证号")
+    # mobile_no: Optional[str] = Field(None, description="手机号码")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "file_base64": "JVBERi0xLjQKJcOkw7zDtsO...",
+                "mime_type": "application/pdf",
+                "file_type": "flow",
+                # "name": "张三",
+                # "id_card": "12131",
+                # "mobile_no": "188"
             }
         }
 

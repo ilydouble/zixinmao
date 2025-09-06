@@ -557,6 +557,79 @@ async def generate_analysis_report(request: AnalysisRequest):
         return None
 
 
+@app.post("/income")
+async def income_extraction(request: IncomeRequest):
+    """
+    从社保、公积金、个税数据中提取关键信息，用于个人收入认定和分析
+    """
+    try:
+        # 验证请求参数
+        if not request.file_base64:
+            raise HTTPException(
+                status_code=400,
+                detail="文件内容不能为空"
+            )
+
+        # 验证文件大小（base64编码后的大小约为原文件的1.33倍）
+        estimated_file_size = len(request.file_base64) * 3 // 4
+        if estimated_file_size > settings.file.max_file_size:
+            raise HTTPException(
+                status_code=413,
+                detail=f"文件大小超过限制 ({settings.file.max_file_size // (1024*1024)}MB)"
+            )
+
+        # 验证MIME类型
+        if request.mime_type not in settings.file.allowed_mime_types:
+            raise HTTPException(
+                status_code=400,
+                detail=f"不支持的文件类型: {request.mime_type}"
+            )
+        
+        # 创建收入服务实例
+        from service.income_service import Income_Service
+        income_service = Income_Service()
+        
+        # 生成唯一请求ID
+        request_id = str(uuid.uuid4())
+        
+        logger.info(f"开始收入信息提取 - 文件类型: {request.file_type} | "
+                   f"MIME: {request.mime_type} | "
+                   f"文件大小: {estimated_file_size // 1024}KB | "
+                   f"request_id: {request_id}")
+        
+        # 调用收入分析服务
+        result = await income_service.process_document(
+            file_base64=request.file_base64,
+            mime_type=request.mime_type,
+            file_type=request.file_type.value,
+            request_id=request_id
+        )
+        
+        if result['success']:
+            return {
+                "success": True,
+                "request_id": request_id,
+                "analysis_result": result['analysis_result'],
+                "processing_time": result['processing_time']
+            }
+        else:
+            return {
+                "success": False,
+                "request_id": request_id,
+                "error_message": result['error_message'],
+                "processing_time": result['processing_time']
+            }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"收入信息提取时发生错误: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"服务器内部错误: {str(e)}"
+        )
+    
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
