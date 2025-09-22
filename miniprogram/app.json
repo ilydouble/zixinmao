@@ -51,13 +51,13 @@
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents",
   "usingComponents": {
-    "t-button": "miniprogram_npm/tdesign-miniprogram/button/button",
-    "t-cell": "miniprogram_npm/tdesign-miniprogram/cell/cell",
-    "t-cell-group": "miniprogram_npm/tdesign-miniprogram/cell-group/cell-group",
-    "t-upload": "miniprogram_npm/tdesign-miniprogram/upload/upload",
-    "t-progress": "miniprogram_npm/tdesign-miniprogram/progress/progress",
-    "t-tag": "miniprogram_npm/tdesign-miniprogram/tag/tag",
-    "t-avatar": "miniprogram_npm/tdesign-miniprogram/avatar/avatar",
-    "t-popup": "miniprogram_npm/tdesign-miniprogram/popup/popup"
+    "t-button": "/miniprogram_npm/tdesign-miniprogram/button/button",
+    "t-cell": "/miniprogram_npm/tdesign-miniprogram/cell/cell",
+    "t-cell-group": "/miniprogram_npm/tdesign-miniprogram/cell-group/cell-group",
+    "t-upload": "/miniprogram_npm/tdesign-miniprogram/upload/upload",
+    "t-progress": "/miniprogram_npm/tdesign-miniprogram/progress/progress",
+    "t-tag": "/miniprogram_npm/tdesign-miniprogram/tag/tag",
+    "t-avatar": "/miniprogram_npm/tdesign-miniprogram/avatar/avatar",
+    "t-popup": "/miniprogram_npm/tdesign-miniprogram/popup/popup"
   }
 }

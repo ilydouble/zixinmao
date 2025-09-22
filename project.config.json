@@ -7,6 +7,7 @@
     "useCompilerPlugins": [
       "typescript"
     ],
+    "urlCheck": false,
     "babelSetting": {
       "ignore": [],
       "disablePlugins": [],
@@ -17,10 +18,10 @@
     "minified": false,
     "enhance": true,
     "showShadowRootInWxmlPanel": false,
-    "packNpmManually": true,
+    "packNpmManually": false,
     "packNpmRelationList": [
       {
-        "packageJsonPath": "package.json",
+        "packageJsonPath": "./miniprogram/package.json",
         "miniprogramNpmDistDir": "./miniprogram/"
       }
     ],
@@ -47,7 +48,7 @@
     "tabIndent": "insertSpaces",
     "tabSize": 2
   },
-  "libVersion": "trial",
+  "libVersion": "3.10.0",
   "packOptions": {
     "ignore": [],
     "include": []
