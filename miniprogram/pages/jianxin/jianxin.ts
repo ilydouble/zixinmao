@@ -805,23 +805,7 @@ Page({
     this.setData({ selectedFile: null })
   },
 
-  /**
-   * 导航到流水宝
-   */
-  navigateToLiushui() {
-    wx.navigateTo({
-      url: '/pages/liushui/liushui'
-    })
-  },
 
-  /**
-   * 导航到专信宝
-   */
-  navigateToZhuanxin() {
-    wx.navigateTo({
-      url: '/pages/zhuanxin/zhuanxin'
-    })
-  },
 
   /**
    * 回到首页
@@ -837,14 +821,14 @@ Page({
         success: (res) => {
           if (res.confirm) {
             wx.switchTab({
-              url: '/pages/index/index'
+              url: '/pages/home/home'
             })
           }
         }
       })
     } else {
       wx.switchTab({
-        url: '/pages/index/index'
+        url: '/pages/home/home'
       })
     }
   }

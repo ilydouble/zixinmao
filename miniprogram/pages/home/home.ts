@@ -19,9 +19,9 @@ Page({
       },
       {
         id: 3,
-        title: '资信猫',
+        title: '专信宝',
         image: '/images/banner3.png',
-        link: '' // 整体介绍
+        link: '/pages/zhuanxin/zhuanxin'
       }
     ],
     currentBanner: 0,

@@ -1,10 +1,14 @@
 <!--liushui.wxml-->
 <view class="container">
-  <!-- 标签导航 -->
-  <view class="tabs">
-    <view class="tab active">流水宝</view>
-    <view class="tab" bind:tap="navigateToJianxin">简信宝</view>
-    <view class="tab" bind:tap="navigateToZhuanxin">专信宝</view>
+  <!-- 功能介绍 -->
+  <view class="feature-intro">
+    <view class="intro-title">💰 流水宝 · 银行流水分析</view>
+    <view class="intro-desc">智能分析银行流水记录，洞察资金流向和消费习惯</view>
+    <view class="intro-features">
+      <view class="feature-tag">智能识别</view>
+      <view class="feature-tag">资金分析</view>
+      <view class="feature-tag">消费洞察</view>
+    </view>
   </view>
 
   <!-- 上传区域 -->
@@ -132,4 +136,5 @@
       <view class="empty-text">暂无历史报告</view>
     </view>
   </view>
+
 </view>

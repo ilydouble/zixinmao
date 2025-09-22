@@ -1,12 +1,5 @@
 <!--zhuanxin.wxml-->
 <view class="container">
-  <!-- 标签导航 -->
-  <view class="tabs">
-    <view class="tab" bind:tap="navigateToLiushui">流水宝</view>
-    <view class="tab" bind:tap="navigateToJianxin">简信宝</view>
-    <view class="tab active">专信宝</view>
-  </view>
-
   <!-- 认证提示 -->
   <view wx:if="{{needAuth}}" class="auth-notice">
     <view class="notice-content">
@@ -162,4 +155,5 @@
       <view class="empty-text">暂无专业分析报告</view>
     </view>
   </view>
+
 </view>

@@ -1,12 +1,5 @@
 <!--jianxin.wxml-->
 <view class="container">
-  <!-- 标签导航 -->
-  <view class="tabs">
-    <view class="tab" bind:tap="navigateToLiushui">流水宝</view>
-    <view class="tab active">简信宝</view>
-    <view class="tab" bind:tap="navigateToZhuanxin">专信宝</view>
-  </view>
-
   <!-- 认证提示 -->
   <view wx:if="{{needAuth}}" class="auth-notice">
     <view class="notice-content">
@@ -18,6 +11,17 @@
       <t-button theme="primary" size="small" bind:tap="goToAuth">
         去认证
       </t-button>
+    </view>
+  </view>
+
+  <!-- 功能介绍 -->
+  <view class="feature-intro">
+    <view class="intro-title">📄 简信宝 · 简版征信分析</view>
+    <view class="intro-desc">快速解读征信报告核心信息，提供基础信用评估</view>
+    <view class="intro-features">
+      <view class="feature-tag">快速分析</view>
+      <view class="feature-tag">核心信息</view>
+      <view class="feature-tag">信用评估</view>
     </view>
   </view>
 
@@ -145,4 +149,5 @@
       <view class="empty-text">暂无历史报告</view>
     </view>
   </view>
+
 </view>

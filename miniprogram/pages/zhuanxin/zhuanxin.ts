@@ -813,20 +813,28 @@ Page({
   },
 
   /**
-   * 导航到流水宝
+   * 回到首页
    */
-  navigateToLiushui() {
-    wx.navigateTo({
-      url: '/pages/liushui/liushui'
-    })
-  },
-
-  /**
-   * 导航到简信宝
-   */
-  navigateToJianxin() {
-    wx.navigateTo({
-      url: '/pages/jianxin/jianxin'
-    })
+  goHome() {
+    // 如果正在生成报告，给用户提示
+    if (this.data.generating) {
+      wx.showModal({
+        title: '提示',
+        content: '专业版征信报告正在生成中，离开页面不会中断处理，您可以稍后回来查看结果',
+        confirmText: '继续离开',
+        cancelText: '留在此页',
+        success: (res) => {
+          if (res.confirm) {
+            wx.switchTab({
+              url: '/pages/home/home'
+            })
+          }
+        }
+      })
+    } else {
+      wx.switchTab({
+        url: '/pages/home/home'
+      })
+    }
   }
 })
