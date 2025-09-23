@@ -6,17 +6,19 @@
       <view class="section-title">个人设置</view>
       <t-cell-group>
         <!-- 所属组织 -->
-        <t-cell title="所属组织" arrow bind:click="onSelectOrganization">
+        <t-cell title="所属组织" bind:click="onSelectOrganization">
           <view class="picker-text">
             {{userSettings.organizationName || '请选择组织'}}
           </view>
+          <view slot="right-icon" class="custom-arrow">›</view>
         </t-cell>
 
         <!-- 所属城市 -->
-        <t-cell title="所属城市" arrow bind:click="onSelectCity">
+        <t-cell title="所属城市" bind:click="onSelectCity">
           <view class="picker-text">
             {{userSettings.cityName || '请选择城市'}}
           </view>
+          <view slot="right-icon" class="custom-arrow">›</view>
         </t-cell>
       </t-cell-group>
     </view>
@@ -25,8 +27,9 @@
     <view class="settings-section">
       <view class="section-title">存储设置</view>
       <t-cell-group>
-        <t-cell title="清除缓存" arrow bind:click="onClearCache">
+        <t-cell title="清除缓存" bind:click="onClearCache">
           <view class="cache-size">约 2.5MB</view>
+          <view slot="right-icon" class="custom-arrow">›</view>
         </t-cell>
       </t-cell-group>
     </view>
@@ -35,9 +38,15 @@
     <view class="settings-section">
       <view class="section-title">关于</view>
       <t-cell-group>
-        <t-cell title="关于资信猫" arrow bind:click="onAbout" />
-        <t-cell title="用户协议" arrow bind:click="onUserAgreement" />
-        <t-cell title="隐私政策" arrow bind:click="onPrivacyPolicy" />
+        <t-cell title="关于资信猫" bind:click="onAbout">
+          <view slot="right-icon" class="custom-arrow">›</view>
+        </t-cell>
+        <t-cell title="用户协议" bind:click="onUserAgreement">
+          <view slot="right-icon" class="custom-arrow">›</view>
+        </t-cell>
+        <t-cell title="隐私政策" bind:click="onPrivacyPolicy">
+          <view slot="right-icon" class="custom-arrow">›</view>
+        </t-cell>
       </t-cell-group>
     </view>
 

@@ -116,11 +116,12 @@
         wx:key="id"
         title="{{item.title}}"
         left-icon="{{item.icon}}"
-        arrow
         data-url="{{item.url}}"
         data-item="{{item}}"
         bind:click="onNavigateToMenu"
-      />
+      >
+        <view slot="right-icon" class="custom-arrow">›</view>
+      </t-cell>
     </t-cell-group>
   </view>
 
@@ -134,11 +135,12 @@
         title="{{item.title}}"
         left-icon="{{item.icon}}"
         note="{{item.description}}"
-        arrow
         data-url="{{item.url}}"
         data-item="{{item}}"
         bind:click="onNavigateToMenu"
-      />
+      >
+        <view slot="right-icon" class="custom-arrow">›</view>
+      </t-cell>
     </t-cell-group>
   </view>
 

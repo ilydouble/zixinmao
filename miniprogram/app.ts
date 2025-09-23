@@ -1,4 +1,5 @@
 // app.ts
+import FontManager from './utils/fontManager'
 
 // 用户信息接口
 interface UserInfo {
@@ -15,6 +16,7 @@ interface GlobalData {
   isLoggedIn: boolean
   currentOrg: any
   systemInfo: WechatMiniprogram.SystemInfo | null
+  fontLoaded: boolean
 }
 
 // App 选项接口
@@ -41,6 +43,8 @@ App<IAppOption>({
       })
     }
 
+    // 动态加载 TDesign 图标字体
+    this.loadTDesignFont()
 
     // 检查登录状态
     this.checkLoginStatus()
@@ -49,6 +53,25 @@ App<IAppOption>({
   onShow() {
     // 小程序显示时检查更新
     this.checkForUpdate()
+  },
+
+  // 动态加载 TDesign 图标字体
+  async loadTDesignFont() {
+    try {
+      const fontManager = FontManager.getInstance()
+      const result = await fontManager.loadTDesignFont()
+
+      this.globalData.fontLoaded = result.success
+
+      if (result.success) {
+        console.log('🎉 字体管理器加载成功:', result.message)
+      } else {
+        console.error('💥 字体管理器加载失败:', result.message)
+      }
+    } catch (error) {
+      console.error('💥 字体加载过程中发生错误:', error)
+      this.globalData.fontLoaded = false
+    }
   },
 
   // 检查登录状态
@@ -97,7 +120,8 @@ App<IAppOption>({
     userInfo: null,
     isLoggedIn: false,
     currentOrg: null,
-    systemInfo: null
+    systemInfo: null,
+    fontLoaded: false
   },
 
   // 获取系统信息

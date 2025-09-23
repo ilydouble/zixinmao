@@ -1,0 +1,78 @@
+<!--font-test.wxml-->
+<view class="container">
+  <view class="test-section">
+    <view class="section-title">TDesign 字体加载测试</view>
+    
+    <!-- 字体状态 -->
+    <view class="status-card">
+      <view class="status-item">
+        <text class="status-label">字体加载状态:</text>
+        <text class="status-value {{fontLoaded ? 'success' : 'error'}}">
+          {{fontLoaded ? '✅ 已加载' : '❌ 未加载'}}
+        </text>
+      </view>
+      
+      <view class="status-item">
+        <text class="status-label">加载信息:</text>
+        <text class="status-message">{{fontMessage}}</text>
+      </view>
+    </view>
+
+    <!-- 重新加载按钮 -->
+    <view class="action-section">
+      <t-button 
+        theme="primary" 
+        size="medium" 
+        bind:tap="onReloadFont"
+        loading="{{loading}}"
+      >
+        {{loading ? '加载中...' : '重新加载字体'}}
+      </t-button>
+    </view>
+
+    <!-- 图标测试 -->
+    <view class="icon-test-section">
+      <view class="section-subtitle">图标显示测试</view>
+      
+      <view class="icon-grid">
+        <view class="icon-item">
+          <t-icon name="home" size="48rpx" />
+          <text class="icon-name">home</text>
+        </view>
+        
+        <view class="icon-item">
+          <t-icon name="user" size="48rpx" />
+          <text class="icon-name">user</text>
+        </view>
+        
+        <view class="icon-item">
+          <t-icon name="setting" size="48rpx" />
+          <text class="icon-name">setting</text>
+        </view>
+        
+        <view class="icon-item">
+          <t-icon name="search" size="48rpx" />
+          <text class="icon-name">search</text>
+        </view>
+        
+        <view class="icon-item">
+          <t-icon name="heart" size="48rpx" />
+          <text class="icon-name">heart</text>
+        </view>
+        
+        <view class="icon-item">
+          <t-icon name="star" size="48rpx" />
+          <text class="icon-name">star</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 说明文字 -->
+    <view class="description">
+      <text class="desc-text">
+        如果图标显示为方块或问号，说明字体未正确加载。
+        请点击"重新加载字体"按钮重试。
+      </text>
+    </view>
+  </view>
+</view>

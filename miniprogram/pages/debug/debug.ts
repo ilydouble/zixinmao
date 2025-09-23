@@ -240,5 +240,14 @@ Page({
     } finally {
       this.setData({ reportTesting: false })
     }
+  },
+
+  /**
+   * 测试字体加载
+   */
+  onTestFont() {
+    wx.navigateTo({
+      url: '/pages/font-test/font-test'
+    })
   }
 })

@@ -351,4 +351,14 @@
   color: #666;
 }
 
-
+/* 自定义箭头样式 */
+.custom-arrow {
+  color: #c8c9cc;
+  font-size: 32rpx;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32rpx;
+  height: 32rpx;
+}
