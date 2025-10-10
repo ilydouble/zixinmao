@@ -85,6 +85,13 @@ async function getReportDetail(reportId, userId) {
       }
     }
   } catch (error) {
+    // 检查是否是文档不存在的错误
+    const errorMessage = error.message || error.toString()
+    if (errorMessage.includes('document.get:fail') ||
+        errorMessage.includes('document with _id') && errorMessage.includes('does not exist')) {
+      throw new Error('报告不存在')
+    }
+
     throw new Error(`获取报告详情失败: ${error.message}`)
   }
 }
@@ -159,6 +166,7 @@ async function getReportStatus(reportId, userId) {
       .get()
 
     if (!reportDoc.data) {
+      console.log(`报告记录不存在: ${reportId}`)
       return {
         success: false,
         error: 'REPORT_NOT_FOUND',
@@ -170,7 +178,12 @@ async function getReportStatus(reportId, userId) {
 
     // 验证用户权限
     if (report.userId !== userId) {
-      throw new Error('无权访问此报告')
+      console.warn(`用户 ${userId} 无权访问报告 ${reportId}`)
+      return {
+        success: false,
+        error: 'PERMISSION_DENIED',
+        message: '无权访问此报告'
+      }
     }
 
     // 现在使用异步处理模式，直接返回当前状态
@@ -179,7 +192,26 @@ async function getReportStatus(reportId, userId) {
     return buildStatusResponse(report)
 
   } catch (error) {
-    throw new Error(`获取报告状态失败: ${error.message}`)
+    // 检查是否是文档不存在的错误
+    const errorMessage = error.message || error.toString()
+    const isDocNotExist = errorMessage.includes('document.get:fail') || (errorMessage.includes('document with _id') && errorMessage.includes('does not exist'))
+
+    if (isDocNotExist) {
+      console.log(`报告记录不存在(异常捕获): ${reportId}`)
+      return {
+        success: false,
+        error: 'REPORT_NOT_FOUND',
+        message: '报告记录不存在，可能已被自动清理'
+      }
+    }
+
+    // 其他错误也返回错误响应，而不是抛出异常
+    console.error(`获取报告状态失败: ${reportId}`, error)
+    return {
+      success: false,
+      error: 'QUERY_FAILED',
+      message: `获取报告状态失败: ${error.message}`
+    }
   }
 }
 
@@ -285,6 +317,13 @@ async function downloadReport(reportId, userId, fileType = 'json') {
       }
     }
   } catch (error) {
+    // 检查是否是文档不存在的错误
+    const errorMessage = error.message || error.toString()
+    if (errorMessage.includes('document.get:fail') ||
+        errorMessage.includes('document with _id') && errorMessage.includes('does not exist')) {
+      throw new Error('报告不存在')
+    }
+
     throw new Error(`下载报告失败: ${error.message}`)
   }
 }

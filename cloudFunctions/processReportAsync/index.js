@@ -9,7 +9,7 @@ const db = cloud.database()
 
 // AI分析服务配置
 const AI_ANALYSIS_SERVICE = {
-  url: process.env.AI_ANALYSIS_SERVICE_URL || 'http://38.60.251.79:8002',
+  url: process.env.AI_ANALYSIS_SERVICE_URL || 'http://115.190.121.59:8005',
   timeout: 300000 // 5分钟超时
 }
 

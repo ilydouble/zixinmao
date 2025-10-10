@@ -548,15 +548,24 @@ Page({
 
       // 检查是否是记录不存在的错误
       const errorMessage = (error as any)?.message || error?.toString()
-      if (errorMessage.includes('document with _id') && errorMessage.includes('does not exist')) {
+      const isDocumentNotExist = errorMessage && (
+        errorMessage.includes('document with _id') && errorMessage.includes('does not exist') ||
+        errorMessage.includes('document.get:fail') ||
+        errorMessage.includes('REPORT_NOT_FOUND')
+      )
+
+      if (isDocumentNotExist) {
         // 报告记录已被删除（处理失败被自动清理）
         console.log('报告记录已被删除，停止轮询')
         this.setData({
           generating: false,
           reportProgress: 0,
-          reportStatus: '处理失败，已自动清理'
+          reportStatus: '处理失败，已自动清理',
+          currentReportId: '',
+          pollStartTime: 0
         })
         showProcessingFailedDialog()
+        return // 停止轮询
       } else {
         // 其他错误
         this.setData({ generating: false })

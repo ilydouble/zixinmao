@@ -183,7 +183,13 @@ export const deepClone = <T>(obj: T): T => {
 export const showProcessingFailedDialog = () => {
   wx.showModal({
     title: '处理失败',
-    content: '文档处理失败，可能的原因：\n1. 文档格式不支持\n2. 文档内容无法识别\n3. 网络连接问题\n\n失败的记录已自动清理，请检查文档后重新上传。',
+    content: `文件分析过程中遇到问题，系统已自动清理。可能的原因：
+
+1. 文件格式不正确
+2. 文件内容无法识别
+3. AI服务暂时不可用
+
+请检查文件后重新上传。`,
     showCancel: false,
     confirmText: '我知道了',
     confirmColor: '#007AFF'

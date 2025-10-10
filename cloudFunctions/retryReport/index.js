@@ -59,6 +59,17 @@ exports.main = async (event, context) => {
     
   } catch (error) {
     console.error('重新生成报告失败:', error)
+
+    // 检查是否是文档不存在的错误
+    const errorMessage = error.message || error.toString()
+    if (errorMessage.includes('document.get:fail') ||
+        errorMessage.includes('document with _id') && errorMessage.includes('does not exist')) {
+      return {
+        success: false,
+        error: '报告不存在'
+      }
+    }
+
     return {
       success: false,
       error: error.message
