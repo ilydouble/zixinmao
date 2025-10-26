@@ -19,6 +19,8 @@ from utils.log_manager import algorithm_logger
 from utils.prompts import PROMPT_TEMPLATES
 from models.basemodel import *
 from service.report_service import *
+from models.visualization_model import VisualizationReportRequest
+from service.html_report_service import HTMLReportService
 
 # 配置日志
 logger.remove()
@@ -48,6 +50,9 @@ app.add_middleware(
 
 # 创建AI分析服务实例
 ai_service = AIAnalysisService()
+
+# 创建HTML报告服务实例
+html_report_service = HTMLReportService()
 
 
 @app.on_event("startup")
@@ -223,45 +228,62 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
     同步分析文档接口（直接处理，不使用队列）
 
     用于紧急或小文件的即时处理
+    支持两种输入方式：
+    1. file_base64 + mime_type: 传统的PDF base64方式
+    2. markdown_content: 直接传入Markdown内容
     """
     request_id = f"sync_req_{int(time.time() * 1000)}"
 
     try:
-        # 验证请求参数
-        if not request.file_base64:
+        # 验证请求参数 - 必须提供file_base64或markdown_content之一
+        if not request.file_base64 and not request.markdown_content:
             raise HTTPException(
                 status_code=400,
-                detail="文件内容不能为空"
+                detail="必须提供file_base64或markdown_content之一"
             )
 
-        # 验证文件大小
-        estimated_file_size = len(request.file_base64) * 3 // 4
-        if estimated_file_size > settings.file.max_file_size:
-            raise HTTPException(
-                status_code=413,
-                detail=f"文件大小超过限制 ({settings.file.max_file_size // (1024*1024)}MB)"
-            )
+        # 如果使用file_base64方式
+        if request.file_base64:
+            # 验证文件大小
+            estimated_file_size = len(request.file_base64) * 3 // 4
+            if estimated_file_size > settings.file.max_file_size:
+                raise HTTPException(
+                    status_code=413,
+                    detail=f"文件大小超过限制 ({settings.file.max_file_size // (1024*1024)}MB)"
+                )
 
-        # 验证MIME类型
-        if request.mime_type not in settings.file.allowed_mime_types:
-            raise HTTPException(
-                status_code=400,
-                detail=f"不支持的文件类型: {request.mime_type}"
-            )
+            # 验证MIME类型
+            if not request.mime_type:
+                raise HTTPException(
+                    status_code=400,
+                    detail="使用file_base64时必须提供mime_type"
+                )
 
-        logger.info(f"开始同步分析文档 - 类型: {request.report_type} | "
-                   f"MIME: {request.mime_type} | "
-                   f"文件大小: {estimated_file_size // 1024}KB | "
-                   f"request_id: {request_id}")
+            if request.mime_type not in settings.file.allowed_mime_types:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"不支持的文件类型: {request.mime_type}"
+                )
+
+            logger.info(f"开始同步分析文档 - 类型: {request.report_type} | "
+                       f"MIME: {request.mime_type} | "
+                       f"文件大小: {estimated_file_size // 1024}KB | "
+                       f"request_id: {request_id}")
+        else:
+            # 使用markdown_content方式
+            logger.info(f"开始同步分析文档(Markdown) - 类型: {request.report_type} | "
+                       f"Markdown长度: {len(request.markdown_content)} | "
+                       f"request_id: {request_id}")
 
         # 记录请求开始日志
         if settings.log.algorithm_enable:
             task_data = {
-                "file_base64": request.file_base64,
+                "file_base64": request.file_base64 if request.file_base64 else None,
+                "markdown_content": request.markdown_content[:500] if request.markdown_content else None,  # 只记录前500字符
                 "mime_type": request.mime_type,
                 "report_type": request.report_type.value,
                 "custom_prompt": request.custom_prompt,
-                "name":None,
+                "name": None,
                 "id_card": None,
                 "mobile_no": None
             }
@@ -271,10 +293,12 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
         start_time = time.time()
         result = await ai_service.analyze_document(
             file_base64=request.file_base64,
+            markdown_content=request.markdown_content,
             mime_type=request.mime_type,
             report_type=request.report_type.value,
             custom_prompt=request.custom_prompt,
-            request_id=request_id
+            request_id=request_id,
+            file_name=request.file_name or "document.pdf"  # 传递文件名
         )
         processing_time = time.time() - start_time
 
@@ -283,11 +307,29 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
             await algorithm_logger.log_request_complete(request_id, result, processing_time)
 
         if result['success']:
+            # 🔧 方式2：自动生成HTML报告
+            logger.info(f"开始生成HTML报告 | request_id: {request_id}")
+            html_start_time = time.time()
+
+            try:
+                html_report = await html_report_service.generate_html_report(
+                    analysis_result=result['analysis_result'],
+                    report_type=request.report_type.value,
+                    name=request.name,
+                    id_card=request.id_card
+                )
+                html_generation_time = time.time() - html_start_time
+                logger.info(f"HTML报告生成成功 | 长度: {len(html_report):,} 字符 | 耗时: {html_generation_time:.2f}s | request_id: {request_id}")
+            except Exception as html_error:
+                logger.error(f"HTML报告生成失败: {str(html_error)} | request_id: {request_id}")
+                html_report = None  # HTML生成失败不影响主流程
+
             return AnalysisResponse(
                 success=True,
                 request_id=request_id,
                 analysis_result=result['analysis_result'],
-                processing_time=result['processing_time']
+                processing_time=result['processing_time'],
+                html_report=html_report
             )
         else:
             return AnalysisResponse(
@@ -584,19 +626,19 @@ async def income_extraction(request: IncomeRequest):
                 status_code=400,
                 detail=f"不支持的文件类型: {request.mime_type}"
             )
-        
+
         # 创建收入服务实例
         from service.income_service import Income_Service
         income_service = Income_Service()
-        
+
         # 生成唯一请求ID
         request_id = str(uuid.uuid4())
-        
+
         logger.info(f"开始收入信息提取 - 文件类型: {request.file_type} | "
                    f"MIME: {request.mime_type} | "
                    f"文件大小: {estimated_file_size // 1024}KB | "
                    f"request_id: {request_id}")
-        
+
         # 调用收入分析服务
         result = await income_service.process_document(
             file_base64=request.file_base64,
@@ -604,7 +646,7 @@ async def income_extraction(request: IncomeRequest):
             file_type=request.file_type.value,
             request_id=request_id
         )
-        
+
         if result['success']:
             return {
                 "success": True,
@@ -628,7 +670,69 @@ async def income_extraction(request: IncomeRequest):
             status_code=500,
             detail=f"服务器内部错误: {str(e)}"
         )
-    
+
+
+@app.post("/generate/html-report")
+async def generate_html_report(request: VisualizationReportRequest):
+    """
+    生成HTML格式的可视化报告
+
+    支持两种方式：
+    1. 通过task_id获取分析结果
+    2. 直接提供report_data
+
+    返回HTML字符串
+    """
+    try:
+        logger.info("开始生成HTML报告")
+
+        analysis_result = None
+        name = None
+        id_card = None
+
+        # 获取分析结果
+        if request.task_id:
+            # 从队列中获取任务结果
+            task = await request_queue.get_task_status(request.task_id)
+
+            if not task:
+                raise HTTPException(status_code=404, detail="任务不存在")
+
+            if task.status != TaskStatus.COMPLETED:
+                raise HTTPException(status_code=400, detail=f"任务未完成，当前状态: {task.status.value}")
+
+            analysis_result = task.result.get("analysis_result", {})
+            # 从任务数据中获取个人信息
+            task_data = task.data or {}
+            name = task_data.get("name")
+            id_card = task_data.get("id_card")
+
+        elif request.report_data:
+            # 直接使用提供的数据
+            analysis_result = request.report_data
+        else:
+            raise HTTPException(status_code=400, detail="必须提供task_id或report_data")
+
+        # 生成HTML报告
+        html_content = await html_report_service.generate_html_report(
+            analysis_result=analysis_result,
+            report_type="simple",  # 可以从request中获取
+            name=name,
+            id_card=id_card
+        )
+
+        logger.info(f"成功生成HTML报告, 长度: {len(html_content):,} 字符")
+
+        # 返回HTML内容
+        from fastapi.responses import HTMLResponse
+        return HTMLResponse(content=html_content)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"生成HTML报告时发生错误: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"生成报告失败: {str(e)}")
+
 
 if __name__ == "__main__":
     import uvicorn

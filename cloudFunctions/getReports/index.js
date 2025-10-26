@@ -9,21 +9,27 @@ const db = cloud.database()
 exports.main = async (event, context) => {
   const { action, reportId, page = 1, pageSize = 10, reportType } = event
   const { OPENID } = cloud.getWXContext()
-  
+
   try {
     switch (action) {
       case 'getReportDetail':
         return await getReportDetail(reportId, OPENID)
-      
+
       case 'getReportsList':
         return await getReportsList(OPENID, page, pageSize, reportType)
-      
+
       case 'getReportStatus':
         return await getReportStatus(reportId, OPENID)
-      
+
       case 'downloadReport':
         return await downloadReport(reportId, OPENID, event.fileType)
-      
+
+      case 'getHTMLContent':
+        return await getHTMLContent(reportId, OPENID)
+
+      case 'getHTMLFileURL':
+        return await getHTMLFileURL(reportId, OPENID)
+
       default:
         throw new Error('未知的操作类型')
     }
@@ -69,16 +75,17 @@ async function getReportDetail(reportId, userId) {
         fileName: report.input.originalFileName,
         fileSize: report.input.fileSize,
         uploadTime: report.input.uploadTime,
-        
+
         status: report.processing.status,
         progress: report.processing.progress,
         currentStage: report.processing.currentStage,
         processingTime: calculateProcessingTime(report.processing.startTime, report.processing.endTime),
         errorMessage: report.processing.errorMessage,
-        
+
         reportFiles: report.output.reportFiles,
         summary: report.output.summary,
-        
+        analysisResult: report.output.analysisResult,  // 🆕 添加AI分析结果
+
         tags: report.metadata.tags,
         createdAt: report.metadata.createdAt,
         expiresAt: report.metadata.expiresAt
@@ -346,6 +353,157 @@ function calculateProcessingTime(startTime, endTime) {
 }
 
 /**
+ * 获取HTML内容
+ */
+async function getHTMLContent(reportId, userId) {
+  try {
+    console.log(`获取HTML内容: reportId=${reportId}, userId=${userId}`)
+
+    const reportDoc = await db.collection('reports')
+      .doc(reportId)
+      .get()
+
+    if (!reportDoc.data) {
+      console.error('报告不存在')
+      throw new Error('报告不存在')
+    }
+
+    const report = reportDoc.data
+
+    // 验证用户权限
+    if (report.userId !== userId) {
+      console.error('无权访问此报告')
+      throw new Error('无权访问此报告')
+    }
+
+    // 检查报告是否完成
+    if (report.processing.status !== 'completed') {
+      console.error('报告尚未完成，状态:', report.processing.status)
+      throw new Error('报告尚未完成')
+    }
+
+    // 获取HTML内容
+    const htmlContent = report.output.htmlReport
+
+    if (!htmlContent) {
+      console.error('HTML报告不存在')
+      throw new Error('HTML报告不存在')
+    }
+
+    console.log(`HTML内容长度: ${htmlContent.length}`)
+
+    return {
+      success: true,
+      data: {
+        htmlContent: htmlContent
+      }
+    }
+  } catch (error) {
+    console.error('获取HTML内容失败:', error)
+    throw new Error(`获取HTML内容失败: ${error.message}`)
+  }
+}
+
+/**
+ * 获取HTML文件URL（用于web-view）
+ */
+async function getHTMLFileURL(reportId, userId) {
+  try {
+    console.log(`获取HTML文件URL: reportId=${reportId}, userId=${userId}`)
+
+    const reportDoc = await db.collection('reports')
+      .doc(reportId)
+      .get()
+
+    if (!reportDoc.data) {
+      console.error('报告不存在')
+      throw new Error('报告不存在')
+    }
+
+    const report = reportDoc.data
+
+    // 验证用户权限
+    if (report.userId !== userId) {
+      console.error('无权访问此报告')
+      throw new Error('无权访问此报告')
+    }
+
+    // 检查报告是否完成
+    if (report.processing.status !== 'completed') {
+      console.error('报告尚未完成，状态:', report.processing.status)
+      throw new Error('报告尚未完成')
+    }
+
+    // 检查是否已有HTML文件
+    const reportFiles = report.output.reportFiles
+    if (reportFiles && reportFiles.htmlUrl) {
+      console.log('使用已存在的HTML文件:', reportFiles.htmlUrl)
+
+      // 生成临时下载链接
+      const tempUrlResult = await cloud.getTempFileURL({
+        fileList: [reportFiles.htmlUrl]
+      })
+
+      if (tempUrlResult.fileList && tempUrlResult.fileList.length > 0) {
+        const tempUrl = tempUrlResult.fileList[0].tempFileURL
+        console.log('临时下载链接:', tempUrl)
+
+        return {
+          success: true,
+          data: {
+            htmlUrl: tempUrl
+          }
+        }
+      }
+    }
+
+    // 如果没有HTML文件，从htmlReport字段创建
+    const htmlContent = report.output.htmlReport
+
+    if (!htmlContent) {
+      console.error('HTML报告不存在')
+      throw new Error('HTML报告不存在')
+    }
+
+    console.log(`HTML内容长度: ${htmlContent.length}`)
+
+    // 上传HTML文件到云存储
+    const htmlPath = `reports/${report.reportType}/${reportId}/report.html`
+    const uploadResult = await cloud.uploadFile({
+      cloudPath: htmlPath,
+      fileContent: Buffer.from(htmlContent, 'utf8')
+    })
+
+    console.log('HTML文件上传成功:', uploadResult.fileID)
+
+    // 更新数据库中的htmlUrl
+    await db.collection('reports').doc(reportId).update({
+      data: {
+        'output.reportFiles.htmlUrl': uploadResult.fileID
+      }
+    })
+
+    // 生成临时下载链接
+    const tempUrlResult = await cloud.getTempFileURL({
+      fileList: [uploadResult.fileID]
+    })
+
+    const tempUrl = tempUrlResult.fileList[0].tempFileURL
+    console.log('临时下载链接:', tempUrl)
+
+    return {
+      success: true,
+      data: {
+        htmlUrl: tempUrl
+      }
+    }
+  } catch (error) {
+    console.error('获取HTML文件URL失败:', error)
+    throw new Error(`获取HTML文件URL失败: ${error.message}`)
+  }
+}
+
+/**
  * 获取阶段文本
  */
 function getStageText(stage) {
@@ -357,6 +515,6 @@ function getStageText(stage) {
     'COMPLETED': '处理完成',
     'FAILED': '处理失败'
   }
-  
+
   return stageTexts[stage] || stage
 }

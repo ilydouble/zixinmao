@@ -9,10 +9,14 @@ class ReportType(str, Enum):
     DETAIL = "detail"  # 详版征信
 
 class AnalysisRequest(BaseModel):
-    file_base64: str = Field(..., description="文件的base64编码")
-    mime_type: str = Field(..., description="文件MIME类型")
+    # 支持两种输入方式：file_base64 或 markdown_content
+    file_base64: Optional[str] = Field(None, description="文件的base64编码（与markdown_content二选一）")
+    markdown_content: Optional[str] = Field(None, description="Markdown格式的文档内容（与file_base64二选一）")
+
+    mime_type: Optional[str] = Field(None, description="文件MIME类型（使用file_base64时必填）")
     report_type: ReportType = Field(..., description="报告类型")
     custom_prompt: Optional[str] = Field(None, description="自定义提示词")
+    file_name: Optional[str] = Field(None, description="文件名")
     name: Optional[str] = Field(None, description="姓名")
     id_card: Optional[str] = Field(None, description="身份证号")
     mobile_no: Optional[str] = Field(None, description="手机号码")
@@ -62,6 +66,7 @@ class AnalysisResponse(BaseModel):
     analysis_result: Optional[Dict[str, Any]] = Field(None, description="分析结果")
     error_message: Optional[str] = Field(None, description="错误信息")
     processing_time: float = Field(..., description="处理时间（秒）")
+    html_report: Optional[str] = Field(None, description="HTML格式的可视化报告")
     
     class Config:
         schema_extra = {

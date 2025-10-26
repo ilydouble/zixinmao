@@ -1,8 +1,15 @@
-/* report.wxss */
+/* report.wxss - 严格按照可视化最新样版.html格式 */
+
+/* 基础样式 */
+page {
+  background: #f5f7fa;
+  font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+}
+
 .container {
   background: #f5f7fa;
   min-height: 100vh;
-  padding-bottom: 40rpx;
+  padding: 24rpx;
 }
 
 /* 加载状态 */
@@ -10,7 +17,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 60vh;
+  height: 100vh;
 }
 
 .loading-text {
@@ -18,308 +25,463 @@
   color: #666;
 }
 
-/* 报告内容 */
-.report-content {
-  padding: 24rpx;
+/* Dashboard容器 */
+.dashboard {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
-/* 报告头部 */
-.report-header {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 32rpx;
+/* Header - 渐变背景头部 */
+.header {
+  background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+  color: white;
+  padding: 70rpx 40rpx 50rpx;
+  text-align: center;
+  min-height: 360rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.header-title {
+  font-size: 64rpx;
+  font-weight: 800;
   margin-bottom: 24rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+  letter-spacing: 3rpx;
+  text-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.3);
 }
 
-.report-title {
+.report-info-header {
+  font-size: 32rpx;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+/* 个人信息卡片 */
+.personal-card {
+  background: white;
+  color: #333;
+  border-radius: 20rpx;
+  padding: 36rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.08);
+  margin: 32rpx;
+  border-left: 8rpx solid #4b6cb7;
+  position: relative;
+  overflow: hidden;
+}
+
+.personal-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 8rpx;
+  background: linear-gradient(90deg, #4b6cb7, #667eea);
+}
+
+.card-title {
+  font-size: 44rpx;
+  font-weight: 700;
+  margin-bottom: 32rpx;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  color: #4b6cb7;
+}
+
+.icon-user {
+  font-size: 44rpx;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24rpx;
+}
+
+.info-item {
+  margin-bottom: 24rpx;
+  padding: 20rpx;
+  border-radius: 16rpx;
+  transition: all 0.3s ease;
+}
+
+.info-label {
+  font-size: 32rpx;
+  color: #666;
+  margin-bottom: 12rpx;
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+/* 统计数据卡片 */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 24rpx;
+  padding: 0 32rpx 32rpx;
+  width: 100%;
+}
+
+.stat-card {
+  background-color: white;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  padding: 32rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stat-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20rpx;
+  font-size: 36rpx;
+  color: white;
+}
+
+.icon-credit {
+  background: linear-gradient(135deg, #4CAF50, #8BC34A);
+}
+
+.icon-debt {
+  background: linear-gradient(135deg, #FF5722, #FF9800);
+}
+
+.icon-institution {
+  background: linear-gradient(135deg, #9C27B0, #E91E63);
+}
+
+.icon-nonbank {
+  background: linear-gradient(135deg, #FF9800, #FFC107);
+}
+
+.icon-overdue {
+  background: linear-gradient(135deg, #F44336, #E91E63);
+}
+
+.icon-query {
+  background: linear-gradient(135deg, #2196F3, #03A9F4);
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 12rpx;
+}
+
+.stat-value {
   font-size: 36rpx;
   font-weight: 700;
-  color: #1a1a1a;
-  margin-bottom: 16rpx;
+  color: #2c3e50;
 }
 
-.report-date {
-  font-size: 26rpx;
-  color: #666;
-  margin-bottom: 24rpx;
+.stat-unit {
+  font-size: 24rpx;
+  color: #7f8c8d;
+  margin-left: 4rpx;
 }
 
-.report-actions {
-  display: flex;
-  gap: 16rpx;
-}
-
-/* 评分区域 */
-.score-section {
-  background: linear-gradient(135deg, #0b3a95, #1e5bb8);
-  border-radius: 16rpx;
-  padding: 40rpx;
-  margin-bottom: 24rpx;
-  color: #fff;
-  text-align: center;
-}
-
-.score-card {
-  margin-bottom: 24rpx;
-}
-
-.score-number {
-  font-size: 80rpx;
-  font-weight: 700;
-  margin-bottom: 8rpx;
-}
-
-.score-label {
-  font-size: 28rpx;
-  opacity: 0.9;
-  margin-bottom: 8rpx;
-}
-
-.score-level {
-  font-size: 32rpx;
-  font-weight: 600;
-}
-
-.risk-info {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12rpx;
-  padding: 16rpx;
-  backdrop-filter: blur(10rpx);
-}
-
-.risk-level {
-  font-size: 26rpx;
-}
-
-/* 分析区域 */
-.analysis-section {
-  background: #fff;
-  border-radius: 16rpx;
-  padding: 32rpx;
-  margin-bottom: 24rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
-}
-
+/* Section标题 */
 .section-title {
-  font-size: 32rpx;
+  font-size: 40rpx;
   font-weight: 700;
-  color: #1a1a1a;
-  margin-bottom: 24rpx;
+  margin: 40rpx 32rpx 24rpx;
+  color: #2c3e50;
   padding-bottom: 16rpx;
-  border-bottom: 2rpx solid #f0f0f0;
+  border-bottom: 4rpx solid #4b6cb7;
 }
 
-/* 分析网格 */
-.analysis-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24rpx;
-  margin-bottom: 32rpx;
+/* 数据表格 */
+.data-table-container {
+  margin: 0 32rpx 40rpx;
 }
 
-.analysis-item {
-  text-align: center;
-  padding: 24rpx;
-  background: #f8fafc;
-  border-radius: 12rpx;
+.data-table {
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
 }
 
-.item-label {
-  font-size: 24rpx;
-  color: #666;
-  margin-bottom: 8rpx;
+.table-wrapper {
+  min-width: 1600rpx;
 }
 
-.item-value {
-  font-size: 32rpx;
+.table-header {
+  display: flex;
+  background-color: #4b6cb7;
+  color: white;
+}
+
+.table-row {
+  display: flex;
+  border-bottom: 1rpx solid #e9ecef;
+}
+
+.table-row:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.table-cell {
+  flex: 1;
+  padding: 24rpx 20rpx;
+  font-size: 26rpx;
+  text-align: left;
+  min-width: 200rpx;
+}
+
+.table-header .table-cell {
+  font-weight: 600;
+  font-size: 26rpx;
+}
+
+.highlight {
+  font-weight: 600;
+  color: #4b6cb7;
+}
+
+.warning {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+.good {
+  color: #2ecc71;
+  font-weight: 600;
+}
+
+/* AI分析区域 */
+.analysis-section {
+  background-color: white;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  padding: 36rpx;
+  margin: 0 32rpx 40rpx;
+}
+
+.analysis-title {
+  font-size: 40rpx;
   font-weight: 700;
-  color: #0b3a95;
+  margin-bottom: 24rpx;
+  color: #2c3e50;
+  padding-bottom: 16rpx;
+  border-bottom: 4rpx solid #4b6cb7;
 }
 
-/* 稳定性信息 */
-.stability-info {
-  background: #f0f9ff;
-  border-radius: 12rpx;
-  padding: 24rpx;
+.analysis-content {
+  line-height: 1.6;
+  font-size: 32rpx;
 }
 
-.stability-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 16rpx;
-  font-size: 26rpx;
+.analysis-point {
+  margin-bottom: 24rpx;
+  padding-left: 32rpx;
+  position: relative;
 }
 
-.stability-item:last-child {
-  margin-bottom: 0;
+.analysis-point:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #4b6cb7;
+  font-weight: bold;
 }
 
-.stability-item .label {
-  color: #666;
-}
-
-.stability-item .value {
-  color: #0b3a95;
-  font-weight: 600;
-}
-
-/* 信息行 */
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16rpx 0;
-  border-bottom: 1rpx solid #f0f0f0;
-  font-size: 26rpx;
-}
-
-.info-row:last-child {
-  border-bottom: none;
-}
-
-.info-row .label {
-  color: #666;
-}
-
-.info-row .value {
-  color: #1a1a1a;
-  font-weight: 600;
-}
-
-.info-row .value.success {
-  color: #22c55e;
-}
-
-/* 子标题 */
-.subsection-title {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin: 24rpx 0 16rpx 0;
-}
-
-/* 查询信息 */
-.query-info {
-  background: #f8fafc;
-  border-radius: 12rpx;
-  padding: 24rpx;
-}
-
-.query-item {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12rpx;
-  font-size: 26rpx;
-}
-
-.query-item:last-child {
-  margin-bottom: 0;
-}
-
-/* 风险评估网格 */
-.risk-assessment {
-  margin-top: 24rpx;
-}
-
-.risk-grid {
+.ai-analysis-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16rpx;
+  grid-template-columns: 1fr;
+  gap: 24rpx;
+  margin-top: 30rpx;
 }
 
-.risk-item {
-  text-align: center;
-  padding: 20rpx;
-  background: #f8fafc;
-  border-radius: 12rpx;
+.ai-analysis-item {
+  padding: 24rpx 32rpx;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: flex-start;
+  gap: 24rpx;
+  font-size: 30rpx;
+  line-height: 1.5;
+  background-color: #f8f9fa;
+  border-left: 8rpx solid #e9ecef;
 }
 
-.risk-label {
+.ai-analysis-item:nth-child(1) {
+  border-left-color: rgba(52, 152, 219, 0.8);
+}
+
+.ai-analysis-item:nth-child(2) {
+  border-left-color: rgba(46, 204, 113, 0.8);
+}
+
+.ai-analysis-item:nth-child(3) {
+  border-left-color: rgba(243, 156, 18, 0.8);
+}
+
+.ai-analysis-item:nth-child(4) {
+  border-left-color: rgba(155, 89, 182, 0.8);
+}
+
+.ai-analysis-number {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 24rpx;
-  color: #666;
-  margin-bottom: 8rpx;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
 }
 
-.risk-value {
-  font-size: 26rpx;
-  font-weight: 600;
-  padding: 4rpx 12rpx;
-  border-radius: 8rpx;
+.ai-analysis-item:nth-child(1) .ai-analysis-number {
+  background: rgba(52, 152, 219, 0.8);
 }
 
-.risk-value.low {
-  background: #dcfce7;
-  color: #16a34a;
+.ai-analysis-item:nth-child(2) .ai-analysis-number {
+  background: rgba(46, 204, 113, 0.8);
 }
 
-.risk-value.medium {
-  background: #fef3c7;
-  color: #d97706;
+.ai-analysis-item:nth-child(3) .ai-analysis-number {
+  background: rgba(243, 156, 18, 0.8);
 }
 
-.risk-value.high {
-  background: #fee2e2;
-  color: #dc2626;
+.ai-analysis-item:nth-child(4) .ai-analysis-number {
+  background: rgba(155, 89, 182, 0.8);
 }
 
-/* 风险提示 */
-.risk-section {
-  background: #fff7ed;
-  border: 2rpx solid #fed7aa;
-  border-radius: 16rpx;
-  padding: 32rpx;
-  margin-bottom: 24rpx;
-}
-
-.risk-list {
-  margin-top: 16rpx;
-}
-
-.risk-item-text {
-  font-size: 26rpx;
-  color: #9a3412;
-  line-height: 1.6;
-  margin-bottom: 12rpx;
-}
-
-/* 建议区域 */
-.suggestion-section {
-  background: #f0fdf4;
-  border: 2rpx solid #bbf7d0;
-  border-radius: 16rpx;
-  padding: 32rpx;
-  margin-bottom: 24rpx;
-}
-
-.suggestion-list {
-  margin-top: 16rpx;
-}
-
-.suggestion-item {
-  font-size: 26rpx;
-  color: #166534;
-  line-height: 1.6;
-  margin-bottom: 16rpx;
+.ai-analysis-text {
+  flex: 1;
+  color: #333;
 }
 
 /* 免责声明 */
 .disclaimer {
-  background: #f8fafc;
+  background-color: #fff3cd;
+  border-left: 8rpx solid #ffc107;
   border-radius: 16rpx;
   padding: 32rpx;
-  margin-top: 40rpx;
+  margin: 0 32rpx 40rpx;
 }
 
 .disclaimer-title {
-  font-size: 28rpx;
-  font-weight: 600;
-  color: #374151;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #856404;
   margin-bottom: 16rpx;
 }
 
-.disclaimer-text {
-  font-size: 24rpx;
-  color: #6b7280;
+.disclaimer-content {
+  font-size: 28rpx;
+  color: #856404;
   line-height: 1.6;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .header {
+    text-align: center;
+    padding: 60rpx 32rpx 40rpx;
+    min-height: 320rpx;
+  }
+
+  .header-title {
+    font-size: 52rpx;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    padding: 50rpx 32rpx 30rpx;
+    min-height: 280rpx;
+  }
+
+  .header-title {
+    font-size: 44rpx;
+  }
+}
+
+/* 操作按钮区域 */
+.action-buttons {
+  display: flex;
+  gap: 24rpx;
+  padding: 40rpx;
+  background: #fff;
+  border-top: 1rpx solid #eee;
+  margin-top: 40rpx;
+}
+
+.action-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32rpx 24rpx;
+  border-radius: 16rpx;
+  border: none;
+  font-size: 28rpx;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.action-btn::after {
+  border: none;
+}
+
+.download-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.share-btn {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.action-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.12);
+}
+
+.btn-icon {
+  font-size: 48rpx;
+  margin-bottom: 12rpx;
+}
+
+.btn-text {
+  font-size: 28rpx;
+  font-weight: 500;
 }

@@ -92,39 +92,51 @@
 
     <!-- 报告列表 -->
     <view wx:if="{{reportList.length > 0}}" class="report-list">
+      <!-- 使用滑动删除组件 -->
       <view
         wx:for="{{reportList}}"
         wx:key="id"
-        class="report-item {{item.status === 'failed' ? 'failed' : ''}} {{item.status === 'processing' ? 'processing' : ''}}"
+        class="report-item-wrapper"
       >
-        <view class="report-icon">
-          <text wx:if="{{item.status === 'completed'}}">🧾</text>
-          <text wx:elif="{{item.status === 'processing'}}">⏳</text>
-          <text wx:elif="{{item.status === 'failed'}}">❌</text>
-          <text wx:else>📄</text>
-        </view>
-        <view class="report-info" data-report="{{item}}" bind:tap="onViewReport">
-          <view class="report-title">{{item.title}}</view>
-          <view class="report-date">{{item.date}}</view>
-          <view wx:if="{{item.status === 'processing'}}" class="report-status processing">
-            处理中 {{item.progress}}%
+        <view class="report-item-container">
+          <!-- 报告内容 -->
+          <view class="report-item {{item.status === 'failed' ? 'failed' : ''}} {{item.status === 'processing' ? 'processing' : ''}}">
+            <view class="report-icon">
+              <text wx:if="{{item.status === 'completed'}}">🧾</text>
+              <text wx:elif="{{item.status === 'processing'}}">⏳</text>
+              <text wx:elif="{{item.status === 'failed'}}">❌</text>
+              <text wx:else>📄</text>
+            </view>
+            <view class="report-info" data-report="{{item}}" bind:tap="onViewReport">
+              <view class="report-title">{{item.title}}</view>
+              <view class="report-date">{{item.date}}</view>
+              <view wx:if="{{item.status === 'processing'}}" class="report-status processing">
+                处理中 {{item.progress}}%
+              </view>
+              <view wx:elif="{{item.status === 'failed'}}" class="report-status failed">
+                处理失败 - 点击重新生成
+              </view>
+              <view wx:elif="{{item.status === 'completed'}}" class="report-status completed">
+                已完成 - 点击查看
+              </view>
+            </view>
+            <view class="report-actions">
+              <!-- 处理中的报告显示终止按钮 -->
+              <view wx:if="{{item.status === 'processing'}}" class="action-btn cancel-action" data-report="{{item}}" catchtap="onCancelReportFromList">
+                终止
+              </view>
+              <!-- 其他状态显示箭头 -->
+              <view wx:else class="report-arrow" data-report="{{item}}" bind:tap="onViewReport">
+                <text wx:if="{{item.status === 'failed'}}">🔄</text>
+                <text wx:else>→</text>
+              </view>
+            </view>
           </view>
-          <view wx:elif="{{item.status === 'failed'}}" class="report-status failed">
-            处理失败 - 点击重新生成
-          </view>
-          <view wx:elif="{{item.status === 'completed'}}" class="report-status completed">
-            已完成 - 点击查看
-          </view>
-        </view>
-        <view class="report-actions">
-          <!-- 处理中的报告显示终止按钮 -->
-          <view wx:if="{{item.status === 'processing'}}" class="action-btn cancel-action" data-report="{{item}}" catchtap="onCancelReportFromList">
-            终止
-          </view>
-          <!-- 其他状态显示箭头 -->
-          <view wx:else class="report-arrow" data-report="{{item}}" bind:tap="onViewReport">
-            <text wx:if="{{item.status === 'failed'}}">🔄</text>
-            <text wx:else>→</text>
+
+          <!-- 删除按钮 -->
+          <view class="delete-btn" data-report="{{item}}" catchtap="onDeleteReport">
+            <text class="delete-icon">🗑️</text>
+            <text class="delete-text">删除</text>
           </view>
         </view>
       </view>

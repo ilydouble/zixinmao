@@ -18,10 +18,21 @@ miniprogram_npm/
 *.pyc
 *.pyo
 *.pyd
+__pycache__/
 
 # 日志或临时数据
 *.log
 *.jsonl
+logs/
+
+# 测试输出
+test_output/
+ai-analysis-service/test_output/
+
+# 临时文件
+*.tmp
+*.bak
+*.swp
 
 # 如果确实要忽略构建生成的小程序文件
 # /dist/**/*.wxml

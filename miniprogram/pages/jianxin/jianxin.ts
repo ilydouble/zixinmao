@@ -237,13 +237,14 @@ Page({
           generating: true,
           currentReportId: response.reportId,
           reportProgress: 10,
-          reportStatus: '文件上传成功，开始AI分析...'
+          reportStatus: '文件上传成功，开始AI分析...',
+          pollStartTime: Date.now() // 记录轮询开始时间
         })
 
-        // 延迟10秒后开始轮询，给AI服务一些处理时间
+        // 🔧 修复：缩短延迟时间从10秒到3秒，更快检测失败状态
         setTimeout(() => {
           this.pollProgress()
-        }, 10000)
+        }, 3000)
 
         // 清除选中文件
         this.setData({ selectedFile: null })
@@ -549,9 +550,20 @@ Page({
 
         } else if (statusData.status === 'failed') {
           // 生成失败
-          console.log('❌ 报告生成失败')
-          this.setData({ generating: false })
-          showError(statusData.errorMessage || '报告生成失败')
+          console.log('❌ 报告生成失败:', statusData.errorMessage)
+          this.setData({
+            generating: false,
+            reportProgress: 0,
+            reportStatus: '处理失败',
+            currentReportId: '',
+            pollStartTime: 0
+          })
+
+          // 显示友好的错误对话框
+          showProcessingFailedDialog()
+
+          // 刷新报告列表（失败的报告会显示在列表中）
+          this.loadReportList()
 
         } else {
           // 继续轮询，根据任务状态调整轮询间隔
@@ -700,9 +712,9 @@ Page({
       return
     }
 
-    // 跳转到报告详情页
+    // 跳转到报告查看页
     wx.navigateTo({
-      url: `/pages/report/report?type=jianxin&reportId=${report.id}&title=${encodeURIComponent(report.title)}`
+      url: `/pages/report/report?reportId=${report.id}&type=jianxin&title=${encodeURIComponent(report.title)}&date=${report.date}`
     })
   },
 
@@ -732,6 +744,54 @@ Page({
     } catch (error) {
       console.error('重新生成报告失败:', error)
       showError('重新生成失败，请稍后重试')
+    }
+  },
+
+  /**
+   * 删除报告
+   */
+  async onDeleteReport(e: any) {
+    const { report } = e.currentTarget.dataset
+
+    try {
+      // 确认删除
+      const confirmResult = await new Promise<boolean>((resolve) => {
+        wx.showModal({
+          title: '确认删除',
+          content: `确定要删除报告"${report.title}"吗？删除后无法恢复。`,
+          confirmText: '确认删除',
+          cancelText: '取消',
+          confirmColor: '#ff4d4f',
+          success: (res) => {
+            resolve(res.confirm)
+          }
+        })
+      })
+
+      if (!confirmResult) {
+        return
+      }
+
+      showToast('正在删除报告...', 'loading')
+
+      // 调用云函数删除报告
+      const result = await wx.cloud.callFunction({
+        name: 'deleteReport',
+        data: {
+          reportId: report.id
+        }
+      })
+
+      if (result.result && (result.result as any).success) {
+        showSuccess('报告已删除')
+        // 刷新报告列表
+        this.loadReportList()
+      } else {
+        throw new Error((result.result as any)?.error || '删除失败')
+      }
+    } catch (error) {
+      console.error('删除报告失败:', error)
+      showError('删除失败，请稍后重试')
     }
   },
 

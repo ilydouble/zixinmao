@@ -386,3 +386,60 @@
 .back-home-container t-button {
   width: 200rpx;
 }
+
+/* 滑动删除样式 */
+.report-item-wrapper {
+  position: relative;
+  margin-bottom: 16rpx;
+  overflow: hidden;
+}
+
+.report-item-container {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  transition: transform 0.3s ease;
+}
+
+.report-item-container .report-item {
+  flex: 1;
+  background: white;
+  z-index: 2;
+}
+
+/* 删除按钮 */
+.delete-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 160rpx;
+  background: linear-gradient(135deg, #ff4d4f, #cf1322);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  z-index: 1;
+  transform: translateX(160rpx);
+  transition: transform 0.3s ease;
+}
+
+.delete-icon {
+  font-size: 48rpx;
+}
+
+.delete-text {
+  font-size: 24rpx;
+  color: white;
+  font-weight: 500;
+}
+
+/* 滑动效果 */
+.report-item-wrapper.swiping .report-item-container {
+  transform: translateX(-160rpx);
+}
+
+.report-item-wrapper.swiping .delete-btn {
+  transform: translateX(0);
+}

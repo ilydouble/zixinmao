@@ -1,4 +1,4 @@
-<!--report.wxml-->
+<!--report.wxml - 严格按照可视化最新样版.html格式-->
 <view class="container">
   <!-- 加载状态 -->
   <view wx:if="{{loading}}" class="loading-container">
@@ -6,202 +6,194 @@
   </view>
 
   <!-- 报告内容 -->
-  <view wx:else class="report-content">
-    <!-- 报告头部 -->
-    <view class="report-header">
-      <view class="report-title">{{reportTitle}}</view>
-      <view class="report-date">生成时间：{{reportDate}}</view>
-      <view class="report-actions">
-        <t-button 
-          theme="light" 
-          size="small" 
-          bind:tap="onDownloadReport"
-        >
-          📥 下载
-        </t-button>
-        <t-button 
-          theme="light" 
-          size="small" 
-          loading="{{sharing}}"
-          bind:tap="onShareReport"
-        >
-          📤 分享
-        </t-button>
+  <view wx:else class="dashboard">
+    <!-- Header - 渐变背景头部 -->
+    <view class="header">
+      <view class="header-title">{{reportData.personalInfo.name}}个人征信分析报告</view>
+      <view class="report-info-header">
+        <view>报告时间: {{reportDate}}</view>
+        <view>报告编号: {{reportId}}</view>
       </view>
     </view>
 
-    <!-- 综合评分 -->
-    <view class="score-section">
-      <view class="score-card">
-        <view class="score-number">{{reportData.summary.score}}</view>
-        <view class="score-label">综合评分</view>
-        <view class="score-level">{{reportData.summary.level}}</view>
+    <!-- 个人信息概览 -->
+    <view class="personal-card">
+      <view class="card-title">
+        <text class="icon-user">👤</text>
+        个人信息概览
       </view>
-      <view class="risk-info">
-        <view class="risk-level">风险等级：{{reportData.summary.riskLevel}}</view>
+      <view class="info-grid">
+        <view class="info-item">
+          <view class="info-label">用户姓名</view>
+          <view class="info-value">{{reportData.personalInfo.name}}</view>
+        </view>
+        <view class="info-item">
+          <view class="info-label">年龄</view>
+          <view class="info-value">{{reportData.personalInfo.age}}</view>
+        </view>
+        <view class="info-item">
+          <view class="info-label">婚姻状况</view>
+          <view class="info-value">{{reportData.personalInfo.maritalStatus}}</view>
+        </view>
+        <view class="info-item">
+          <view class="info-label">单位性质</view>
+          <view class="info-value">{{reportData.personalInfo.companyType}}</view>
+        </view>
+        <view class="info-item">
+          <view class="info-label">工作时长</view>
+          <view class="info-value">{{reportData.personalInfo.workYears}}</view>
+        </view>
+        <view class="info-item">
+          <view class="info-label">公积金基数</view>
+          <view class="info-value">{{reportData.personalInfo.fundBase}}</view>
+        </view>
+        <view class="info-item">
+          <view class="info-label">白名单客群</view>
+          <view class="info-value">{{reportData.personalInfo.whiteList}}</view>
+        </view>
+        <view class="info-item">
+          <view class="info-label">身份证号</view>
+          <view class="info-value">{{reportData.personalInfo.idCard}}</view>
+        </view>
       </view>
     </view>
 
-    <!-- 流水宝报告内容 -->
-    <block wx:if="{{reportType === 'liushui'}}">
-      <view class="analysis-section">
-        <view class="section-title">💰 流水分析</view>
-        <view class="analysis-grid">
-          <view class="analysis-item">
-            <view class="item-label">总收入</view>
-            <view class="item-value">{{reportData.flowAnalysis.totalIncome}}</view>
+    <!-- 统计数据卡片 -->
+    <view class="stats-grid">
+      <view class="stat-card">
+        <view class="stat-icon icon-credit">💳</view>
+        <view class="stat-label">总授信</view>
+        <view class="stat-value">{{reportData.statistics.totalCredit}}<text class="stat-unit">元</text></view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-icon icon-debt">💰</view>
+        <view class="stat-label">总负债</view>
+        <view class="stat-value">{{reportData.statistics.totalDebt}}<text class="stat-unit">元</text></view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-icon icon-institution">🏦</view>
+        <view class="stat-label">银行机构数</view>
+        <view class="stat-value">{{reportData.statistics.bankCount}}<text class="stat-unit">家</text></view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-icon icon-nonbank">🏢</view>
+        <view class="stat-label">非银机构数</view>
+        <view class="stat-value">{{reportData.statistics.nonBankCount}}<text class="stat-unit">家</text></view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-icon icon-overdue">⚠️</view>
+        <view class="stat-label">逾期金额</view>
+        <view class="stat-value">{{reportData.statistics.overdueAmount}}<text class="stat-unit">元</text></view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-icon icon-query">🔍</view>
+        <view class="stat-label">查询次数</view>
+        <view class="stat-value">{{reportData.statistics.queryCount}}<text class="stat-unit">次</text></view>
+      </view>
+    </view>
+
+    <!-- 银行贷款列表 -->
+    <view wx:if="{{reportData.bankLoans && reportData.bankLoans.length > 0}}">
+      <view class="section-title">🏦 银行贷款明细</view>
+      <view class="data-table-container">
+        <scroll-view scroll-x class="data-table">
+          <view class="table-wrapper">
+            <view class="table-header">
+              <view class="table-cell">机构名称</view>
+              <view class="table-cell">贷款金额</view>
+              <view class="table-cell">剩余金额</view>
+              <view class="table-cell">发放日期</view>
+              <view class="table-cell">状态</view>
+            </view>
+            <view wx:for="{{reportData.bankLoans}}" wx:key="index" class="table-row">
+              <view class="table-cell">{{item.institutionName}}</view>
+              <view class="table-cell highlight">¥{{item.loanAmount}}</view>
+              <view class="table-cell">¥{{item.remainingAmount}}</view>
+              <view class="table-cell">{{item.issueDate}}</view>
+              <view class="table-cell {{item.status === '正常' ? 'good' : 'warning'}}">{{item.status}}</view>
+            </view>
           </view>
-          <view class="analysis-item">
-            <view class="item-label">总支出</view>
-            <view class="item-value">{{reportData.flowAnalysis.totalExpense}}</view>
+        </scroll-view>
+      </view>
+    </view>
+
+    <!-- 非银贷款列表 -->
+    <view wx:if="{{reportData.nonBankLoans && reportData.nonBankLoans.length > 0}}">
+      <view class="section-title">🏢 非银贷款明细</view>
+      <view class="data-table-container">
+        <scroll-view scroll-x class="data-table">
+          <view class="table-wrapper">
+            <view class="table-header">
+              <view class="table-cell">机构名称</view>
+              <view class="table-cell">贷款金额</view>
+              <view class="table-cell">剩余金额</view>
+              <view class="table-cell">状态</view>
+            </view>
+            <view wx:for="{{reportData.nonBankLoans}}" wx:key="index" class="table-row">
+              <view class="table-cell">{{item.institutionName}}</view>
+              <view class="table-cell highlight">¥{{item.loanAmount}}</view>
+              <view class="table-cell">¥{{item.remainingAmount}}</view>
+              <view class="table-cell {{item.status === '正常' ? 'good' : 'warning'}}">{{item.status}}</view>
+            </view>
           </view>
-          <view class="analysis-item">
-            <view class="item-label">月均收入</view>
-            <view class="item-value">{{reportData.flowAnalysis.avgMonthlyIncome}}</view>
+        </scroll-view>
+      </view>
+    </view>
+
+    <!-- 信用卡列表 -->
+    <view wx:if="{{reportData.creditCards && reportData.creditCards.length > 0}}">
+      <view class="section-title">💳 信用卡明细</view>
+      <view class="data-table-container">
+        <scroll-view scroll-x class="data-table">
+          <view class="table-wrapper">
+            <view class="table-header">
+              <view class="table-cell">发卡机构</view>
+              <view class="table-cell">信用额度</view>
+              <view class="table-cell">已用额度</view>
+              <view class="table-cell">开卡日期</view>
+              <view class="table-cell">状态</view>
+            </view>
+            <view wx:for="{{reportData.creditCards}}" wx:key="index" class="table-row">
+              <view class="table-cell">{{item.issuer}}</view>
+              <view class="table-cell highlight">¥{{item.creditLimit}}</view>
+              <view class="table-cell">¥{{item.usedAmount}}</view>
+              <view class="table-cell">{{item.issueDate}}</view>
+              <view class="table-cell {{item.status === '正常' ? 'good' : 'warning'}}">{{item.status}}</view>
+            </view>
           </view>
-          <view class="analysis-item">
-            <view class="item-label">月均支出</view>
-            <view class="item-value">{{reportData.flowAnalysis.avgMonthlyExpense}}</view>
-          </view>
-        </view>
-        
-        <view class="stability-info">
-          <view class="stability-item">
-            <text class="label">收入稳定性：</text>
-            <text class="value">{{reportData.flowAnalysis.incomeStability}}</text>
-          </view>
-          <view class="stability-item">
-            <text class="label">支出规律性：</text>
-            <text class="value">{{reportData.flowAnalysis.expensePattern}}</text>
+        </scroll-view>
+      </view>
+    </view>
+
+    <!-- AI智能分析 -->
+    <view wx:if="{{reportData.aiAnalysis}}" class="analysis-section">
+      <view class="analysis-title">🤖 AI智能分析</view>
+      <view class="analysis-content">
+        <view class="ai-analysis-grid">
+          <view wx:for="{{reportData.aiAnalysisPoints}}" wx:key="index" class="ai-analysis-item">
+            <view class="ai-analysis-number">{{index + 1}}</view>
+            <view class="ai-analysis-text">{{item}}</view>
           </view>
         </view>
       </view>
-    </block>
-
-    <!-- 简信宝报告内容 -->
-    <block wx:if="{{reportType === 'jianxin'}}">
-      <view class="analysis-section">
-        <view class="section-title">💳 信用卡信息</view>
-        <view class="credit-info">
-          <view class="info-row">
-            <text class="label">信用卡数量：</text>
-            <text class="value">{{reportData.creditInfo.creditCards}}张</text>
-          </view>
-          <view class="info-row">
-            <text class="label">总授信额度：</text>
-            <text class="value">{{reportData.creditInfo.totalCreditLimit}}</text>
-          </view>
-          <view class="info-row">
-            <text class="label">已用额度：</text>
-            <text class="value">{{reportData.creditInfo.usedCredit}}</text>
-          </view>
-          <view class="info-row">
-            <text class="label">使用率：</text>
-            <text class="value">{{reportData.creditInfo.utilizationRate}}</text>
-          </view>
-        </view>
-      </view>
-
-      <view class="analysis-section">
-        <view class="section-title">🏦 贷款信息</view>
-        <view class="loan-info">
-          <view class="info-row">
-            <text class="label">在贷笔数：</text>
-            <text class="value">{{reportData.loanInfo.activeLoan}}笔</text>
-          </view>
-          <view class="info-row">
-            <text class="label">贷款总额：</text>
-            <text class="value">{{reportData.loanInfo.totalLoanAmount}}</text>
-          </view>
-          <view class="info-row">
-            <text class="label">月供金额：</text>
-            <text class="value">{{reportData.loanInfo.monthlyPayment}}</text>
-          </view>
-          <view class="info-row">
-            <text class="label">还款状态：</text>
-            <text class="value success">{{reportData.loanInfo.paymentHistory}}</text>
-          </view>
-        </view>
-      </view>
-    </block>
-
-    <!-- 专信宝报告内容 -->
-    <block wx:if="{{reportType === 'zhuanxin'}}">
-      <view class="analysis-section">
-        <view class="section-title">📊 详细分析</view>
-        <view class="detailed-info">
-          <view class="info-row">
-            <text class="label">信用历史：</text>
-            <text class="value">{{reportData.detailedAnalysis.creditHistory}}</text>
-          </view>
-          <view class="info-row">
-            <text class="label">账户类型：</text>
-            <text class="value">{{reportData.detailedAnalysis.accountTypes}}</text>
-          </view>
-        </view>
-        
-        <view class="query-section">
-          <view class="subsection-title">查询记录</view>
-          <view class="query-info">
-            <view class="query-item">
-              <text class="label">近6个月：</text>
-              <text class="value">{{reportData.detailedAnalysis.queryRecords.recent6Months}}次</text>
-            </view>
-            <view class="query-item">
-              <text class="label">近2年：</text>
-              <text class="value">{{reportData.detailedAnalysis.queryRecords.recent2Years}}次</text>
-            </view>
-          </view>
-        </view>
-
-        <view class="risk-assessment">
-          <view class="subsection-title">风险评估</view>
-          <view class="risk-grid">
-            <view class="risk-item">
-              <view class="risk-label">整体风险</view>
-              <view class="risk-value low">{{reportData.riskAssessment.overallRisk}}</view>
-            </view>
-            <view class="risk-item">
-              <view class="risk-label">信用风险</view>
-              <view class="risk-value low">{{reportData.riskAssessment.creditRisk}}</view>
-            </view>
-            <view class="risk-item">
-              <view class="risk-label">还款风险</view>
-              <view class="risk-value low">{{reportData.riskAssessment.repaymentRisk}}</view>
-            </view>
-            <view class="risk-item">
-              <view class="risk-label">稳定性风险</view>
-              <view class="risk-value medium">{{reportData.riskAssessment.stabilityRisk}}</view>
-            </view>
-          </view>
-        </view>
-      </view>
-    </block>
+    </view>
 
     <!-- 风险提示 -->
-    <view wx:if="{{reportData.riskPoints}}" class="risk-section">
-      <view class="section-title">⚠️ 风险提示</view>
-      <view class="risk-list">
-        <view 
-          wx:for="{{reportData.riskPoints}}" 
-          wx:key="index"
-          class="risk-item-text"
-        >
-          • {{item}}
+    <view wx:if="{{reportData.riskFactors && reportData.riskFactors.length > 0}}" class="analysis-section">
+      <view class="analysis-title">⚠️ 风险提示</view>
+      <view class="analysis-content">
+        <view wx:for="{{reportData.riskFactors}}" wx:key="index" class="analysis-point">
+          {{item}}
         </view>
       </view>
     </view>
 
-    <!-- 建议 -->
-    <view wx:if="{{reportData.suggestions || reportData.professionalAdvice}}" class="suggestion-section">
-      <view class="section-title">💡 专业建议</view>
-      <view class="suggestion-list">
-        <view 
-          wx:for="{{reportData.suggestions || reportData.professionalAdvice}}" 
-          wx:key="index"
-          class="suggestion-item"
-        >
-          {{index + 1}}. {{item}}
+    <!-- 专业建议 -->
+    <view wx:if="{{reportData.suggestions && reportData.suggestions.length > 0}}" class="analysis-section">
+      <view class="analysis-title">💡 专业建议</view>
+      <view class="analysis-content">
+        <view wx:for="{{reportData.suggestions}}" wx:key="index" class="analysis-point">
+          {{item}}
         </view>
       </view>
     </view>
@@ -209,9 +201,22 @@
     <!-- 免责声明 -->
     <view class="disclaimer">
       <view class="disclaimer-title">免责声明</view>
-      <view class="disclaimer-text">
-        本报告仅供参考，不构成任何投资建议。报告内容基于提供的数据进行分析，实际情况可能存在差异。使用本报告产生的任何后果，本平台不承担责任。
+      <view class="disclaimer-content">
+        本报告仅供参考，不构成任何投资建议或信用评估依据。报告内容基于AI分析生成，可能存在误差。具体信用状况请以中国人民银行征信中心出具的官方征信报告为准。
       </view>
+    </view>
+
+    <!-- 操作按钮区域 -->
+    <view class="action-buttons">
+      <button class="action-btn download-btn" bindtap="onDownloadReport">
+        <text class="btn-icon">📥</text>
+        <text class="btn-text">下载报告</text>
+      </button>
+      <button class="action-btn share-btn" open-type="share">
+        <text class="btn-icon">📤</text>
+        <text class="btn-text">分享报告</text>
+      </button>
     </view>
   </view>
 </view>
+
