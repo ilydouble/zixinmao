@@ -334,6 +334,18 @@
               <text class="query-label">担保资格审查</text>
               <text class="query-value">{{item.guarantee_review}}次</text>
             </view>
+            <view class="query-detail" wx:if="{{item.insurance_review > 0}}">
+              <text class="query-label">保前审查</text>
+              <text class="query-value">{{item.insurance_review}}次</text>
+            </view>
+            <view class="query-detail" wx:if="{{item.credit_review > 0}}">
+              <text class="query-label">资信审查</text>
+              <text class="query-value">{{item.credit_review}}次</text>
+            </view>
+            <view class="query-detail" wx:if="{{item.non_post_loan > 0}}">
+              <text class="query-label">非贷后管理查询</text>
+              <text class="query-value">{{item.non_post_loan}}次</text>
+            </view>
             <view class="query-detail" wx:if="{{item.self_query > 0}}">
               <text class="query-label">本人查询</text>
               <text class="query-value">{{item.self_query}}次</text>
