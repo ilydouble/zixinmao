@@ -8,6 +8,7 @@ import uuid
 from datetime import datetime
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from loguru import logger
 import sys
 
@@ -670,68 +671,6 @@ async def income_extraction(request: IncomeRequest):
             status_code=500,
             detail=f"服务器内部错误: {str(e)}"
         )
-
-
-@app.post("/generate/html-report")
-async def generate_html_report(request: VisualizationReportRequest):
-    """
-    生成HTML格式的可视化报告
-
-    支持两种方式：
-    1. 通过task_id获取分析结果
-    2. 直接提供report_data
-
-    返回HTML字符串
-    """
-    try:
-        logger.info("开始生成HTML报告")
-
-        analysis_result = None
-        name = None
-        id_card = None
-
-        # 获取分析结果
-        if request.task_id:
-            # 从队列中获取任务结果
-            task = await request_queue.get_task_status(request.task_id)
-
-            if not task:
-                raise HTTPException(status_code=404, detail="任务不存在")
-
-            if task.status != TaskStatus.COMPLETED:
-                raise HTTPException(status_code=400, detail=f"任务未完成，当前状态: {task.status.value}")
-
-            analysis_result = task.result.get("analysis_result", {})
-            # 从任务数据中获取个人信息
-            task_data = task.data or {}
-            name = task_data.get("name")
-            id_card = task_data.get("id_card")
-
-        elif request.report_data:
-            # 直接使用提供的数据
-            analysis_result = request.report_data
-        else:
-            raise HTTPException(status_code=400, detail="必须提供task_id或report_data")
-
-        # 生成HTML报告
-        html_content = await html_report_service.generate_html_report(
-            analysis_result=analysis_result,
-            report_type="simple",  # 可以从request中获取
-            name=name,
-            id_card=id_card
-        )
-
-        logger.info(f"成功生成HTML报告, 长度: {len(html_content):,} 字符")
-
-        # 返回HTML内容
-        from fastapi.responses import HTMLResponse
-        return HTMLResponse(content=html_content)
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"生成HTML报告时发生错误: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"生成报告失败: {str(e)}")
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@
     "pages/jianxin/jianxin",
     "pages/zhuanxin/zhuanxin",
     "pages/report/report",
+    "pages/report-native/report-native",
     "pages/center/center",
     "pages/support/support",
     "pages/orders/orders",

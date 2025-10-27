@@ -1,0 +1,432 @@
+<!-- miniprogram/pages/report-native/report-native.wxml -->
+<view class="report-container">
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载报告中...</text>
+  </view>
+
+  <!-- 错误提示 -->
+  <view wx:elif="{{error}}" class="error-container">
+    <text class="error-icon">⚠️</text>
+    <text class="error-text">{{error}}</text>
+    <button class="retry-button" bindtap="loadReportData">重试</button>
+  </view>
+
+  <!-- 报告内容 -->
+  <view wx:else class="report-content">
+    <!-- 头部 -->
+    <view class="report-header">
+      <text class="report-title">个人征信分析报告</text>
+      <text class="report-subtitle">{{personalInfo.name}} | 报告编号: {{reportId}}</text>
+    </view>
+
+    <!-- 个人信息卡片 -->
+    <view class="section personal-section">
+      <view class="section-title">
+        <text class="title-icon">👤</text>
+        <text class="title-text">个人信息</text>
+      </view>
+      <view class="info-grid">
+        <view class="info-item">
+          <text class="info-label">姓名</text>
+          <text class="info-value">{{personalInfo.name}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">年龄</text>
+          <text class="info-value">{{personalInfo.age}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">婚姻状况</text>
+          <text class="info-value">{{personalInfo.marital_status}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">身份证号</text>
+          <text class="info-value">{{personalInfo.id_card}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 统计卡片 -->
+    <view class="stats-grid">
+      <view class="stat-card">
+        <view class="stat-icon icon-credit">💰</view>
+        <text class="stat-label">总授信额度</text>
+        <text class="stat-value">{{stats.total_credit}}<text class="stat-unit">元</text></text>
+      </view>
+      <view class="stat-card">
+        <view class="stat-icon icon-debt">📊</view>
+        <text class="stat-label">总负债金额</text>
+        <text class="stat-value">{{stats.total_debt}}<text class="stat-unit">元</text></text>
+      </view>
+      <view class="stat-card">
+        <view class="stat-icon icon-institution">🏦</view>
+        <text class="stat-label">总机构数</text>
+        <text class="stat-value">{{stats.total_institutions}}<text class="stat-unit">个</text></text>
+      </view>
+      <view class="stat-card">
+        <view class="stat-icon icon-loan">🏢</view>
+        <text class="stat-label">贷款机构数</text>
+        <text class="stat-value">{{stats.loan_institutions}}<text class="stat-unit">个</text></text>
+      </view>
+      <view class="stat-card">
+        <view class="stat-icon icon-overdue">⚠️</view>
+        <text class="stat-label">历史逾期月份</text>
+        <text class="stat-value">{{stats.overdue_months}}<text class="stat-unit">月</text></text>
+      </view>
+      <view class="stat-card">
+        <view class="stat-icon icon-query">🔍</view>
+        <text class="stat-label">近3月查询次数</text>
+        <text class="stat-value">{{stats.query_count_3m}}<text class="stat-unit">次</text></text>
+      </view>
+    </view>
+
+    <!-- 负债构成 -->
+    <view class="section">
+      <view class="section-title">
+        <text class="title-icon">📈</text>
+        <text class="title-text">负债构成分析</text>
+      </view>
+      <view class="debt-list">
+        <view wx:for="{{debtComposition}}" wx:key="type" class="debt-item">
+          <view class="debt-header">
+            <text class="debt-type">{{item.type}}</text>
+            <text class="debt-usage" wx:if="{{item.usage_rate}}">使用率: {{item.usage_rate}}</text>
+          </view>
+          <view class="debt-stats">
+            <view class="debt-stat">
+              <text class="debt-stat-label">机构数</text>
+              <text class="debt-stat-value">{{item.institutions}}个</text>
+            </view>
+            <view class="debt-stat">
+              <text class="debt-stat-label">账户数</text>
+              <text class="debt-stat-value">{{item.accounts}}个</text>
+            </view>
+            <view class="debt-stat">
+              <text class="debt-stat-label">授信额度</text>
+              <text class="debt-stat-value">{{item.credit_limit}}元</text>
+            </view>
+            <view class="debt-stat">
+              <text class="debt-stat-label">余额</text>
+              <text class="debt-stat-value">{{item.balance}}元</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 贷款详情 -->
+    <view class="section">
+      <view class="section-title">
+        <text class="title-icon">🏦</text>
+        <text class="title-text">贷款详情</text>
+      </view>
+      
+      <!-- 贷款汇总 -->
+      <view class="loan-summary">
+        <view class="summary-item">
+          <text class="summary-label">平均期限</text>
+          <text class="summary-value">{{loanSummary.avg_period}}</text>
+        </view>
+        <view class="summary-item">
+          <text class="summary-label">最高单笔</text>
+          <text class="summary-value">{{loanSummary.max_balance}}元</text>
+        </view>
+        <view class="summary-item">
+          <text class="summary-label">最小单笔</text>
+          <text class="summary-value">{{loanSummary.min_balance}}元</text>
+        </view>
+        <view class="summary-item full-width">
+          <text class="summary-label">机构类型</text>
+          <text class="summary-value">{{loanSummary.institution_types}}</text>
+        </view>
+      </view>
+
+      <!-- 银行贷款 -->
+      <view wx:if="{{bankLoans.length > 0}}" class="loan-category">
+        <text class="category-title">银行贷款</text>
+        <view class="table-container">
+          <scroll-view scroll-x="true" class="table-scroll">
+            <view class="loan-table">
+              <view class="table-header">
+                <text class="table-cell">序号</text>
+                <text class="table-cell">管理机构</text>
+                <text class="table-cell">授信额度</text>
+                <text class="table-cell">余额</text>
+                <text class="table-cell">业务类型</text>
+                <text class="table-cell">起止日期</text>
+                <text class="table-cell">剩余期限</text>
+                <text class="table-cell">使用率</text>
+              </view>
+              <view wx:for="{{bankLoans}}" wx:key="id" class="table-row">
+                <text class="table-cell">{{item.id}}</text>
+                <text class="table-cell">{{item.institution}}</text>
+                <text class="table-cell">{{item.credit_limit}}</text>
+                <text class="table-cell">{{item.balance}}</text>
+                <text class="table-cell">{{item.business_type}}</text>
+                <text class="table-cell">{{item.period}}</text>
+                <text class="table-cell">{{item.remaining_period}}</text>
+                <text class="table-cell">{{item.usage_rate}}</text>
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
+
+      <!-- 非银机构贷款 -->
+      <view wx:if="{{nonBankLoans.length > 0}}" class="loan-category">
+        <text class="category-title">非银机构贷款</text>
+        <view class="table-container">
+          <scroll-view scroll-x="true" class="table-scroll">
+            <view class="loan-table">
+              <view class="table-header">
+                <text class="table-cell">序号</text>
+                <text class="table-cell">管理机构</text>
+                <text class="table-cell">授信额度</text>
+                <text class="table-cell">余额</text>
+                <text class="table-cell">业务类型</text>
+                <text class="table-cell">起止日期</text>
+                <text class="table-cell">剩余期限</text>
+                <text class="table-cell">使用率</text>
+              </view>
+              <view wx:for="{{nonBankLoans}}" wx:key="id" class="table-row">
+                <text class="table-cell">{{item.id}}</text>
+                <text class="table-cell">{{item.institution}}</text>
+                <text class="table-cell">{{item.credit_limit}}</text>
+                <text class="table-cell">{{item.balance}}</text>
+                <text class="table-cell">{{item.business_type}}</text>
+                <text class="table-cell">{{item.period}}</text>
+                <text class="table-cell">{{item.remaining_period}}</text>
+                <text class="table-cell">{{item.usage_rate}}</text>
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 信用卡使用情况 -->
+    <view class="section">
+      <view class="section-title">
+        <text class="title-icon">💳</text>
+        <text class="title-text">信用卡使用情况</text>
+      </view>
+      
+      <!-- 使用率分析 -->
+      <view class="credit-usage-card">
+        <view class="usage-header">
+          <text class="usage-title">使用率分析</text>
+          <text class="usage-percentage">{{creditUsage.usage_percentage}}%</text>
+        </view>
+        <view class="usage-progress">
+          <view class="progress-bar" style="width: {{creditUsage.usage_percentage}}%;"></view>
+        </view>
+        <view class="usage-info">
+          <view class="usage-item">
+            <text class="usage-label">风险等级</text>
+            <text class="usage-value {{creditUsage.risk_level == '低' ? 'risk-low' : (creditUsage.risk_level == '中' ? 'risk-medium' : 'risk-high')}}">{{creditUsage.risk_level}}</text>
+          </view>
+          <view class="usage-item">
+            <text class="usage-label">影响程度</text>
+            <text class="usage-value">{{creditUsage.impact_level}}</text>
+          </view>
+        </view>
+        <view class="usage-amounts">
+          <view class="amount-item">
+            <text class="amount-label">授信额度</text>
+            <text class="amount-value">{{creditUsage.total_credit}}元</text>
+          </view>
+          <view class="amount-item">
+            <text class="amount-label">已用额度</text>
+            <text class="amount-value">{{creditUsage.used_credit}}元</text>
+          </view>
+          <view class="amount-item">
+            <text class="amount-label">可用额度</text>
+            <text class="amount-value">{{creditUsage.available_credit}}元</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 信用卡明细 -->
+      <view wx:if="{{creditCards.length > 0}}" class="credit-cards-list">
+        <text class="list-title">信用卡明细</text>
+        <view class="table-container">
+          <scroll-view scroll-x="true" class="table-scroll">
+            <view class="credit-table">
+              <view class="table-header">
+                <text class="table-cell">序号</text>
+                <text class="table-cell">管理机构</text>
+                <text class="table-cell">授信额度</text>
+                <text class="table-cell">已用额度</text>
+                <text class="table-cell">分期余额</text>
+                <text class="table-cell">使用率</text>
+                <text class="table-cell">当前状态</text>
+                <text class="table-cell">历史逾期</text>
+              </view>
+              <view wx:for="{{creditCards}}" wx:key="id" class="table-row">
+                <text class="table-cell">{{item.id}}</text>
+                <text class="table-cell">{{item.institution}}</text>
+                <text class="table-cell">{{item.credit_limit}}</text>
+                <text class="table-cell">{{item.used_amount}}</text>
+                <text class="table-cell">{{item.installment_balance}}</text>
+                <text class="table-cell">{{item.usage_rate}}</text>
+                <text class="table-cell">{{item.status}}</text>
+                <text class="table-cell">{{item.overdue_history}}</text>
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 逾期情况分析 -->
+    <view class="section">
+      <view class="section-title">
+        <text class="title-icon">⚠️</text>
+        <text class="title-text">逾期情况分析</text>
+      </view>
+
+      <view class="overdue-severity">
+        <view class="severity-header">
+          <text class="severity-title">严重程度</text>
+          <text class="severity-level">{{overdueAnalysis.severity_level}}</text>
+        </view>
+        <view class="severity-progress">
+          <view class="severity-bar" style="width: {{overdueAnalysis.severity_percentage}}%;"></view>
+        </view>
+        <view class="overdue-stats">
+          <view class="overdue-stat">
+            <text class="overdue-stat-value">{{overdueAnalysis.overdue_90plus}}</text>
+            <text class="overdue-stat-label">90天以上</text>
+          </view>
+          <view class="overdue-stat">
+            <text class="overdue-stat-value">{{overdueAnalysis.overdue_30_90}}</text>
+            <text class="overdue-stat-label">30-90天</text>
+          </view>
+          <view class="overdue-stat">
+            <text class="overdue-stat-value">{{overdueAnalysis.overdue_under_30}}</text>
+            <text class="overdue-stat-label">30天以内</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 查询记录分析 -->
+    <view class="section">
+      <view class="section-title">
+        <text class="title-icon">🔍</text>
+        <text class="title-text">查询记录分析</text>
+      </view>
+
+      <view class="query-list">
+        <view wx:for="{{queryRecords}}" wx:key="period" class="query-item">
+          <view class="query-period">{{item.period}}</view>
+          <view class="query-details">
+            <view class="query-detail" wx:if="{{item.loan_approval > 0}}">
+              <text class="query-label">贷款审批</text>
+              <text class="query-value">{{item.loan_approval}}次</text>
+            </view>
+            <view class="query-detail" wx:if="{{item.credit_card_approval > 0}}">
+              <text class="query-label">信用卡审批</text>
+              <text class="query-value">{{item.credit_card_approval}}次</text>
+            </view>
+            <view class="query-detail" wx:if="{{item.guarantee_review > 0}}">
+              <text class="query-label">担保资格审查</text>
+              <text class="query-value">{{item.guarantee_review}}次</text>
+            </view>
+            <view class="query-detail" wx:if="{{item.self_query > 0}}">
+              <text class="query-label">本人查询</text>
+              <text class="query-value">{{item.self_query}}次</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 产品推荐 -->
+    <view class="section" wx:if="{{productRecommendations.length > 0}}">
+      <view class="section-title">
+        <text class="title-icon">🎯</text>
+        <text class="title-text">产品推荐</text>
+      </view>
+
+      <view class="match-status">
+        <text class="match-text">{{matchStatus}}</text>
+      </view>
+
+      <view class="product-list">
+        <view wx:for="{{productRecommendations}}" wx:key="product_name" class="product-card">
+          <view class="product-header">
+            <text class="product-name">{{item.product_name}}</text>
+            <text class="product-match">匹配度: {{item.match_score}}</text>
+          </view>
+          <view class="product-info">
+            <view class="product-info-item">
+              <text class="product-label">额度范围</text>
+              <text class="product-value">{{item.credit_range}}</text>
+            </view>
+            <view class="product-info-item">
+              <text class="product-label">利率</text>
+              <text class="product-value">{{item.interest_rate}}</text>
+            </view>
+            <view class="product-info-item">
+              <text class="product-label">期限</text>
+              <text class="product-value">{{item.term}}</text>
+            </view>
+          </view>
+          <view class="product-features">
+            <text class="feature-label">产品特点：</text>
+            <text class="feature-text">{{item.features}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- AI分析 -->
+    <view class="section ai-section">
+      <view class="section-title">
+        <text class="title-icon">🤖</text>
+        <text class="title-text">AI智能分析</text>
+      </view>
+
+      <view class="suitability-rating">
+        <text class="rating-label">适合贷款申请程度</text>
+        <text class="rating-value">{{suitabilityRating}}</text>
+      </view>
+
+      <view class="ai-points">
+        <text class="points-title">分析要点</text>
+        <view wx:for="{{aiAnalysis}}" wx:key="index" class="ai-point">
+          <text class="point-category">{{item.category}}</text>
+          <text class="point-content">{{item.content}}</text>
+        </view>
+      </view>
+
+      <view class="optimization-suggestions" wx:if="{{optimizationSuggestions.length > 0}}">
+        <text class="suggestions-title">优化建议</text>
+        <view wx:for="{{optimizationSuggestions}}" wx:key="index" class="suggestion-item">
+          <text class="suggestion-icon">💡</text>
+          <text class="suggestion-text">{{item}}</text>
+        </view>
+      </view>
+
+      <view class="risk-warning" wx:if="{{riskWarning}}">
+        <text class="warning-icon">⚠️</text>
+        <text class="warning-text">{{riskWarning}}</text>
+      </view>
+    </view>
+
+    <!-- 底部操作按钮 -->
+    <view class="action-buttons">
+      <button class="action-button primary" bindtap="downloadHTMLReport">
+        <text class="button-icon">📥</text>
+        <text class="button-text">下载HTML报告</text>
+      </button>
+      <button class="action-button" open-type="share">
+        <text class="button-icon">📤</text>
+        <text class="button-text">分享报告</text>
+      </button>
+    </view>
+  </view>
+</view>
+

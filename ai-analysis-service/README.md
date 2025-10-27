@@ -20,15 +20,14 @@
 ai-analysis-service/
 ├── app/                    # 核心应用代码
 │   ├── main.py            # FastAPI主应用
-│   ├── queue_manager.py   # 请求队列管理
-│   ├── log_manager.py     # 算法调用日志
-│   ├── ai_service.py      # AI分析服务
-│   ├── prompts.py         # 提示词模板
-│   ├── models.py          # 数据模型
-│   └── config.py          # 配置管理
+│   ├── service/           # 业务服务层
+│   ├── models/            # 数据模型
+│   ├── utils/             # 工具函数
+│   ├── config/            # 配置管理
+│   └── templates/         # HTML模板
 ├── logs/                  # 算法调用日志目录
-├── cuiyi.pdf             # 测试征信文件
-├── quick_test.py         # 综合测试脚本
+├── test/                  # 测试文件目录
+├── docs/                  # 文档目录
 ├── run.py                # 服务启动脚本
 ├── requirements.txt      # 依赖列表
 ├── .env.example         # 环境变量模板
@@ -52,11 +51,6 @@ cp .env.example .env
 ### 3. 启动服务
 ```bash
 python run.py
-```
-
-### 4. 测试服务（新开终端）
-```bash
-python quick_test.py
 ```
 
 服务启动后可访问：
@@ -220,26 +214,19 @@ GET /prompts/{report_type}
 
 ## 测试
 
-### 快速测试
+### API测试
 
-项目中包含了测试文件，使用以下命令进行测试：
+使用 FastAPI 自动生成的交互式文档进行测试：
 
 ```bash
-# 1. 启动服务（终端1）
+# 1. 启动服务
 python run.py
 
-# 2. 运行测试（终端2）
-python quick_test.py
+# 2. 访问 API 文档
+# 浏览器打开: http://localhost:8000/docs
 ```
 
-`quick_test.py` 会自动测试：
-- ✅ 服务健康状态检查
-- 📄 读取 `cuiyi.pdf` 文件
-- 📋 队列功能测试（任务提交、状态监控）
-- 🤖 简版征信分析（简信宝）
-- 🤖 详版征信分析（专信宝）
-- 💾 保存结果到 `result_simple.json` 和 `result_detail.json`
-- 📊 显示队列统计和算法调用统计
+在 Swagger UI 中可以直接测试所有接口
 
 ### 队列功能使用
 

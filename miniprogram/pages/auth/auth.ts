@@ -27,7 +27,14 @@ Page({
 
     // 检查是否已认证
     if (!needRealNameAuth()) {
-      this.redirectToReturn()
+      wx.showToast({
+        title: '您已完成实名认证',
+        icon: 'success',
+        duration: 1500
+      })
+      setTimeout(() => {
+        this.redirectToReturn()
+      }, 1500)
     }
   },
 
@@ -101,12 +108,12 @@ Page({
    */
   async onSubmit() {
     if (this.data.loading) return
-    
+
     if (!this.validateForm()) return
-    
+
     this.setData({ loading: true })
     showLoading('认证中...')
-    
+
     try {
       const { realName, idCard, phone } = this.data.formData
       await realNameAuth(realName, idCard, phone)
@@ -116,10 +123,25 @@ Page({
       setTimeout(() => {
         this.redirectToReturn()
       }, 1500)
-    } catch (error) {
+    } catch (error: any) {
       console.error('实名认证失败:', error)
       hideLoading()
       this.setData({ loading: false })
+
+      // 如果是已完成认证的错误，显示提示并跳转
+      if (error.message && error.message.includes('已完成实名认证')) {
+        wx.showToast({
+          title: '您已完成实名认证',
+          icon: 'success',
+          duration: 1500
+        })
+        setTimeout(() => {
+          this.redirectToReturn()
+        }, 1500)
+      } else {
+        // 其他错误，显示错误信息
+        showError(error.message || '认证失败，请重试')
+      }
     }
   },
 

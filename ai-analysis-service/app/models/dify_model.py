@@ -22,7 +22,7 @@ class DifyBasicInfo(BaseModel):
 
 class DifyLoanDetail(BaseModel):
     """Dify返回的贷款明细"""
-    id: int = Field(..., description="序号")
+    id: Optional[int] = Field(None, description="序号")
     institution: str = Field(..., description="管理机构")
     credit_limit: int = Field(..., description="授信额度(元)")
     balance: int = Field(..., description="余额(元)")
@@ -38,7 +38,7 @@ class DifyLoanDetail(BaseModel):
 
 class DifyCreditCardDetail(BaseModel):
     """Dify返回的信用卡明细"""
-    id: int = Field(..., description="序号")
+    id: Optional[int] = Field(None, description="序号")
     institution: str = Field(..., description="管理机构")
     credit_limit: int = Field(..., description="授信额度(元)")
     used_limit: int = Field(..., description="已用额度(元)")
@@ -53,7 +53,7 @@ class DifyCreditCardDetail(BaseModel):
 
 class DifyQueryRecord(BaseModel):
     """Dify返回的查询记录"""
-    id: int = Field(..., description="序号")
+    id: Optional[int] = Field(None, description="序号")
     query_date: date = Field(..., description="查询日期")
     institution: str = Field(..., description="查询机构")
     reason: str = Field(..., description="查询原因")

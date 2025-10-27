@@ -1,30 +1,39 @@
 """
 HTML报告生成服务
 负责将分析结果渲染为HTML格式的可视化报告
-支持两种模式：
-1. 模板模式：使用Jinja2模板渲染（需要手动维护模板）
-2. 代码模式：直接用Python代码生成HTML（推荐，易于维护）
+支持三种模式：
+1. JS模板模式：使用JavaScript模板生成（推荐，前端技术栈,响应式设计）
+2. Jinja2模板模式：使用Jinja2模板渲染（需要手动维护模板）
+3. 代码模式：直接用Python代码生成HTML（旧版本，兼容性）
 """
+import sys
+from pathlib import Path
+# 添加项目根目录到 sys.path
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 from typing import Dict, Any, Optional, List
 from loguru import logger
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from pathlib import Path
 import json
 from datetime import datetime
 from .html_builder import build_credit_report_html
+from .js_html_builder import build_html_with_js_template
+from app.models.visualization_model import VisualizationReportData
 
 
 class HTMLReportService:
     """HTML报告生成服务类"""
 
-    def __init__(self, use_template: bool = False):
+    def __init__(self, use_template: bool = False, use_js_template: bool = True):
         """
         初始化服务
 
         Args:
-            use_template: 是否使用Jinja2模板模式（默认False，使用代码生成模式）
+            use_template: 是否使用Jinja2模板模式（默认False）
+            use_js_template: 是否使用JavaScript模板模式（默认True，推荐）
         """
         self.use_template = use_template
+        self.use_js_template = use_js_template
 
         if use_template:
             # 设置模板目录
@@ -41,13 +50,15 @@ class HTMLReportService:
             self.env.filters['format_number'] = self._format_number
             self.env.filters['format_date'] = self._format_date
 
-            logger.info(f"HTML报告服务初始化完成（模板模式）, 模板目录: {template_dir}")
+            logger.info(f"HTML报告服务初始化完成（Jinja2模板模式）, 模板目录: {template_dir}")
+        elif use_js_template:
+            logger.info(f"HTML报告服务初始化完成（JavaScript模板模式）")
         else:
-            logger.info(f"HTML报告服务初始化完成（代码生成模式）")
+            logger.info(f"HTML报告服务初始化完成（Python代码生成模式）")
     
     async def generate_html_report(
         self,
-        analysis_result: Dict[str, Any],
+        analysis_result: Any,
         report_type: str = "simple",
         name: Optional[str] = None,
         id_card: Optional[str] = None
@@ -56,7 +67,7 @@ class HTMLReportService:
         生成HTML格式的可视化报告
 
         Args:
-            analysis_result: AI分析结果
+            analysis_result: AI分析结果（可以是Dict或VisualizationReportData对象）
             report_type: 报告类型（simple/detail/flow）
             name: 姓名
             id_card: 身份证号
@@ -65,15 +76,21 @@ class HTMLReportService:
             HTML字符串
         """
         try:
-            logger.info(f"开始生成HTML报告, 类型: {report_type}, 模式: {'模板' if self.use_template else '代码生成'}")
+            mode = "JavaScript模板" if self.use_js_template else ("Jinja2模板" if self.use_template else "Python代码生成")
+            logger.info(f"开始生成HTML报告, 类型: {report_type}, 模式: {mode}")
 
-            if self.use_template:
-                # 模板模式：使用Jinja2模板
+            if self.use_js_template:
+                # JavaScript模板模式：使用前端技术栈生成（推荐）
+                html_content = await self._generate_with_js_template(
+                    analysis_result, report_type, name, id_card
+                )
+            elif self.use_template:
+                # Jinja2模板模式：使用Jinja2模板
                 html_content = await self._generate_with_template(
                     analysis_result, report_type, name, id_card
                 )
             else:
-                # 代码生成模式：直接用Python生成HTML
+                # Python代码生成模式：直接用Python生成HTML（旧版本）
                 html_content = await self._generate_with_code(
                     analysis_result, report_type, name, id_card
                 )
@@ -84,6 +101,39 @@ class HTMLReportService:
         except Exception as e:
             logger.error(f"生成HTML报告失败: {str(e)}")
             raise
+
+    async def _generate_with_js_template(
+        self,
+        analysis_result: Any,
+        report_type: str,
+        name: Optional[str],
+        id_card: Optional[str]
+    ) -> str:
+        """使用JavaScript模板生成HTML"""
+        # 如果analysis_result是VisualizationReportData对象，直接使用
+        if isinstance(analysis_result, VisualizationReportData):
+            data = analysis_result
+        else:
+            # 如果是字典，转换为VisualizationReportData对象
+            try:
+                data = VisualizationReportData(**analysis_result)
+            except Exception as e:
+                logger.error(f"无法将分析结果转换为VisualizationReportData: {str(e)}")
+                raise ValueError(f"分析结果格式不正确: {str(e)}")
+
+        # 生成报告日期和编号
+        now = datetime.now()
+        report_date = now.strftime("%Y-%m-%d")
+        report_number = now.strftime("%Y%m%d%H%M%S")
+
+        # 使用JavaScript模板生成HTML
+        html_content = build_html_with_js_template(
+            data=data,
+            report_date=report_date,
+            report_number=report_number
+        )
+
+        return html_content
 
     async def _generate_with_template(
         self,

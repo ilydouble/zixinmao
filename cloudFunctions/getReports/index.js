@@ -1,10 +1,16 @@
 const cloud = require('wx-server-sdk')
+const axios = require('axios')
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
 })
 
 const db = cloud.database()
+
+// AI分析服务配置
+const AI_ANALYSIS_SERVICE = {
+  url: 'http://115.190.121.59:8005'
+}
 
 exports.main = async (event, context) => {
   const { action, reportId, page = 1, pageSize = 10, reportType } = event
@@ -26,9 +32,6 @@ exports.main = async (event, context) => {
 
       case 'getHTMLContent':
         return await getHTMLContent(reportId, OPENID)
-
-      case 'getHTMLFileURL':
-        return await getHTMLFileURL(reportId, OPENID)
 
       default:
         throw new Error('未知的操作类型')
@@ -401,105 +404,6 @@ async function getHTMLContent(reportId, userId) {
   } catch (error) {
     console.error('获取HTML内容失败:', error)
     throw new Error(`获取HTML内容失败: ${error.message}`)
-  }
-}
-
-/**
- * 获取HTML文件URL（用于web-view）
- */
-async function getHTMLFileURL(reportId, userId) {
-  try {
-    console.log(`获取HTML文件URL: reportId=${reportId}, userId=${userId}`)
-
-    const reportDoc = await db.collection('reports')
-      .doc(reportId)
-      .get()
-
-    if (!reportDoc.data) {
-      console.error('报告不存在')
-      throw new Error('报告不存在')
-    }
-
-    const report = reportDoc.data
-
-    // 验证用户权限
-    if (report.userId !== userId) {
-      console.error('无权访问此报告')
-      throw new Error('无权访问此报告')
-    }
-
-    // 检查报告是否完成
-    if (report.processing.status !== 'completed') {
-      console.error('报告尚未完成，状态:', report.processing.status)
-      throw new Error('报告尚未完成')
-    }
-
-    // 检查是否已有HTML文件
-    const reportFiles = report.output.reportFiles
-    if (reportFiles && reportFiles.htmlUrl) {
-      console.log('使用已存在的HTML文件:', reportFiles.htmlUrl)
-
-      // 生成临时下载链接
-      const tempUrlResult = await cloud.getTempFileURL({
-        fileList: [reportFiles.htmlUrl]
-      })
-
-      if (tempUrlResult.fileList && tempUrlResult.fileList.length > 0) {
-        const tempUrl = tempUrlResult.fileList[0].tempFileURL
-        console.log('临时下载链接:', tempUrl)
-
-        return {
-          success: true,
-          data: {
-            htmlUrl: tempUrl
-          }
-        }
-      }
-    }
-
-    // 如果没有HTML文件，从htmlReport字段创建
-    const htmlContent = report.output.htmlReport
-
-    if (!htmlContent) {
-      console.error('HTML报告不存在')
-      throw new Error('HTML报告不存在')
-    }
-
-    console.log(`HTML内容长度: ${htmlContent.length}`)
-
-    // 上传HTML文件到云存储
-    const htmlPath = `reports/${report.reportType}/${reportId}/report.html`
-    const uploadResult = await cloud.uploadFile({
-      cloudPath: htmlPath,
-      fileContent: Buffer.from(htmlContent, 'utf8')
-    })
-
-    console.log('HTML文件上传成功:', uploadResult.fileID)
-
-    // 更新数据库中的htmlUrl
-    await db.collection('reports').doc(reportId).update({
-      data: {
-        'output.reportFiles.htmlUrl': uploadResult.fileID
-      }
-    })
-
-    // 生成临时下载链接
-    const tempUrlResult = await cloud.getTempFileURL({
-      fileList: [uploadResult.fileID]
-    })
-
-    const tempUrl = tempUrlResult.fileList[0].tempFileURL
-    console.log('临时下载链接:', tempUrl)
-
-    return {
-      success: true,
-      data: {
-        htmlUrl: tempUrl
-      }
-    }
-  } catch (error) {
-    console.error('获取HTML文件URL失败:', error)
-    throw new Error(`获取HTML文件URL失败: ${error.message}`)
   }
 }
 

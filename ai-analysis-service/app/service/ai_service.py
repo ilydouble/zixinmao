@@ -306,7 +306,7 @@ class AIAnalysisService:
     ) -> Dict[str, Any]:
         """
         加工Dify工作流返回的结果为可视化报告需要的格式
-        支持标准Dify响应格式：
+        只支持标准Dify响应格式：
         {
             "basic_info": {...},
             "loan_details": [...],
@@ -319,255 +319,24 @@ class AIAnalysisService:
             request_id: 请求ID
 
         Returns:
-            加工后的可视化报告数据（包含完整的默认值）
+            加工后的可视化报告数据
+
+        Raises:
+            ValueError: 当数据格式不符合标准Dify格式时
         """
-        try:
-            logger.info(f"🔄 [数据加工] 开始处理Dify结果, request_id: {request_id}")
-            logger.debug(f"📋 [数据加工] Dify结果字段: {list(dify_result.keys())}")
+        logger.info(f"🔄 [数据加工] 开始处理Dify结果, request_id: {request_id}")
+        logger.debug(f"📋 [数据加工] Dify结果字段: {list(dify_result.keys())}")
 
-            # 🆕 检查是否是标准Dify格式（包含basic_info, loan_details等）
-            if self._is_standard_dify_format(dify_result):
-                logger.info(f"✅ [数据加工] 检测到标准Dify格式，使用Pydantic模型解析")
-                return self._parse_and_convert_dify_format(dify_result, request_id)
+        # 检查是否是标准Dify格式（包含basic_info, loan_details等）
+        if not self._is_standard_dify_format(dify_result):
+            error_msg = f"❌ [数据加工] 数据格式不符合标准Dify格式，缺少必需字段。当前字段: {list(dify_result.keys())}"
+            logger.error(error_msg)
+            raise ValueError(error_msg)
 
-            # 如果Dify返回的结果已经是可视化格式，填充缺失字段后返回
-            if self._is_valid_visualization_format(dify_result):
-                logger.info(f"✅ [数据加工] Dify结果已是可视化格式，填充缺失字段")
-                return self._fill_missing_fields(dify_result)
+        logger.info(f"✅ [数据加工] 检测到标准Dify格式，使用Pydantic模型解析")
+        return self._parse_and_convert_dify_format(dify_result, request_id)
 
-            # 否则，进行数据映射和转换（兼容旧格式）
-            processed_data = {}
 
-            # 1. 提取个人信息
-            processed_data["个人信息"] = (
-                dify_result.get("个人信息") or
-                dify_result.get("personal_info") or
-                dify_result.get("basic_info") or
-                {}
-            )
-
-            # 2. 提取统计概览
-            processed_data["统计概览"] = (
-                dify_result.get("统计概览") or
-                dify_result.get("stats") or
-                dify_result.get("summary") or
-                {}
-            )
-
-            # 3. 提取负债构成
-            processed_data["负债构成"] = (
-                dify_result.get("负债构成") or
-                dify_result.get("debt_composition") or
-                []
-            )
-
-            # 4. 提取贷款汇总
-            processed_data["贷款汇总"] = (
-                dify_result.get("贷款汇总") or
-                dify_result.get("loan_summary") or
-                {}
-            )
-
-            # 5. 提取银行贷款明细
-            processed_data["银行贷款明细"] = (
-                dify_result.get("银行贷款明细") or
-                dify_result.get("bank_loans") or
-                []
-            )
-
-            # 6. 提取非银机构贷款明细
-            processed_data["非银机构贷款明细"] = (
-                dify_result.get("非银机构贷款明细") or
-                dify_result.get("non_bank_loans") or
-                []
-            )
-
-            # 7. 提取信用卡使用分析
-            processed_data["信用卡使用分析"] = (
-                dify_result.get("信用卡使用分析") or
-                dify_result.get("credit_usage") or
-                {}
-            )
-
-            # 8. 提取信用卡明细
-            processed_data["信用卡明细"] = (
-                dify_result.get("信用卡明细") or
-                dify_result.get("credit_cards") or
-                dify_result.get("credit_card_details") or
-                []
-            )
-
-            # 9. 提取逾期分析
-            processed_data["逾期分析"] = (
-                dify_result.get("逾期分析") or
-                dify_result.get("overdue_analysis") or
-                {}
-            )
-
-            # 10. 提取逾期机构
-            processed_data["逾期机构"] = (
-                dify_result.get("逾期机构") or
-                dify_result.get("overdue_institutions") or
-                []
-            )
-
-            # 11. 提取查询记录
-            processed_data["查询记录"] = (
-                dify_result.get("查询记录") or
-                dify_result.get("query_records") or
-                []
-            )
-
-            # 12. 提取产品推荐
-            processed_data["产品推荐"] = (
-                dify_result.get("产品推荐") or
-                dify_result.get("product_recommendations") or
-                []
-            )
-
-            # 13. 提取AI分析
-            processed_data["AI分析"] = (
-                dify_result.get("AI分析") or
-                dify_result.get("ai_analysis") or
-                []
-            )
-
-            # 如果没有提取到任何数据，使用默认值
-            if not any(processed_data.values()):
-                logger.warning(f"⚠️ [数据加工] 未能提取到任何标准字段，使用默认值")
-                processed_data = self._get_default_visualization_data()
-
-            # 填充所有缺失的字段
-            processed_data = self._fill_missing_fields(processed_data)
-
-            logger.info(f"✅ [数据加工] 数据加工完成, 提取到 {len(processed_data)} 个字段")
-            return processed_data
-
-        except Exception as e:
-            logger.error(f"❌ [数据加工] 处理Dify结果失败: {str(e)}, request_id: {request_id}")
-            # 出错时返回带默认值的数据
-            return self._get_default_visualization_data()
-
-    def _fill_missing_fields(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        填充缺失的字段，确保所有必需字段都存在
-
-        Args:
-            data: 原始数据
-
-        Returns:
-            填充后的完整数据
-        """
-        # 获取默认数据
-        default_data = self._get_default_visualization_data()
-
-        # 合并数据，保留原有数据，填充缺失字段
-        for key, default_value in default_data.items():
-            if key not in data or not data[key]:
-                data[key] = default_value
-                logger.debug(f"填充缺失字段: {key}")
-            elif isinstance(default_value, dict) and isinstance(data[key], dict):
-                # 对于字典类型，填充缺失的子字段
-                for sub_key, sub_default_value in default_value.items():
-                    if sub_key not in data[key]:
-                        data[key][sub_key] = sub_default_value
-                        logger.debug(f"填充缺失子字段: {key}.{sub_key}")
-
-        return data
-
-    def _get_default_visualization_data(self) -> Dict[str, Any]:
-        """
-        获取默认的可视化报告数据结构
-
-        Returns:
-            包含所有必需字段的默认数据
-        """
-        return {
-            "个人信息": {
-                "姓名": "未提供",
-                "年龄": "未提供",
-                "婚姻状况": "未提供",
-                "单位性质": "未提供",
-                "工作时长": "未提供",
-                "公积金基数": "未提供",
-                "白名单客群": "未提供",
-                "身份证号": "未提供"
-            },
-            "统计概览": {
-                "总授信额度": 0,
-                "总负债金额": 0,
-                "总机构数": 0,
-                "贷款机构数": 0,
-                "历史逾期月份": 0,
-                "近3月查询次数": 0
-            },
-            "负债构成": [
-                {
-                    "类型": "贷款",
-                    "机构数": 0,
-                    "账户数": 0,
-                    "授信额度": 0,
-                    "余额": 0,
-                    "使用率": "-"
-                },
-                {
-                    "类型": "信用卡",
-                    "机构数": 0,
-                    "账户数": 0,
-                    "授信额度": 0,
-                    "余额": 0,
-                    "使用率": "0%"
-                },
-                {
-                    "类型": "对外担保",
-                    "机构数": 0,
-                    "账户数": 0,
-                    "授信额度": 0,
-                    "余额": 0,
-                    "使用率": "-"
-                }
-            ],
-            "贷款汇总": {
-                "贷款平均期限": "0年",
-                "最高单笔贷款余额": 0,
-                "最小单笔贷款余额": 0,
-                "贷款机构类型": "未知"
-            },
-            "银行贷款明细": [],
-            "非银机构贷款明细": [],
-            "信用卡使用分析": {
-                "总使用率": "0%",
-                "风险等级": "未知",
-                "总授信额度": 0,
-                "已用额度": 0,
-                "可用额度": 0
-            },
-            "信用卡明细": [],
-            "逾期分析": {
-                "总逾期月份": 0,
-                "90天以上逾期": 0,
-                "当前逾期": 0,
-                "历史最高逾期": "无"
-            },
-            "逾期机构": [],
-            "查询记录": [
-                {"时间段": "近7天", "贷款审批": 0, "信用卡审批": 0, "担保资格审查": 0, "保前审查": 0, "资信审查": 0, "非贷后管理查询": 0, "本人查询": 0},
-                {"时间段": "近1月", "贷款审批": 0, "信用卡审批": 0, "担保资格审查": 0, "保前审查": 0, "资信审查": 0, "非贷后管理查询": 0, "本人查询": 0},
-                {"时间段": "近2月", "贷款审批": 0, "信用卡审批": 0, "担保资格审查": 0, "保前审查": 0, "资信审查": 0, "非贷后管理查询": 0, "本人查询": 0},
-                {"时间段": "近3月", "贷款审批": 0, "信用卡审批": 0, "担保资格审查": 0, "保前审查": 0, "资信审查": 0, "非贷后管理查询": 0, "本人查询": 0},
-                {"时间段": "近6月", "贷款审批": 0, "信用卡审批": 0, "担保资格审查": 0, "保前审查": 0, "资信审查": 0, "非贷后管理查询": 0, "本人查询": 0},
-                {"时间段": "近12月", "贷款审批": 0, "信用卡审批": 0, "担保资格审查": 0, "保前审查": 0, "资信审查": 0, "非贷后管理查询": 0, "本人查询": 0},
-                {"时间段": "近24月", "贷款审批": 0, "信用卡审批": 0, "担保资格审查": 0, "保前审查": 0, "资信审查": 0, "非贷后管理查询": 0, "本人查询": 0}
-            ],
-            "产品推荐": [],
-            "AI分析": [
-                {
-                    "序号": 1,
-                    "标题": "数据不足",
-                    "内容": "暂无足够数据进行分析，请确保提供完整的征信报告信息。"
-                }
-            ]
-        }
 
     def _is_standard_dify_format(self, data: Dict[str, Any]) -> bool:
         """
@@ -600,84 +369,22 @@ class AIAnalysisService:
 
         Returns:
             可视化报告数据
+
+        Raises:
+            ValidationError: 当Pydantic验证失败时
+            Exception: 当转换失败时
         """
-        try:
-            logger.info(f"🔄 [Dify解析] 开始解析标准Dify格式, request_id: {request_id}")
+        logger.info(f"🔄 [Dify解析] 开始解析标准Dify格式, request_id: {request_id}")
 
-            # 使用Pydantic模型解析Dify数据
-            dify_output = DifyWorkflowOutput(**dify_result)
-            logger.info(f"✅ [Dify解析] Pydantic模型解析成功")
+        # 使用Pydantic模型解析Dify数据
+        dify_output = DifyWorkflowOutput(**dify_result)
+        logger.info(f"✅ [Dify解析] Pydantic模型解析成功")
 
-            # 使用转换器转换为可视化格式
-            visualization_data = DifyToVisualizationConverter.convert(dify_output, request_id)
-            logger.info(f"✅ [Dify解析] 转换为可视化格式成功")
-
-            return visualization_data
-
-        except ValidationError as e:
-            logger.error(f"❌ [Dify解析] Pydantic验证失败: {e}, request_id: {request_id}")
-            # 验证失败时，尝试使用旧的映射方式
-            logger.warning(f"⚠️ [Dify解析] 降级使用旧的映射方式")
-            return self._fallback_convert_dify_format(dify_result, request_id)
-        except Exception as e:
-            logger.error(f"❌ [Dify解析] 转换失败: {str(e)}, request_id: {request_id}")
-            # 出错时返回默认数据
-            return self._get_default_visualization_data()
-
-    def _fallback_convert_dify_format(
-        self,
-        dify_result: Dict[str, Any],
-        request_id: str = None
-    ) -> Dict[str, Any]:
-        """
-        降级转换方法：当Pydantic验证失败时使用
-
-        Args:
-            dify_result: Dify结果
-            request_id: 请求ID
-
-        Returns:
-            可视化数据
-        """
-        logger.info(f"🔄 [降级转换] 使用降级转换方法, request_id: {request_id}")
-
-        # 简单的字段映射
-        visualization_data = {}
-
-        # 提取基本信息
-        basic_info = dify_result.get("basic_info", {})
-        visualization_data["个人信息"] = {
-            "姓名": basic_info.get("name", "未知"),
-            "年龄": "未知",
-            "婚姻状况": basic_info.get("marital_status", "未知"),
-            "单位性质": "未知",
-            "工作时长": "未知",
-            "公积金基数": "未知",
-            "是否白名单客群": "否",
-            "身份证号": basic_info.get("id_card", "未知")
-        }
-
-        # 其他字段使用默认值
-        default_data = self._get_default_visualization_data()
-        for key, value in default_data.items():
-            if key not in visualization_data:
-                visualization_data[key] = value
+        # 使用转换器转换为可视化格式
+        visualization_data = DifyToVisualizationConverter.convert(dify_output, request_id)
+        logger.info(f"✅ [Dify解析] 转换为可视化格式成功")
 
         return visualization_data
-
-    def _is_valid_visualization_format(self, data: Dict[str, Any]) -> bool:
-        """
-        检查数据是否已经是有效的可视化报告格式
-
-        Args:
-            data: 待检查的数据
-
-        Returns:
-            是否是有效格式
-        """
-        # 检查是否包含关键字段
-        required_fields = ["个人信息", "统计概览", "负债构成"]
-        return all(field in data for field in required_fields)
 
     def _extract_json_from_text(self, text: str) -> Optional[Dict[str, Any]]:
         """

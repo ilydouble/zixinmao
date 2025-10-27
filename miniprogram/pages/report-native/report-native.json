@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "征信分析报告",
+  "navigationBarBackgroundColor": "#4b6cb7",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#f5f7fa",
+  "enablePullDownRefresh": true,
+  "usingComponents": {}
+}
+

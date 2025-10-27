@@ -1,0 +1,860 @@
+/* miniprogram/pages/report-native/report-native.wxss */
+page {
+  background-color: #f5f7fa;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+}
+
+.report-container {
+  min-height: 100vh;
+  padding-bottom: 120rpx;
+}
+
+/* 加载状态 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 40rpx;
+}
+
+.loading-spinner {
+  width: 80rpx;
+  height: 80rpx;
+  border: 6rpx solid #e0e0e0;
+  border-top-color: #4b6cb7;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  margin-top: 30rpx;
+  font-size: 28rpx;
+  color: #666;
+}
+
+/* 错误状态 */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 40rpx;
+}
+
+.error-icon {
+  font-size: 100rpx;
+  margin-bottom: 20rpx;
+}
+
+.error-text {
+  font-size: 28rpx;
+  color: #666;
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.retry-button {
+  background-color: #4b6cb7;
+  color: white;
+  border-radius: 40rpx;
+  padding: 20rpx 60rpx;
+  font-size: 28rpx;
+}
+
+/* 报告内容 */
+.report-content {
+  padding: 20rpx;
+}
+
+/* 头部 */
+.report-header {
+  background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+  color: white;
+  padding: 60rpx 40rpx;
+  border-radius: 20rpx;
+  margin-bottom: 20rpx;
+  text-align: center;
+  box-shadow: 0 8rpx 24rpx rgba(75, 108, 183, 0.3);
+}
+
+.report-title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  letter-spacing: 2rpx;
+}
+
+.report-subtitle {
+  display: block;
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+
+/* 通用section */
+.section {
+  background-color: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 30rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 3rpx solid #4b6cb7;
+}
+
+.title-icon {
+  font-size: 36rpx;
+  margin-right: 15rpx;
+}
+
+.title-text {
+  flex: 1;
+}
+
+/* 个人信息 */
+.personal-section {
+  border-left: 8rpx solid #4b6cb7;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30rpx;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  padding: 20rpx;
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+}
+
+.info-label {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.info-value {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+/* 统计卡片 */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.stat-card {
+  background-color: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+}
+
+.stat-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20rpx;
+  font-size: 36rpx;
+}
+
+.icon-credit {
+  background: linear-gradient(135deg, #4CAF50, #8BC34A);
+}
+
+.icon-debt {
+  background: linear-gradient(135deg, #FF5722, #FF9800);
+}
+
+.icon-institution {
+  background: linear-gradient(135deg, #9C27B0, #E91E63);
+}
+
+.icon-loan {
+  background: linear-gradient(135deg, #FF9800, #FFC107);
+}
+
+.icon-overdue {
+  background: linear-gradient(135deg, #F44336, #E91E63);
+}
+
+.icon-query {
+  background: linear-gradient(135deg, #2196F3, #03A9F4);
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.stat-value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.stat-unit {
+  font-size: 24rpx;
+  color: #7f8c8d;
+  margin-left: 5rpx;
+}
+
+/* 负债列表 */
+.debt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.debt-item {
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+  padding: 25rpx;
+  border-left: 6rpx solid #4b6cb7;
+}
+
+.debt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.debt-type {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.debt-usage {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.debt-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15rpx;
+}
+
+.debt-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.debt-stat-label {
+  font-size: 22rpx;
+  color: #999;
+  margin-bottom: 5rpx;
+}
+
+.debt-stat-value {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+/* 贷款汇总 */
+.loan-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
+  margin-bottom: 30rpx;
+  padding: 25rpx;
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.summary-label {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.summary-value {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+/* 贷款分类 */
+.loan-category {
+  margin-top: 30rpx;
+}
+
+.category-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #4b6cb7;
+  margin-bottom: 20rpx;
+}
+
+/* 表格 */
+.table-container {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12rpx;
+  background-color: #f8f9fa;
+}
+
+.table-scroll {
+  width: 100%;
+}
+
+.loan-table,
+.credit-table {
+  min-width: 1400rpx;
+  font-size: 24rpx;
+}
+
+.table-header {
+  display: flex;
+  background-color: #4b6cb7;
+  color: white;
+  font-weight: bold;
+  padding: 20rpx 0;
+}
+
+.table-row {
+  display: flex;
+  border-bottom: 1rpx solid #e0e0e0;
+  padding: 20rpx 0;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-cell {
+  flex: 1;
+  min-width: 150rpx;
+  padding: 0 15rpx;
+  text-align: center;
+  word-break: break-all;
+}
+
+/* 信用卡使用率 */
+.credit-usage-card {
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+}
+
+.usage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.usage-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.usage-percentage {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #4b6cb7;
+}
+
+.usage-progress {
+  height: 20rpx;
+  background-color: #e0e0e0;
+  border-radius: 10rpx;
+  overflow: hidden;
+  margin-bottom: 25rpx;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #4b6cb7, #667eea);
+  transition: width 0.3s;
+}
+
+.usage-info {
+  display: flex;
+  gap: 30rpx;
+  margin-bottom: 25rpx;
+}
+
+.usage-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.usage-label {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.usage-value {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+/* 风险等级颜色 */
+.usage-value.risk-low {
+  color: #4CAF50;
+}
+
+.usage-value.risk-medium {
+  color: #FF9800;
+}
+
+.usage-value.risk-high {
+  color: #F44336;
+}
+
+.usage-amounts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15rpx;
+}
+
+.amount-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15rpx;
+  background-color: white;
+  border-radius: 8rpx;
+}
+
+.amount-label {
+  font-size: 22rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+.amount-value {
+  font-size: 24rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+/* 信用卡列表 */
+.credit-cards-list {
+  margin-top: 30rpx;
+}
+
+.list-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #4b6cb7;
+  margin-bottom: 20rpx;
+}
+
+/* 底部操作按钮 */
+.action-buttons {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 20rpx;
+  padding: 20rpx;
+  background-color: white;
+  box-shadow: 0 -4rpx 12rpx rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+
+.action-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  padding: 25rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  border: none;
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.action-button.primary {
+  background: linear-gradient(135deg, #4b6cb7, #667eea);
+  color: white;
+}
+
+.button-icon {
+  font-size: 32rpx;
+}
+
+.button-text {
+  font-weight: 500;
+}
+
+/* 逾期分析 */
+.overdue-severity {
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+  padding: 30rpx;
+}
+
+.severity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.severity-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.severity-level {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #F44336;
+}
+
+.severity-progress {
+  height: 20rpx;
+  background-color: #e0e0e0;
+  border-radius: 10rpx;
+  overflow: hidden;
+  margin-bottom: 30rpx;
+}
+
+.severity-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #F44336, #E91E63);
+  transition: width 0.3s;
+}
+
+.overdue-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20rpx;
+}
+
+.overdue-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx;
+  background-color: white;
+  border-radius: 8rpx;
+}
+
+.overdue-stat-value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #F44336;
+  margin-bottom: 8rpx;
+}
+
+.overdue-stat-label {
+  font-size: 22rpx;
+  color: #666;
+}
+
+/* 查询记录 */
+.query-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.query-item {
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+  padding: 25rpx;
+  border-left: 6rpx solid #2196F3;
+}
+
+.query-period {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 20rpx;
+}
+
+.query-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15rpx;
+}
+
+.query-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15rpx;
+  background-color: white;
+  border-radius: 8rpx;
+}
+
+.query-label {
+  font-size: 24rpx;
+  color: #666;
+}
+
+.query-value {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #2196F3;
+}
+
+/* 产品推荐 */
+.match-status {
+  background-color: #e3f2fd;
+  border-radius: 12rpx;
+  padding: 25rpx;
+  margin-bottom: 25rpx;
+  text-align: center;
+}
+
+.match-text {
+  font-size: 28rpx;
+  color: #2196F3;
+  font-weight: 500;
+}
+
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.product-card {
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+  padding: 25rpx;
+  border-left: 6rpx solid #4CAF50;
+}
+
+.product-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.product-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.product-match {
+  font-size: 24rpx;
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+.product-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15rpx;
+  margin-bottom: 20rpx;
+}
+
+.product-info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15rpx;
+  background-color: white;
+  border-radius: 8rpx;
+}
+
+.product-label {
+  font-size: 22rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+.product-value {
+  font-size: 24rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.product-features {
+  padding: 20rpx;
+  background-color: white;
+  border-radius: 8rpx;
+}
+
+.feature-label {
+  font-size: 24rpx;
+  color: #666;
+  margin-right: 10rpx;
+}
+
+.feature-text {
+  font-size: 24rpx;
+  color: #2c3e50;
+  line-height: 1.6;
+}
+
+/* AI分析 */
+.ai-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.ai-section .section-title {
+  color: white;
+  border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+.suitability-rating {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 12rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  text-align: center;
+}
+
+.rating-label {
+  display: block;
+  font-size: 24rpx;
+  opacity: 0.9;
+  margin-bottom: 15rpx;
+}
+
+.rating-value {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.ai-points {
+  margin-bottom: 30rpx;
+}
+
+.points-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+}
+
+.ai-point {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 12rpx;
+  padding: 25rpx;
+  margin-bottom: 15rpx;
+}
+
+.point-category {
+  display: block;
+  font-size: 24rpx;
+  opacity: 0.9;
+  margin-bottom: 10rpx;
+}
+
+.point-content {
+  display: block;
+  font-size: 26rpx;
+  line-height: 1.6;
+}
+
+.optimization-suggestions {
+  margin-bottom: 30rpx;
+}
+
+.suggestions-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: flex-start;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 15rpx;
+}
+
+.suggestion-icon {
+  font-size: 32rpx;
+  margin-right: 15rpx;
+  flex-shrink: 0;
+}
+
+.suggestion-text {
+  flex: 1;
+  font-size: 26rpx;
+  line-height: 1.6;
+}
+
+.risk-warning {
+  display: flex;
+  align-items: flex-start;
+  background-color: rgba(244, 67, 54, 0.2);
+  border-radius: 12rpx;
+  padding: 25rpx;
+  border: 2rpx solid rgba(244, 67, 54, 0.5);
+}
+
+.warning-icon {
+  font-size: 36rpx;
+  margin-right: 15rpx;
+  flex-shrink: 0;
+}
+
+.warning-text {
+  flex: 1;
+  font-size: 26rpx;
+  line-height: 1.6;
+  font-weight: 500;
+}
+

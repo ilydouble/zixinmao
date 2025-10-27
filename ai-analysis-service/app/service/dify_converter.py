@@ -33,6 +33,36 @@ from app.models.visualization_model import (
 logger = logging.getLogger(__name__)
 
 
+def parse_report_date(date_str: str):
+    """
+    灵活解析报告日期，支持多种格式
+
+    Args:
+        date_str: 日期字符串
+
+    Returns:
+        datetime对象
+    """
+    from datetime import datetime
+
+    # 尝试多种日期格式
+    formats = [
+        "%Y-%m-%d %H:%M:%S",  # 2024-10-15 12:00:00
+        "%Y-%m-%d",           # 2024-10-15
+        "%Y/%m/%d %H:%M:%S",  # 2024/10/15 12:00:00
+        "%Y/%m/%d",           # 2024/10/15
+    ]
+
+    for fmt in formats:
+        try:
+            return datetime.strptime(date_str, fmt)
+        except ValueError:
+            continue
+
+    # 如果所有格式都失败，抛出异常
+    raise ValueError(f"无法解析日期格式: {date_str}")
+
+
 class DifyToVisualizationConverter:
     """Dify数据到可视化数据的转换器"""
 
@@ -207,7 +237,7 @@ class DifyToVisualizationConverter:
         # 计算近3月查询次数
         from datetime import datetime, timedelta
         # 使用报告日期作为基准日期
-        report_datetime = datetime.strptime(basic_info.report_date, "%Y-%m-%d %H:%M:%S")
+        report_datetime = parse_report_date(basic_info.report_date)
         three_months_ago = report_datetime - timedelta(days=90)
         query_count_3m = 0
         for record in query_records:
@@ -362,14 +392,14 @@ class DifyToVisualizationConverter:
         """转换贷款汇总"""
         if not loan_details:
             return LoanSummary(
-                avg_period=0.0,
+                avg_period="0年",
                 max_balance=0,
                 min_balance=0,
                 institution_types="无"
             )
 
         # 计算平均期限（简化处理，假设为1年）
-        avg_period = 1.0
+        avg_period = "1年"
 
         # 计算最高和最小余额
         balances = [loan.balance for loan in loan_details if loan.balance > 0]
@@ -581,7 +611,7 @@ class DifyToVisualizationConverter:
         from collections import OrderedDict
 
         # 使用报告日期作为基准日期
-        report_datetime = datetime.strptime(basic_info.report_date, "%Y-%m-%d %H:%M:%S")
+        report_datetime = parse_report_date(basic_info.report_date)
 
         # 定义时间段（使用OrderedDict保持顺序）
         periods = OrderedDict([
@@ -633,7 +663,7 @@ class DifyToVisualizationConverter:
                 bank="工商银行",
                 product_name="融e借",
                 min_rate="3.85%",
-                max_credit=80,
+                max_credit="80",
                 rating=5,
                 suggestion="信用记录良好，强烈推荐申请"
             ))
@@ -641,7 +671,7 @@ class DifyToVisualizationConverter:
                 bank="建设银行",
                 product_name="快贷",
                 min_rate="4.35%",
-                max_credit=50,
+                max_credit="50",
                 rating=4,
                 suggestion="适合您的信用状况"
             ))
@@ -651,7 +681,7 @@ class DifyToVisualizationConverter:
                 bank="招商银行",
                 product_name="闪电贷",
                 min_rate="5.6%",
-                max_credit=30,
+                max_credit="30",
                 rating=3,
                 suggestion="建议降低信用卡使用率后申请"
             ))
@@ -661,7 +691,7 @@ class DifyToVisualizationConverter:
                 bank="微众银行",
                 product_name="微粒贷",
                 min_rate="7.2%",
-                max_credit=20,
+                max_credit="20",
                 rating=2,
                 suggestion="建议先改善信用状况"
             ))

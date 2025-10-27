@@ -712,9 +712,9 @@ Page({
       return
     }
 
-    // 跳转到报告查看页
+    // 跳转到报告查看页 - 使用小程序原生页面展示
     wx.navigateTo({
-      url: `/pages/report/report?reportId=${report.id}&type=jianxin&title=${encodeURIComponent(report.title)}&date=${report.date}`
+      url: `/pages/report-native/report-native?reportId=${report.reportId || report.id}`
     })
   },
 

@@ -36,13 +36,13 @@ class DebtItem(BaseModel):
 
 class LoanChart(BaseModel):
     """贷款详情图表"""
-    institution: int = Field(..., description="机构")
+    institution: str = Field(..., description="机构名称")
     credit_limit: int = Field(..., description="授信额度(元)")
     balance: int = Field(..., description="贷款余额(元)")
 
 class LoanSummary(BaseModel):
     """贷款汇总"""
-    avg_period: float = Field(..., description="贷款平均期限(年)")
+    avg_period: str = Field(..., description="贷款平均期限(如：5年)")
     max_balance: int = Field(..., description="最高单笔贷款余额(元)")
     min_balance: int = Field(..., description="最小单笔贷款余额(元)")
     institution_types: str = Field(..., description="贷款机构类型")
@@ -68,7 +68,7 @@ class CreditUsageAnalysis(BaseModel):
     used_credit: int = Field(..., description="已用额度(元)")
     available_credit: int = Field(..., description="可用额度(元)")
     recommended_threshold: float = Field(default=70.0, description="建议阈值")
-    safety_margin: float = Field(..., description="安全空间")
+    safety_margin: Optional[float] = Field(None, description="安全空间")
     impact_level: str = Field(..., description="影响程度")
 
 class CreditCardDetail(BaseModel):
@@ -119,7 +119,7 @@ class ProductRecommendation(BaseModel):
     bank: str = Field(..., description="所属银行")
     product_name: str = Field(..., description="产品名")
     min_rate: str = Field(..., description="最低年利率")
-    max_credit: int = Field(..., description="最高授信额度(万元)")
+    max_credit: str = Field(..., description="最高授信额度(如：30万)")
     rating: int = Field(..., description="推荐指数(1-5星)")
     suggestion: str = Field(..., description="建议")
 

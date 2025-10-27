@@ -67,7 +67,7 @@ exports.main = async (event, context) => {
 
         // 5. 更新完成状态
         console.log(`✅ [异步任务] 更新完成状态: ${reportId}`)
-        await updateReportStatus(reportId, 'completed', 'COMPLETED', 100, reportFiles)
+        await updateReportStatus(reportId, 'completed', 'COMPLETED', 100, reportFiles, analysisResult, htmlReport)
 
         console.log(`🎉 [异步任务] 报告处理完成: ${reportId}`)
 
@@ -79,7 +79,7 @@ exports.main = async (event, context) => {
 
         // 🔧 修复：不再删除报告记录，而是标记为失败状态
         // 这样小程序端可以检测到失败状态并显示友好的错误信息
-        await updateReportStatus(reportId, 'failed', 'FAILED', 0, null, error.message)
+        await updateReportStatus(reportId, 'failed', 'FAILED', 0, null, null, null, error.message)
 
         // 可选：删除上传的原始文件以节省存储空间
         if (fileId) {
@@ -109,7 +109,7 @@ exports.main = async (event, context) => {
 
     // 🔧 修复：不再删除报告记录，而是标记为失败状态
     try {
-      await updateReportStatus(reportId, 'failed', 'FAILED', 0, null, error.message)
+      await updateReportStatus(reportId, 'failed', 'FAILED', 0, null, null, null, error.message)
 
       // 可选：删除上传的原始文件以节省存储空间
       if (fileId) {
@@ -376,12 +376,14 @@ async function generateReportFiles(analysisResult, reportId, reportType, htmlRep
 /**
  * 更新报告状态
  */
-async function updateReportStatus(reportId, status, stage, progress, reportFiles = null, errorMessage = null) {
+async function updateReportStatus(reportId, status, stage, progress, reportFiles = null, analysisResult = null, htmlReport = null, errorMessage = null) {
   console.log(`📊 [状态更新] 开始更新报告状态: ${reportId}`, {
     status,
     stage,
     progress,
     hasReportFiles: !!reportFiles,
+    hasAnalysisResult: !!analysisResult,
+    hasHtmlReport: !!htmlReport,
     errorMessage
   })
 
@@ -413,6 +415,18 @@ async function updateReportStatus(reportId, status, stage, progress, reportFiles
     updateData['output.reportFiles'] = reportFiles
     updateData['output.summary'] = '报告生成完成'
     console.log(`📄 [状态更新] 包含报告文件: ${Object.keys(reportFiles).length} 个`)
+  }
+
+  // 🆕 保存AI分析结果
+  if (analysisResult) {
+    updateData['output.analysisResult'] = analysisResult
+    console.log(`🤖 [状态更新] 包含AI分析结果`)
+  }
+
+  // 🆕 保存HTML报告内容
+  if (htmlReport) {
+    updateData['output.htmlReport'] = htmlReport
+    console.log(`📝 [状态更新] 包含HTML报告内容: ${htmlReport.length} 字符`)
   }
 
   try {
