@@ -34,6 +34,12 @@ class DebtItem(BaseModel):
     balance: int = Field(..., description="余额(元)")
     usage_rate: Optional[str] = Field(None, description="使用率")
 
+class LoanChart(BaseModel):
+    """贷款详情图表"""
+    institution: int = Field(..., description="机构")
+    credit_limit: int = Field(..., description="授信额度(元)")
+    balance: int = Field(..., description="贷款余额(元)")
+
 class LoanSummary(BaseModel):
     """贷款汇总"""
     avg_period: float = Field(..., description="贷款平均期限(年)")
@@ -140,6 +146,7 @@ class VisualizationReportData(BaseModel):
     debt_composition: List[DebtItem] = Field(..., description="负债构成列表")
     
     # 贷款详情
+    loan_charts: List[LoanChart] = Field(..., description="贷款图表标签")
     loan_summary: LoanSummary = Field(..., description="贷款汇总信息")
     bank_loans: List[LoanDetail] = Field(..., description="银行贷款列表")
     non_bank_loans: List[LoanDetail] = Field(..., description="非银机构贷款列表")
@@ -163,16 +170,14 @@ class VisualizationReportData(BaseModel):
     suitability_rating: str = Field(..., description="适合贷款申请程度")
     optimization_suggestions: List[str] = Field(..., description="优化建议列表")
     risk_warning: str = Field(..., description="风险提示")
+
+    query_charts: List[QueryRecord] = Field(..., description="查询记录图表")
+
     
-    # 图表数据
-    loan_chart_labels: List[str] = Field(..., description="贷款图表标签")
-    loan_chart_credit_data: List[float] = Field(..., description="贷款图表授信数据(万元)")
-    loan_chart_balance_data: List[float] = Field(..., description="贷款图表余额数据(万元)")
-    
-    query_chart_labels: List[str] = Field(..., description="查询图表标签")
-    query_chart_loan_data: List[int] = Field(..., description="查询图表贷款审批数据")
-    query_chart_card_data: List[int] = Field(..., description="查询图表信用卡审批数据")
-    query_chart_guarantee_data: List[int] = Field(..., description="查询图表担保审查数据")
+    # query_chart_labels: List[str] = Field(..., description="查询图表标签")
+    # query_chart_loan_data: List[int] = Field(..., description="查询图表贷款审批数据")
+    # query_chart_card_data: List[int] = Field(..., description="查询图表信用卡审批数据")
+    # query_chart_guarantee_data: List[int] = Field(..., description="查询图表担保审查数据")
 
 
 class VisualizationReportRequest(BaseModel):

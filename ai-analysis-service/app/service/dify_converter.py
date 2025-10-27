@@ -26,7 +26,8 @@ from app.models.visualization_model import (
     AIAnalysisPoint,
     CreditUsageAnalysis,
     OverdueAnalysis,
-    LoanSummary
+    LoanSummary,
+    LoanChart
 )
 
 logger = logging.getLogger(__name__)
@@ -112,11 +113,11 @@ class DifyToVisualizationConverter:
             )
 
             # 12. 生成图表数据
-            loan_chart_labels, loan_chart_credit_data, loan_chart_balance_data = \
-                DifyToVisualizationConverter._generate_loan_chart_data(bank_loans, non_bank_loans)
+            loan_charts = \
+                DifyToVisualizationConverter._generate_loan_chart_data(dify_output.loan_details)
 
-            query_chart_labels, query_chart_loan_data, query_chart_card_data, query_chart_guarantee_data = \
-                DifyToVisualizationConverter._generate_query_chart_data(query_records)
+            # query_chart_labels, query_chart_loan_data, query_chart_card_data, query_chart_guarantee_data = \
+            #     DifyToVisualizationConverter._generate_query_chart_data(query_records)
 
             # 构建完整的可视化数据Pydantic对象
             visualization_report = VisualizationReportData(
@@ -142,13 +143,8 @@ class DifyToVisualizationConverter:
                     "减少短期内的查询次数"
                 ],
                 risk_warning="请注意保护个人信用记录" if overdue_analysis.severity_level == "无逾期" else "存在逾期记录，请及时处理",
-                loan_chart_labels=loan_chart_labels,
-                loan_chart_credit_data=loan_chart_credit_data,
-                loan_chart_balance_data=loan_chart_balance_data,
-                query_chart_labels=query_chart_labels,
-                query_chart_loan_data=query_chart_loan_data,
-                query_chart_card_data=query_chart_card_data,
-                query_chart_guarantee_data=query_chart_guarantee_data
+                loan_charts=loan_charts,
+                query_charts=query_records
             )
 
             logger.info(f"✅ [Dify转换] 转换完成, request_id: {request_id}")
@@ -743,27 +739,17 @@ class DifyToVisualizationConverter:
 
     @staticmethod
     def _generate_loan_chart_data(
-        bank_loans: List[LoanDetail],
-        non_bank_loans: List[LoanDetail]
-    ) -> tuple:
+        loan_details: List[LoanDetail]
+    ) -> List[LoanChart]:
         """生成贷款图表数据"""
-        labels = []
-        credit_data = []
-        balance_data = []
-
-        # 添加银行贷款数据
-        for loan in bank_loans[:5]:  # 最多显示5个
-            labels.append(loan.institution[:8] + "..." if len(loan.institution) > 8 else loan.institution)
-            credit_data.append(loan.credit_limit)
-            balance_data.append(loan.balance)
-
-        # 添加非银贷款数据
-        for loan in non_bank_loans[:5]:  # 最多显示5个
-            labels.append(loan.institution[:8] + "..." if len(loan.institution) > 8 else loan.institution)
-            credit_data.append(loan.credit_limit)
-            balance_data.append(loan.balance)
-
-        return labels, credit_data, balance_data
+        return [
+            LoanChart(
+                institution=loan.institution,
+                credit_limit=loan.credit_limit,
+                balance=loan.balance
+            )
+            for loan in loan_details
+        ]
 
     @staticmethod
     def _generate_query_chart_data(
