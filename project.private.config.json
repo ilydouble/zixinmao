@@ -20,17 +20,5 @@
     "ignoreDevUnusedFiles": true
   },
   "libVersion": "3.10.0",
-  "condition": {
-    "miniprogram": {
-      "list": [
-        {
-          "name": "pages/jianxin/jianxin",
-          "pathName": "pages/jianxin/jianxin",
-          "query": "",
-          "scene": null,
-          "launchMode": "default"
-        }
-      ]
-    }
-  }
+  "condition": {}
 }

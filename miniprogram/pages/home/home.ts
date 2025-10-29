@@ -9,19 +9,22 @@ Page({
         id: 1,
         title: '流水宝',
         image: '/images/banner1.png',
-        link: '/pages/liushui/liushui'
+        link: '/pages/liushui/liushui',
+        disabled: true
       },
       {
         id: 2,
         title: '简信宝',
         image: '/images/banner2.png',
-        link: '/pages/jianxin/jianxin'
+        link: '/pages/jianxin/jianxin',
+        disabled: false
       },
       {
         id: 3,
         title: '专信宝',
         image: '/images/banner3.png',
-        link: '/pages/zhuanxin/zhuanxin'
+        link: '/pages/zhuanxin/zhuanxin',
+        disabled: true
       }
     ],
     currentBanner: 0,
@@ -76,7 +79,17 @@ Page({
    * 点击 Banner
    */
   onBannerTap(e: any) {
-    const { link } = e.currentTarget.dataset
+    const { link, disabled } = e.currentTarget.dataset
+
+    // 如果功能被禁用，显示提示
+    if (disabled) {
+      wx.showToast({
+        title: '功能开发中，敬请期待',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
 
     if (link) {
       // 检查是否需要实名认证（征信相关功能）
@@ -123,34 +136,6 @@ Page({
     const { product } = e.currentTarget.dataset
     wx.navigateTo({
       url: `/pages/product-detail/product-detail?product=${product}`
-    })
-  },
-
-  /**
-   * 检查开发模式
-   */
-  checkDevMode() {
-    // 通过环境或其他方式判断是否为开发模式
-    const accountInfo = wx.getAccountInfoSync()
-    const isDev = accountInfo.miniProgram.envVersion === 'develop'
-    this.setData({ isDev })
-  },
-
-  /**
-   * 跳转到初始化页面
-   */
-  goToInit() {
-    wx.navigateTo({
-      url: '/pages/init/init'
-    })
-  },
-
-  /**
-   * 跳转到测试页面
-   */
-  goToTest() {
-    wx.navigateTo({
-      url: '/pages/test/test'
     })
   }
 })

@@ -86,16 +86,16 @@
         <!-- 统计信息 -->
         <view class="stats-grid">
           <view class="stats-item">
-            <text class="stats-value">¥{{userInfo.totalConsumption || 0}}</text>
-            <text class="stats-label">总订单</text>
-          </view>
-          <view class="stats-item">
             <text class="stats-value">¥{{userInfo.totalRecharge || 0}}</text>
             <text class="stats-label">总充值</text>
           </view>
           <view class="stats-item">
             <text class="stats-value">¥{{userInfo.orderStats.totalConsumption || 0}}</text>
             <text class="stats-label">总消费</text>
+          </view>
+          <view class="stats-item">
+            <text class="stats-value">{{userInfo.orderStats.totalOrders || 0}}</text>
+            <text class="stats-label">总订单</text>
           </view>
           <view class="stats-item">
             <text class="stats-value">{{userInfo.orderStats.completedOrders || 0}}</text>
@@ -125,24 +125,7 @@
     </t-cell-group>
   </view>
 
-  <!-- 测试功能菜单 -->
-  <view class="menu-section">
-    <view class="menu-title">🔧 开发测试</view>
-    <t-cell-group>
-      <t-cell
-        wx:for="{{testMenuItems}}"
-        wx:key="id"
-        title="{{item.title}}"
-        left-icon="{{item.icon}}"
-        note="{{item.description}}"
-        data-url="{{item.url}}"
-        data-item="{{item}}"
-        bind:click="onNavigateToMenu"
-      >
-        <view slot="right-icon" class="custom-arrow">›</view>
-      </t-cell>
-    </t-cell-group>
-  </view>
+
 
   <!-- 退出登录 -->
   <view wx:if="{{isLoggedIn}}" class="logout-section">

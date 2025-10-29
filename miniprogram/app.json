@@ -16,8 +16,7 @@
     "pages/balance/balance",
     "pages/help/help",
     "pages/settings/settings",
-    "pages/product-detail/product-detail",
-    "pages/font-test/font-test"
+    "pages/product-detail/product-detail"
   ],
   "window": {
     "backgroundTextStyle": "light",
