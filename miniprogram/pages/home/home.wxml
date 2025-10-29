@@ -33,12 +33,12 @@
           data-disabled="{{item.disabled}}"
           bind:tap="onBannerTap"
         >
-          <image
-            class="banner-image"
-            src="{{item.image}}"
-            mode="aspectFill"
-            lazy-load
-          />
+          <view class="banner-bg" style="background: {{item.bgColor}}">
+            <view class="banner-content">
+              <text class="banner-title">{{item.title}}</text>
+              <text class="banner-desc">专业的{{item.title}}分析服务</text>
+            </view>
+          </view>
           <view wx:if="{{item.disabled}}" class="banner-badge">开发中</view>
         </view>
       </swiper-item>
@@ -58,7 +58,7 @@
 
       <view
         class="function-item"
-        data-url="/pages/jianxin/jianxin"
+        data-url="/packageBusiness/pages/jianxin/jianxin"
         bind:tap="navigateToPage"
       >
         <view class="function-icon">📋</view>

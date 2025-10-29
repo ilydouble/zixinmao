@@ -15,37 +15,37 @@ Page({
         id: 'orders',
         icon: '🧾',
         title: '个人订单',
-        url: '/pages/orders/orders'
+        url: '/packageUser/pages/orders/orders'
       },
       {
         id: 'recharge',
         icon: '💳',
         title: '会员充值',
-        url: '/pages/recharge/recharge'
+        url: '/packageUser/pages/recharge/recharge'
       },
       {
         id: 'balance',
         icon: '💰',
         title: '我的余额',
-        url: '/pages/balance/balance'
+        url: '/packageUser/pages/balance/balance'
       },
       {
         id: 'support',
         icon: '🎧',
         title: '联系客服',
-        url: '/pages/support/support'
+        url: '/packageUser/pages/support/support'
       },
       {
         id: 'help',
         icon: '🧠',
         title: '帮助中心',
-        url: '/pages/help/help'
+        url: '/packageUser/pages/help/help'
       },
       {
         id: 'settings',
         icon: '⚙️',
         title: '设置',
-        url: '/pages/settings/settings'
+        url: '/packageUser/pages/settings/settings'
       }
     ]
   },
@@ -269,7 +269,7 @@ Page({
    */
   onRecharge() {
     wx.navigateTo({
-      url: '/pages/recharge/recharge'
+      url: '/packageUser/pages/recharge/recharge'
     })
   },
 

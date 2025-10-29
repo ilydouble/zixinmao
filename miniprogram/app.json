@@ -4,19 +4,33 @@
     "pages/home/home",
     "pages/login/login",
     "pages/auth/auth",
-    "pages/liushui/liushui",
-    "pages/jianxin/jianxin",
-    "pages/zhuanxin/zhuanxin",
-    "pages/report/report",
-    "pages/report-native/report-native",
-    "pages/center/center",
-    "pages/support/support",
-    "pages/orders/orders",
-    "pages/recharge/recharge",
-    "pages/balance/balance",
-    "pages/help/help",
-    "pages/settings/settings",
-    "pages/product-detail/product-detail"
+    "pages/center/center"
+  ],
+  "subpackages": [
+    {
+      "root": "packageBusiness",
+      "name": "business",
+      "pages": [
+        "pages/liushui/liushui",
+        "pages/jianxin/jianxin",
+        "pages/zhuanxin/zhuanxin",
+        "pages/report/report",
+        "pages/report-native/report-native"
+      ]
+    },
+    {
+      "root": "packageUser",
+      "name": "user",
+      "pages": [
+        "pages/orders/orders",
+        "pages/recharge/recharge",
+        "pages/balance/balance",
+        "pages/support/support",
+        "pages/help/help",
+        "pages/settings/settings",
+        "pages/product-detail/product-detail"
+      ]
+    }
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -52,13 +66,13 @@
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents",
   "usingComponents": {
-    "t-button": "/miniprogram_npm/tdesign-miniprogram/button/button",
-    "t-cell": "/miniprogram_npm/tdesign-miniprogram/cell/cell",
-    "t-cell-group": "/miniprogram_npm/tdesign-miniprogram/cell-group/cell-group",
-    "t-upload": "/miniprogram_npm/tdesign-miniprogram/upload/upload",
-    "t-progress": "/miniprogram_npm/tdesign-miniprogram/progress/progress",
-    "t-tag": "/miniprogram_npm/tdesign-miniprogram/tag/tag",
-    "t-avatar": "/miniprogram_npm/tdesign-miniprogram/avatar/avatar",
-    "t-popup": "/miniprogram_npm/tdesign-miniprogram/popup/popup"
+    "t-button": "tdesign-miniprogram/button/button",
+    "t-cell": "tdesign-miniprogram/cell/cell",
+    "t-cell-group": "tdesign-miniprogram/cell-group/cell-group",
+    "t-progress": "tdesign-miniprogram/progress/progress",
+    "t-tag": "tdesign-miniprogram/tag/tag",
+    "t-avatar": "tdesign-miniprogram/avatar/avatar",
+    "t-popup": "tdesign-miniprogram/popup/popup",
+    "t-icon": "tdesign-miniprogram/icon/icon"
   }
 }

@@ -8,22 +8,25 @@ Page({
       {
         id: 1,
         title: '流水宝',
-        image: '/images/banner1.png',
-        link: '/pages/liushui/liushui',
+        image: '', // 使用CSS渐变背景
+        bgColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        link: '/packageBusiness/pages/liushui/liushui',
         disabled: true
       },
       {
         id: 2,
         title: '简信宝',
-        image: '/images/banner2.png',
-        link: '/pages/jianxin/jianxin',
+        image: '', // 使用CSS渐变背景
+        bgColor: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        link: '/packageBusiness/pages/jianxin/jianxin',
         disabled: false
       },
       {
         id: 3,
         title: '专信宝',
-        image: '/images/banner3.png',
-        link: '/pages/zhuanxin/zhuanxin',
+        image: '', // 使用CSS渐变背景
+        bgColor: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+        link: '/packageBusiness/pages/zhuanxin/zhuanxin',
         disabled: true
       }
     ],

@@ -48,7 +48,7 @@ Page({
    */
   onContactSupport() {
     wx.navigateTo({
-      url: '/pages/support/support'
+      url: '/packageUser/pages/support/support'
     })
   }
 })

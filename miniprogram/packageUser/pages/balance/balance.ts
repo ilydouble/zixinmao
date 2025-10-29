@@ -78,7 +78,7 @@ Page({
    */
   onRecharge() {
     wx.navigateTo({
-      url: '/pages/recharge/recharge'
+      url: '/packageUser/pages/recharge/recharge'
     })
   },
 
