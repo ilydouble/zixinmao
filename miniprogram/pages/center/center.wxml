@@ -64,43 +64,54 @@
     </view>
   </view>
 
-  <!-- 账户信息卡片 -->
-  <view wx:if="{{isLoggedIn}}" class="account-section">
-    <view class="account-card">
-      <view class="account-header">
-        <text class="account-title">账户信息</text>
+  <!-- 会员信息卡片 -->
+  <view wx:if="{{isLoggedIn}}" class="membership-section">
+    <view class="membership-card" style="background: {{membershipConfig.gradient}}">
+      <view class="membership-header">
+        <view class="membership-badge">
+          <text class="membership-icon">{{membershipConfig.icon}}</text>
+          <text class="membership-name">{{membershipConfig.name}}</text>
+        </view>
+        <view class="membership-expiry">
+          <text class="expiry-label">{{expiryStatus}}</text>
+          <text class="expiry-date">{{expiryText}}</text>
+        </view>
       </view>
 
-      <view class="account-content">
-        <!-- 账户余额 -->
-        <view class="balance-info">
-          <view class="balance-item">
-            <text class="balance-label">账户余额</text>
-            <text class="balance-value">¥{{userInfo.balance || 0}}</text>
-          </view>
-          <view class="balance-actions">
-            <t-button theme="primary" size="small" bind:tap="onRecharge">充值</t-button>
-          </view>
-        </view>
+      <view class="membership-desc">
+        <text>{{membershipConfig.description}}</text>
+      </view>
 
-        <!-- 统计信息 -->
-        <view class="stats-grid">
-          <view class="stats-item">
-            <text class="stats-value">¥{{userInfo.totalRecharge || 0}}</text>
-            <text class="stats-label">总充值</text>
-          </view>
-          <view class="stats-item">
-            <text class="stats-value">¥{{userInfo.orderStats.totalConsumption || 0}}</text>
-            <text class="stats-label">总消费</text>
-          </view>
-          <view class="stats-item">
-            <text class="stats-value">{{userInfo.orderStats.totalOrders || 0}}</text>
-            <text class="stats-label">总订单</text>
-          </view>
-          <view class="stats-item">
-            <text class="stats-value">{{userInfo.orderStats.completedOrders || 0}}</text>
-            <text class="stats-label">已完成</text>
-          </view>
+      <view class="membership-actions">
+        <t-button
+          wx:if="{{!isMembershipValid}}"
+          theme="light"
+          size="medium"
+          bind:tap="onUpgradeMembership"
+        >
+          开通会员
+        </t-button>
+        <t-button
+          wx:else
+          theme="light"
+          size="medium"
+          bind:tap="onRenewMembership"
+        >
+          续费会员
+        </t-button>
+      </view>
+    </view>
+
+    <!-- 会员权益 -->
+    <view class="membership-features">
+      <view class="features-title">会员权益</view>
+      <view class="features-list">
+        <view
+          wx:for="{{membershipConfig.features}}"
+          wx:key="index"
+          class="feature-item"
+        >
+          <text class="feature-text">{{item}}</text>
         </view>
       </view>
     </view>

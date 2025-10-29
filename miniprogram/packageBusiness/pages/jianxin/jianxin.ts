@@ -1,7 +1,8 @@
 // jianxin.ts - 简信宝页面
-import { needRealNameAuth } from '../../utils/auth'
-import { showSuccess, showError, showToast, showProcessingFailedDialog } from '../../utils/util'
-import { validateFile } from '../../utils/fileValidator'
+import { needRealNameAuth, getCurrentUser, type UserInfo } from '../../../utils/auth'
+import { showSuccess, showError, showToast, showProcessingFailedDialog } from '../../../utils/util'
+import { validateFile } from '../../../utils/fileValidator'
+import { MembershipType, hasFeatureAccess, isMembershipValid } from '../../../config/membership'
 
 Page({
   data: {
@@ -10,6 +11,10 @@ Page({
 
     // 认证状态
     needAuth: false,
+
+    // 会员状态
+    needMembership: false,
+    membershipExpired: false,
 
     // 上传状态
     uploading: false,
@@ -42,12 +47,14 @@ Page({
     // 隐藏左上角返回按钮，避免异步任务被中断
     wx.hideHomeButton()
     this.checkAuth()
+    this.checkMembership()
     this.loadReportList()
   },
 
   onShow() {
     console.log('📱 简信宝页面显示，检查是否需要恢复轮询')
     this.checkAuth()
+    this.checkMembership()
     this.loadReportList()
 
     // 检查是否有正在生成的报告需要恢复轮询
@@ -68,6 +75,39 @@ Page({
   },
 
   /**
+   * 检查会员状态
+   */
+  checkMembership() {
+    const userInfo = getCurrentUser()
+
+    if (!userInfo) {
+      this.setData({
+        needMembership: true,
+        membershipExpired: false
+      })
+      return
+    }
+
+    const memberType = (userInfo.memberLevel || 'free') as MembershipType
+    const hasAccess = hasFeatureAccess(memberType, 'jianxin')
+    const isValid = isMembershipValid(userInfo.memberExpireTime || null)
+
+    this.setData({
+      needMembership: !hasAccess || !isValid,
+      membershipExpired: hasAccess && !isValid
+    })
+  },
+
+  /**
+   * 去开通会员
+   */
+  goToMembership() {
+    wx.navigateTo({
+      url: '/packageUser/pages/recharge/recharge'
+    })
+  },
+
+  /**
    * 去认证
    */
   goToAuth() {
@@ -82,6 +122,36 @@ Page({
   onChooseFile() {
     if (this.data.needAuth) {
       this.goToAuth()
+      return
+    }
+
+    // 检查会员状态
+    if (this.data.needMembership) {
+      if (this.data.membershipExpired) {
+        wx.showModal({
+          title: '会员已过期',
+          content: '您的会员已过期，请续费后继续使用简信宝功能',
+          confirmText: '去续费',
+          cancelText: '取消',
+          success: (res) => {
+            if (res.confirm) {
+              this.goToMembership()
+            }
+          }
+        })
+      } else {
+        wx.showModal({
+          title: '需要开通会员',
+          content: '简信宝功能需要开通普通会员或高级会员后使用',
+          confirmText: '去开通',
+          cancelText: '取消',
+          success: (res) => {
+            if (res.confirm) {
+              this.goToMembership()
+            }
+          }
+        })
+      }
       return
     }
 
@@ -679,6 +749,36 @@ Page({
    */
   onViewReport(e: any) {
     const { report } = e.currentTarget.dataset
+
+    // 检查会员状态
+    if (this.data.needMembership) {
+      if (this.data.membershipExpired) {
+        wx.showModal({
+          title: '会员已过期',
+          content: '您的会员已过期，请续费后继续查看报告',
+          confirmText: '去续费',
+          cancelText: '取消',
+          success: (res) => {
+            if (res.confirm) {
+              this.goToMembership()
+            }
+          }
+        })
+      } else {
+        wx.showModal({
+          title: '需要开通会员',
+          content: '查看报告需要开通普通会员或高级会员',
+          confirmText: '去开通',
+          cancelText: '取消',
+          success: (res) => {
+            if (res.confirm) {
+              this.goToMembership()
+            }
+          }
+        })
+      }
+      return
+    }
 
     // 如果报告还在处理中，显示进度并提供刷新选项
     if (report.status === 'processing' || report.status === 'pending') {

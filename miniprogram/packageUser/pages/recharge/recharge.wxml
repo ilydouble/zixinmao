@@ -1,37 +1,46 @@
 <!--recharge.wxml-->
 <view class="container">
   <view class="recharge-content">
-    <!-- 充值金额选择 -->
-    <view class="amounts-section">
-      <view class="section-title">选择充值金额</view>
-      <view class="amounts-grid">
+    <!-- 会员类型选择 -->
+    <view class="membership-section">
+      <view class="section-title">选择会员类型</view>
+      <view class="membership-types">
         <view
-          wx:for="{{rechargeAmounts}}"
-          wx:key="id"
-          class="amount-item {{selectedAmount === item.id ? 'selected' : ''}}"
-          data-amount-id="{{item.id}}"
-          bind:tap="onSelectAmount">
-          <view wx:if="{{item.popular}}" class="popular-badge">推荐</view>
-          <view class="amount-price">{{item.title}}</view>
-          <view class="amount-desc">{{item.desc}}</view>
+          wx:for="{{membershipTypes}}"
+          wx:key="type"
+          class="membership-type-card {{selectedMembershipType === item.type ? 'selected' : ''}}"
+          style="border-color: {{item.color}}"
+          data-type="{{item.type}}"
+          bind:tap="onSelectMembershipType">
+          <view class="type-header" style="background: {{item.gradient}}">
+            <text class="type-icon">{{item.icon}}</text>
+            <text class="type-name">{{item.name}}</text>
+          </view>
+          <view class="type-desc">{{item.description}}</view>
+          <view class="type-features">
+            <view wx:for="{{item.features}}" wx:key="index" wx:for-item="feature" class="feature-item-small">
+              <text class="feature-text-small">{{feature}}</text>
+            </view>
+          </view>
         </view>
       </view>
     </view>
 
-    <!-- 自定义金额 -->
-    <view class="custom-amount-section">
-      <view class="section-title">自定义金额</view>
-      <view class="custom-input-wrapper">
-        <text class="currency-symbol">¥</text>
-        <input
-          class="custom-amount-input"
-          type="digit"
-          placeholder="请输入充值金额"
-          value="{{customAmount}}"
-          bind:input="onCustomAmountInput"
-        />
+    <!-- 时长选择 -->
+    <view class="duration-section">
+      <view class="section-title">选择时长</view>
+      <view class="duration-grid">
+        <view
+          wx:for="{{durationOptions}}"
+          wx:key="key"
+          class="duration-item {{selectedDuration === item.key ? 'selected' : ''}}"
+          data-duration="{{item.key}}"
+          bind:tap="onSelectDuration">
+          <view wx:if="{{item.badge}}" class="duration-badge">{{item.badge}}</view>
+          <view class="duration-label">{{item.label}}</view>
+          <view class="duration-price">¥{{item.price}}</view>
+        </view>
       </view>
-      <view class="amount-tips">最低充值1元，最高单次充值10000元</view>
     </view>
 
     <!-- 支付方式 -->
@@ -48,22 +57,27 @@
 
     <!-- 支付按钮 -->
     <view class="pay-section">
+      <view class="pay-info">
+        <view class="pay-label">支付金额</view>
+        <view class="pay-amount">¥{{currentPrice}}</view>
+      </view>
       <t-button
         theme="primary"
         size="large"
         block
         bind:tap="onPay"
       >
-        立即充值
+        立即开通
       </t-button>
     </view>
 
-    <!-- 充值说明 -->
+    <!-- 会员说明 -->
     <view class="service-note">
-      <view class="note-title">💡 充值说明</view>
+      <view class="note-title">💡 会员说明</view>
       <view class="note-content">
-        • 充值金额将立即到账，可用于查询服务<br/>
+        • 开通后立即生效，可使用对应会员功能<br/>
         • 支持微信支付，安全便捷<br/>
+        • 会员到期后可续费延长使用时间<br/>
         • 如有问题请联系客服
       </view>
     </view>

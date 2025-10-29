@@ -39,8 +39,8 @@ interface UserInfo {
   balance?: number
   totalRecharge?: number
   totalConsumption?: number
-  memberLevel?: string
-  memberExpireTime?: string | null
+  memberLevel?: string  // 会员类型: 'free' | 'basic' | 'premium'
+  memberExpireTime?: string | null  // 会员到期时间
   organizationId?: string
   organizationName?: string
   cityCode?: string
@@ -52,6 +52,9 @@ interface UserInfo {
   recentOrders?: RecentOrder[]
   [key: string]: any
 }
+
+// 导出 UserInfo 接口供其他模块使用
+export type { UserInfo }
 
 // 云函数响应接口
 interface CloudResponse<T = any> {

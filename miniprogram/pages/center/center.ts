@@ -1,34 +1,28 @@
 // center.ts - 个人中心页面
-import { getCurrentUser, isAuthenticated, updateUserInfo, getUserProfile, logout, refreshUserInfo } from '../../utils/auth'
+import { getCurrentUser, isAuthenticated, updateUserInfo, getUserProfile, logout, refreshUserInfo, type UserInfo } from '../../utils/auth'
 import { showConfirm } from '../../utils/util'
+import {
+  MembershipType,
+  getMembershipConfig,
+  isMembershipValid,
+  formatExpiryDate,
+  type MembershipLevel
+} from '../../config/membership'
 
 Page({
   data: {
-    userInfo: null,
+    userInfo: null as UserInfo | null,
     isLoggedIn: false,
     // 状态栏高度（用于自定义导航栏安全区）
     statusBarHeight: 0,
     refreshing: false,
+    // 会员相关
+    membershipConfig: {} as MembershipLevel,
+    isMembershipValid: false,
+    expiryStatus: '未开通',
+    expiryText: '',
     // 常用功能菜单
     commonMenuItems: [
-      {
-        id: 'orders',
-        icon: '🧾',
-        title: '个人订单',
-        url: '/packageUser/pages/orders/orders'
-      },
-      {
-        id: 'recharge',
-        icon: '💳',
-        title: '会员充值',
-        url: '/packageUser/pages/recharge/recharge'
-      },
-      {
-        id: 'balance',
-        icon: '💰',
-        title: '我的余额',
-        url: '/packageUser/pages/balance/balance'
-      },
       {
         id: 'support',
         icon: '🎧',
@@ -92,7 +86,11 @@ Page({
       const userInfo = await refreshUserInfo()
       if (userInfo) {
         console.log('refreshAndLoadUserInfo: 刷新成功', { avatarUrl: userInfo.avatarUrl })
-        // 直接设置用户信息，避免再次调用 loadUserInfo
+
+        // 更新会员信息显示
+        await this.updateMembershipInfo(userInfo)
+
+        // 设置用户信息
         this.setData({
           isLoggedIn: true,
           userInfo: userInfo as any,
@@ -115,16 +113,107 @@ Page({
   /**
    * 加载用户信息
    */
-  loadUserInfo() {
+  async loadUserInfo() {
     const isLoggedIn = isAuthenticated()
     const userInfo = getCurrentUser()
 
     console.log('loadUserInfo 调用:', { isLoggedIn, avatarUrl: userInfo?.avatarUrl })
 
+    // 更新会员信息
+    await this.updateMembershipInfo(userInfo)
+
     this.setData({
       isLoggedIn,
       userInfo: userInfo as any
     })
+  },
+
+  /**
+   * 更新会员信息显示
+   */
+  async updateMembershipInfo(userInfo: UserInfo | null) {
+    try {
+      const memberType = userInfo?.memberLevel || 'free'
+
+      console.log('个人中心 - 开始获取会员配置, memberType:', memberType)
+
+      // 从云端获取会员配置
+      const result = await wx.cloud.callFunction({
+        name: 'getMembershipConfig',
+        data: {
+          type: memberType
+        }
+      })
+
+      console.log('个人中心 - 云函数调用结果:', result)
+
+      const response = result.result as any
+
+      if (response && response.success && response.data) {
+        console.log('个人中心 - 成功获取会员配置:', response.data)
+
+        const memberConfig = response.data
+        const isValid = isMembershipValid(userInfo?.memberExpireTime || null)
+        const expiryText = formatExpiryDate(userInfo?.memberExpireTime || null)
+
+        let expiryStatus = '未开通'
+        if (isValid) {
+          expiryStatus = '到期时间'
+        } else if (userInfo?.memberExpireTime) {
+          expiryStatus = '已过期'
+        }
+
+        this.setData({
+          membershipConfig: memberConfig,
+          isMembershipValid: isValid,
+          expiryStatus,
+          expiryText
+        })
+      } else {
+        console.warn('个人中心 - 云端获取失败，使用本地配置作为后备')
+
+        // 如果获取失败，使用本地配置作为后备
+        const memberConfig = getMembershipConfig(memberType as MembershipType)
+        const isValid = isMembershipValid(userInfo?.memberExpireTime || null)
+        const expiryText = formatExpiryDate(userInfo?.memberExpireTime || null)
+
+        let expiryStatus = '未开通'
+        if (isValid) {
+          expiryStatus = '到期时间'
+        } else if (userInfo?.memberExpireTime) {
+          expiryStatus = '已过期'
+        }
+
+        this.setData({
+          membershipConfig: memberConfig,
+          isMembershipValid: isValid,
+          expiryStatus,
+          expiryText
+        })
+      }
+    } catch (error: any) {
+      console.error('个人中心 - 更新会员信息失败:', error)
+      console.error('个人中心 - 错误详情:', error.errMsg || error.message || JSON.stringify(error))
+      // 使用本地配置作为后备
+      const memberType = (userInfo?.memberLevel || 'free') as MembershipType
+      const memberConfig = getMembershipConfig(memberType)
+      const isValid = isMembershipValid(userInfo?.memberExpireTime || null)
+      const expiryText = formatExpiryDate(userInfo?.memberExpireTime || null)
+
+      let expiryStatus = '未开通'
+      if (isValid) {
+        expiryStatus = '到期时间'
+      } else if (userInfo?.memberExpireTime) {
+        expiryStatus = '已过期'
+      }
+
+      this.setData({
+        membershipConfig: memberConfig,
+        isMembershipValid: isValid,
+        expiryStatus,
+        expiryText
+      })
+    }
   },
 
 
@@ -265,16 +354,20 @@ Page({
   },
 
   /**
-   * 充值
+   * 开通会员
    */
-  onRecharge() {
+  onUpgradeMembership() {
     wx.navigateTo({
       url: '/packageUser/pages/recharge/recharge'
     })
   },
 
-
-
-
-
+  /**
+   * 续费会员
+   */
+  onRenewMembership() {
+    wx.navigateTo({
+      url: '/packageUser/pages/recharge/recharge'
+    })
+  }
 })

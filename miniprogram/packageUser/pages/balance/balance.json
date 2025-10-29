@@ -1,5 +1,8 @@
 {
   "navigationBarTitleText": "我的余额",
   "enablePullDownRefresh": true,
-  "backgroundColor": "#f5f7fa"
+  "backgroundColor": "#f5f7fa",
+  "usingComponents": {
+    "t-button": "tdesign-miniprogram/button/button"
+  }
 }

@@ -18,33 +18,97 @@
   margin-bottom: 24rpx;
 }
 
-/* 充值金额区域 */
-.amounts-section {
+/* 会员类型区域 */
+.membership-section {
   margin-bottom: 32rpx;
 }
 
-.amounts-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+.membership-types {
+  display: flex;
+  flex-direction: column;
   gap: 16rpx;
 }
 
-.amount-item {
+.membership-type-card {
+  background: #fff;
+  border: 3rpx solid #e5e7eb;
+  border-radius: 16rpx;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.membership-type-card.selected {
+  border-width: 3rpx;
+  box-shadow: 0 4rpx 16rpx rgba(11, 58, 149, 0.15);
+}
+
+.type-header {
+  padding: 24rpx;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.type-icon {
+  font-size: 36rpx;
+}
+
+.type-name {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.type-desc {
+  padding: 16rpx 24rpx;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.type-features {
+  padding: 0 24rpx 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.feature-item-small {
+  font-size: 22rpx;
+  color: #333;
+  line-height: 1.6;
+}
+
+.feature-text-small {
+  display: block;
+}
+
+/* 时长选择区域 */
+.duration-section {
+  margin-bottom: 32rpx;
+}
+
+.duration-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
+}
+
+.duration-item {
   background: #fff;
   border: 2rpx solid #e5e7eb;
   border-radius: 16rpx;
-  padding: 32rpx 24rpx;
+  padding: 24rpx 16rpx;
   text-align: center;
   position: relative;
   transition: all 0.3s ease;
 }
 
-.amount-item.selected {
+.duration-item.selected {
   border-color: #0b3a95;
   background: #f6f8ff;
 }
 
-.popular-badge {
+.duration-badge {
   position: absolute;
   top: -8rpx;
   right: -8rpx;
@@ -56,54 +120,20 @@
   font-weight: 600;
 }
 
-.amount-price {
-  font-size: 40rpx;
+.duration-label {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8rpx;
+}
+
+.duration-price {
+  font-size: 32rpx;
   font-weight: 700;
   color: #0b3a95;
-  margin-bottom: 12rpx;
 }
 
-.amount-desc {
-  font-size: 24rpx;
-  color: #666;
-  line-height: 1.4;
-}
 
-/* 自定义金额区域 */
-.custom-amount-section {
-  margin-bottom: 32rpx;
-}
-
-.custom-input-wrapper {
-  background: #fff;
-  border: 2rpx solid #e5e7eb;
-  border-radius: 16rpx;
-  padding: 24rpx;
-  display: flex;
-  align-items: center;
-  margin-bottom: 16rpx;
-}
-
-.currency-symbol {
-  font-size: 32rpx;
-  font-weight: 600;
-  color: #0b3a95;
-  margin-right: 12rpx;
-}
-
-.custom-amount-input {
-  flex: 1;
-  font-size: 32rpx;
-  color: #1a1a1a;
-  border: none;
-  outline: none;
-}
-
-.amount-tips {
-  font-size: 24rpx;
-  color: #999;
-  text-align: center;
-}
 
 /* 支付方式 */
 .payment-section {
@@ -152,6 +182,27 @@
 /* 支付按钮 */
 .pay-section {
   margin-bottom: 32rpx;
+}
+
+.pay-info {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pay-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.pay-amount {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #ef4444;
 }
 
 /* 服务说明 */

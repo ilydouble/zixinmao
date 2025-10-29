@@ -16,7 +16,15 @@
 
   <!-- Banner 轮播 -->
   <view class="banner-section">
+    <!-- 调试信息 -->
+    <!-- <view style="padding: 20rpx; background: #f0f0f0; margin: 20rpx; border-radius: 8rpx; font-size: 24rpx;">
+      <text>调试信息：</text>
+      <text>\nbanners 数量: {{banners.length}}</text>
+      <text>\nloading: {{loading}}</text>
+    </view> -->
+
     <swiper
+      wx:if="{{banners.length > 0}}"
       class="banner-swiper"
       autoplay
       interval="{{5000}}"
@@ -33,16 +41,35 @@
           data-disabled="{{item.disabled}}"
           bind:tap="onBannerTap"
         >
-          <view class="banner-bg" style="background: {{item.bgColor}}">
+          <!-- 如果有图片URL，显示图片；否则显示渐变背景 -->
+          <view wx:if="{{item.imageUrl}}" class="banner-bg banner-image">
+            <image
+              src="{{item.imageUrl}}"
+              mode="aspectFill"
+              class="banner-img"
+            />
+            <view wx:if="{{item.disabled}}" class="banner-badge">开发中</view>
+          </view>
+          <view wx:else class="banner-bg" style="background: {{item.bgColor}}">
             <view class="banner-content">
               <text class="banner-title">{{item.title}}</text>
-              <text class="banner-desc">专业的{{item.title}}分析服务</text>
+              <text class="banner-desc">{{item.description || '专业的' + item.title + '分析服务'}}</text>
             </view>
+            <view wx:if="{{item.disabled}}" class="banner-badge">开发中</view>
           </view>
-          <view wx:if="{{item.disabled}}" class="banner-badge">开发中</view>
         </view>
       </swiper-item>
     </swiper>
+
+    <!-- 加载中状态 -->
+    <view wx:if="{{loading}}" class="banner-loading">
+      <text>加载中...</text>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:if="{{!loading && banners.length === 0}}" class="banner-loading">
+      <text>暂无 Banner</text>
+    </view>
   </view>
 
   <!-- 功能模块 -->

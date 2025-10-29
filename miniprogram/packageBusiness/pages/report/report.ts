@@ -1,6 +1,6 @@
 // report.ts - 报告查看页面
-import { mockApi } from '../../services/api'
-import { showLoading, hideLoading, showSuccess, showError } from '../../utils/util'
+import { mockApi } from '../../../services/api'
+import { showLoading, hideLoading, showSuccess, showError } from '../../../utils/util'
 
 Page({
   data: {

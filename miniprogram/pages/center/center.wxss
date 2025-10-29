@@ -217,13 +217,7 @@
   padding-left: 8rpx;
 }
 
-/* 余额操作按钮 */
-.balance-actions {
-  display: flex;
-  gap: 16rpx;
-  flex-wrap: wrap;
-  margin-top: 16rpx;
-}
+
 
 /* 退出登录 */
 .logout-section {
@@ -261,94 +255,124 @@
   font-size: 22rpx;
 }
 
-/* 账户信息卡片 */
-.account-section {
+/* 会员信息卡片 */
+.membership-section {
   margin: 32rpx 40rpx;
 }
 
-.account-card {
-  background: rgba(255, 255, 255, 0.95);
+.membership-card {
   border-radius: 24rpx;
   padding: 32rpx;
-  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.15);
+  color: white;
+  position: relative;
+  overflow: hidden;
 }
 
-.account-header {
-  margin-bottom: 24rpx;
+.membership-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  pointer-events: none;
 }
 
-.account-title {
-  font-size: 36rpx;
-  font-weight: 600;
-  color: #1a1a1a;
-  display: block;
-}
-
-.account-subtitle {
-  font-size: 24rpx;
-  color: #666;
-  opacity: 0.8;
-}
-
-.account-content {
-  display: flex;
-  flex-direction: column;
-  gap: 24rpx;
-}
-
-/* 余额信息 */
-.balance-info {
+.membership-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 24rpx;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 16rpx;
-  color: white;
+  align-items: flex-start;
+  margin-bottom: 24rpx;
+  position: relative;
+  z-index: 1;
 }
 
-.balance-item {
+.membership-badge {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.membership-icon {
+  font-size: 48rpx;
+}
+
+.membership-name {
+  font-size: 36rpx;
+  font-weight: 600;
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2);
+}
+
+.membership-expiry {
   display: flex;
   flex-direction: column;
-  gap: 8rpx;
+  align-items: flex-end;
+  gap: 4rpx;
 }
 
-.balance-label {
-  font-size: 24rpx;
+.expiry-label {
+  font-size: 22rpx;
   opacity: 0.9;
 }
 
-.balance-value {
-  font-size: 48rpx;
+.expiry-date {
+  font-size: 26rpx;
   font-weight: 600;
 }
 
-/* 新的统计网格样式 */
-.account-card .stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16rpx;
+.membership-desc {
+  font-size: 24rpx;
+  opacity: 0.9;
+  margin-bottom: 24rpx;
+  position: relative;
+  z-index: 1;
 }
 
-.account-card .stats-item {
+.membership-actions {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8rpx;
-  padding: 16rpx;
-  background: #f8fafc;
-  border-radius: 12rpx;
+  gap: 16rpx;
+  position: relative;
+  z-index: 1;
 }
 
-.account-card .stats-value {
-  font-size: 32rpx;
+/* 会员权益 */
+.membership-features {
+  margin-top: 24rpx;
+  background: white;
+  border-radius: 16rpx;
+  padding: 24rpx;
+}
+
+.features-title {
+  font-size: 28rpx;
   font-weight: 600;
   color: #1a1a1a;
+  margin-bottom: 16rpx;
 }
 
-.account-card .stats-label {
-  font-size: 22rpx;
-  color: #666;
+.features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.feature-item:last-child {
+  border-bottom: none;
+}
+
+.feature-text {
+  font-size: 26rpx;
+  color: #333;
+  line-height: 1.6;
 }
 
 /* 自定义箭头样式 */

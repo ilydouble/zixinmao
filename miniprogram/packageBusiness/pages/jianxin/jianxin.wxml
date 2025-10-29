@@ -14,6 +14,20 @@
     </view>
   </view>
 
+  <!-- 会员提示 -->
+  <view wx:if="{{needMembership}}" class="membership-notice">
+    <view class="notice-content">
+      <view class="notice-icon">👑</view>
+      <view class="notice-text">
+        <view class="notice-title">{{membershipExpired ? '会员已过期' : '需要开通会员'}}</view>
+        <view class="notice-desc">{{membershipExpired ? '您的会员已过期，请续费后继续使用' : '简信宝功能需要开通普通会员或高级会员'}}</view>
+      </view>
+      <t-button theme="primary" size="small" bind:tap="goToMembership">
+        {{membershipExpired ? '去续费' : '去开通'}}
+      </t-button>
+    </view>
+  </view>
+
   <!-- 功能介绍 -->
   <view class="feature-intro">
     <view class="intro-title">📄 简信宝 · 简版征信分析</view>

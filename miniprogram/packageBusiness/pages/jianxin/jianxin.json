@@ -1,3 +1,7 @@
 {
-  "navigationBarTitleText": "简信宝"
+  "navigationBarTitleText": "简信宝",
+  "usingComponents": {
+    "t-button": "tdesign-miniprogram/button/button",
+    "t-progress": "tdesign-miniprogram/progress/progress"
+  }
 }

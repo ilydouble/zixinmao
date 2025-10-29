@@ -1,5 +1,5 @@
 // settings.ts - 设置页面
-import { getCurrentUser, updateUserInfo } from '../../utils/auth'
+import { getCurrentUser, updateUserInfo } from '../../../utils/auth'
 
 // 组织接口
 interface Organization {

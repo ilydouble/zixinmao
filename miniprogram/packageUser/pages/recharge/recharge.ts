@@ -1,114 +1,210 @@
 // recharge.ts - 会员充值页面
+import {
+  MembershipType,
+  DURATION_OPTIONS,
+  type DurationOption
+} from '../../../config/membership'
+import { refreshUserInfo } from '../../../utils/auth'
+
+// 会员配置接口
+interface MembershipConfig {
+  _id: string
+  type: string
+  name: string
+  icon: string
+  color: string
+  gradient: string
+  description: string
+  features: string[]
+  prices: {
+    monthly: number
+    quarterly: number
+    yearly: number
+  }
+  enabled: boolean
+  sort: number
+}
+
+// 带价格的时长选项接口
+interface DurationOptionWithPrice extends DurationOption {
+  price: number
+}
+
 Page({
   data: {
-    // 充值金额选项
-    rechargeAmounts: [
-      {
-        id: 'amount_50',
-        amount: 50,
-        title: '¥50',
-        desc: '适合轻度使用',
-        popular: false
-      },
-      {
-        id: 'amount_100',
-        amount: 100,
-        title: '¥100',
-        desc: '推荐金额',
-        popular: true
-      },
-      {
-        id: 'amount_200',
-        amount: 200,
-        title: '¥200',
-        desc: '更多优惠',
-        popular: false
-      },
-      {
-        id: 'amount_500',
-        amount: 500,
-        title: '¥500',
-        desc: '大额充值',
-        popular: false
+    // 会员类型选项
+    membershipTypes: [] as MembershipConfig[],
+    selectedMembershipType: MembershipType.BASIC,
+
+    // 时长选项（带价格）
+    durationOptions: [] as DurationOptionWithPrice[],
+    selectedDuration: 'monthly' as 'monthly' | 'quarterly' | 'yearly',
+
+    // 当前价格
+    currentPrice: 0,
+
+    // 加载状态
+    loading: true
+  },
+
+  onLoad() {
+    this.loadMembershipConfig()
+  },
+
+  /**
+   * 加载会员配置
+   */
+  loadMembershipConfig() {
+    const that = this
+
+    wx.showLoading({ title: '加载中...' })
+
+    console.log('开始调用 getMembershipConfig 云函数')
+
+    // 从云端获取会员配置
+    wx.cloud.callFunction({
+      name: 'getMembershipConfig'
+    }).then((result: any) => {
+      console.log('云函数调用结果:', result)
+
+      const response = result.result as any
+
+      console.log('云函数返回数据:', response)
+
+      if (response && response.success && response.data) {
+        console.log('会员配置数据:', response.data)
+
+        // 过滤掉免费用户配置
+        const membershipTypes = response.data.filter((item: MembershipConfig) =>
+          item.type !== 'free'
+        )
+
+        console.log('过滤后的会员类型:', membershipTypes)
+
+        that.setData({
+          membershipTypes,
+          loading: false
+        })
+
+        // 更新时长选项和价格
+        that.updateDurationOptions()
+
+        wx.hideLoading()
+      } else {
+        const errorMsg = response?.message || '加载会员配置失败'
+        console.error('云函数返回错误:', errorMsg)
+        throw new Error(errorMsg)
       }
-    ],
-    selectedAmount: 'amount_100',
-    customAmount: '', // 自定义金额
-    useCustomAmount: false // 是否使用自定义金额
-  },
+    }).catch((error: any) => {
+      wx.hideLoading()
+      console.error('加载会员配置失败 - 详细错误:', error)
+      console.error('错误类型:', typeof error)
+      console.error('错误信息:', error.message || error.errMsg || JSON.stringify(error))
 
-  /**
-   * 选择充值金额
-   */
-  onSelectAmount(e: any) {
-    const { amountId } = e.currentTarget.dataset
-    this.setData({
-      selectedAmount: amountId,
-      useCustomAmount: false,
-      customAmount: ''
+      const errorDetail = error.errMsg || error.message || JSON.stringify(error)
+
+      wx.showModal({
+        title: '加载失败',
+        content: `无法加载会员配置\n错误：${errorDetail}\n\n请确保：\n1. 云函数已部署\n2. 数据库已初始化\n3. 网络连接正常`,
+        confirmText: '重试',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            that.loadMembershipConfig()
+          }
+        }
+      })
     })
   },
 
   /**
-   * 输入自定义金额
+   * 选择会员类型
    */
-  onCustomAmountInput(e: any) {
-    const value = e.detail.value
+  onSelectMembershipType(e: any) {
+    const { type } = e.currentTarget.dataset
     this.setData({
-      customAmount: value,
-      useCustomAmount: value.length > 0,
-      selectedAmount: ''
+      selectedMembershipType: type
     })
+    this.updateDurationOptions()
   },
 
   /**
-   * 获取当前选择的金额
+   * 选择时长
    */
-  getCurrentAmount() {
-    if (this.data.useCustomAmount && this.data.customAmount) {
-      return parseFloat(this.data.customAmount)
+  onSelectDuration(e: any) {
+    const { duration } = e.currentTarget.dataset
+    this.setData({
+      selectedDuration: duration
+    })
+    this.updatePrice()
+  },
+
+  /**
+   * 更新时长选项（带价格）
+   */
+  updateDurationOptions() {
+    const selectedType = this.data.membershipTypes.find(
+      (item: MembershipConfig) => item.type === this.data.selectedMembershipType
+    )
+
+    if (selectedType) {
+      // 为每个时长选项添加对应的价格
+      const durationOptions: DurationOptionWithPrice[] = DURATION_OPTIONS.map(option => ({
+        ...option,
+        price: selectedType.prices[option.key]
+      }))
+
+      this.setData({
+        durationOptions
+      })
+
+      // 更新当前价格
+      this.updatePrice()
     }
+  },
 
-    const selectedItem = this.data.rechargeAmounts.find(item => item.id === this.data.selectedAmount)
-    return selectedItem ? selectedItem.amount : 0
+  /**
+   * 更新当前选中的价格
+   */
+  updatePrice() {
+    const selectedOption = this.data.durationOptions.find(
+      (item: DurationOptionWithPrice) => item.key === this.data.selectedDuration
+    )
+
+    if (selectedOption) {
+      this.setData({
+        currentPrice: selectedOption.price
+      })
+    }
   },
 
   /**
    * 立即支付
    */
   onPay() {
-    const amount = this.getCurrentAmount()
+    const membershipType = this.data.selectedMembershipType
+    const duration = this.data.selectedDuration
+    const price = this.data.currentPrice
 
-    if (!amount || amount <= 0) {
-      wx.showToast({
-        title: '请选择充值金额',
-        icon: 'error'
-      })
-      return
-    }
+    const membershipConfig = this.data.membershipTypes.find(
+      (item: MembershipConfig) => item.type === membershipType
+    )
+    const durationOption = DURATION_OPTIONS.find(d => d.key === duration)
 
-    if (amount < 1) {
+    if (!membershipConfig) {
       wx.showToast({
-        title: '充值金额不能少于1元',
-        icon: 'error'
-      })
-      return
-    }
-
-    if (amount > 10000) {
-      wx.showToast({
-        title: '单次充值不能超过10000元',
+        title: '请选择会员类型',
         icon: 'error'
       })
       return
     }
 
     wx.showModal({
-      title: '确认充值',
-      content: `确认充值 ¥${amount.toFixed(2)} 到账户余额？`,
+      title: '确认开通',
+      content: `确认开通 ${membershipConfig.name} ${durationOption?.label}？\n支付金额：¥${price}`,
       success: (res) => {
         if (res.confirm) {
-          this.processPayment(amount)
+          this.processPayment(membershipType, duration, price)
         }
       }
     })
@@ -117,56 +213,80 @@ Page({
   /**
    * 处理支付
    */
-  async processPayment(amount: number) {
-    try {
-      wx.showLoading({
-        title: '处理中...'
-      })
+  processPayment(membershipType: MembershipType, duration: string, price: number) {
+    const that = this
 
-      // 调用云函数创建充值订单
-      const result = await wx.cloud.callFunction({
-        name: 'createRechargeOrder',
-        data: {
-          amount: amount,
-          paymentMethod: 'wechat_pay'
-        }
-      })
+    wx.showLoading({
+      title: '处理中...'
+    })
 
+    // 调用云函数购买会员
+    wx.cloud.callFunction({
+      name: 'purchaseMembership',
+      data: {
+        membershipType,
+        duration,
+        price
+      }
+    }).then((result: any) => {
       wx.hideLoading()
 
       const response = result.result as any
 
       if (response.success) {
-        // 充值成功
-        wx.showModal({
-          title: '充值成功',
-          content: `充值 ¥${amount} 已到账\n当前余额：¥${response.data.newBalance.toFixed(2)}`,
-          showCancel: false,
-          confirmText: '确定',
-          success: () => {
-            // 返回到余额页面
-            wx.navigateBack()
-          }
+        const membershipConfig = that.data.membershipTypes.find(
+          (item: MembershipConfig) => item.type === membershipType
+        )
+        const durationOption = DURATION_OPTIONS.find(d => d.key === duration)
+
+        // 刷新用户信息
+        refreshUserInfo().then(() => {
+          console.log('用户信息已刷新')
+
+          // 开通成功
+          wx.showModal({
+            title: '开通成功',
+            content: `${membershipConfig?.name} ${durationOption?.label} 已开通成功！\n到期时间：${response.data.expiryDate}`,
+            showCancel: false,
+            confirmText: '确定',
+            success: () => {
+              // 返回到个人中心
+              wx.navigateBack()
+            }
+          })
+        }).catch((error) => {
+          console.error('刷新用户信息失败:', error)
+
+          // 即使刷新失败也显示成功提示
+          wx.showModal({
+            title: '开通成功',
+            content: `${membershipConfig?.name} ${durationOption?.label} 已开通成功！\n到期时间：${response.data.expiryDate}`,
+            showCancel: false,
+            confirmText: '确定',
+            success: () => {
+              // 返回到个人中心
+              wx.navigateBack()
+            }
+          })
         })
       } else {
-        // 充值失败
+        // 开通失败
         wx.showModal({
-          title: '充值失败',
-          content: response.message || '充值过程中出现错误，请重试',
+          title: '开通失败',
+          content: response.message || '开通过程中出现错误，请重试',
           showCancel: false,
           confirmText: '确定'
         })
       }
-
-    } catch (error: any) {
+    }).catch((error: any) => {
       wx.hideLoading()
-      console.error('充值失败:', error)
+      console.error('开通失败:', error)
       wx.showModal({
-        title: '充值失败',
+        title: '开通失败',
         content: '网络错误，请检查网络连接后重试',
         showCancel: false,
         confirmText: '确定'
       })
-    }
+    })
   }
 })

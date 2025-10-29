@@ -1,6 +1,6 @@
 // liushui.ts - 流水宝页面
-import { fileApi, reportApi, mockApi } from '../../services/api'
-import { showLoading, hideLoading, showSuccess, showError, showToast, isSupportedFileType, formatFileSize, showProcessingFailedDialog } from '../../utils/util'
+import { fileApi, reportApi, mockApi } from '../../../services/api'
+import { showLoading, hideLoading, showSuccess, showError, showToast, isSupportedFileType, formatFileSize, showProcessingFailedDialog } from '../../../utils/util'
 
 Page({
   data: {

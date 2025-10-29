@@ -10,6 +10,15 @@
   padding: 24rpx;
 }
 
+/* 会员提示 */
+.membership-notice {
+  margin: 24rpx;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2rpx solid #fbbf24;
+  border-radius: 16rpx;
+  padding: 24rpx;
+}
+
 .notice-content {
   display: flex;
   align-items: center;

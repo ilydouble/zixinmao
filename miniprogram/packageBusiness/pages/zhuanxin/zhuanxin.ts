@@ -1,7 +1,7 @@
 // zhuanxin.ts - 专信宝页面
-import { needRealNameAuth } from '../../utils/auth'
-import { showSuccess, showError, showToast, showProcessingFailedDialog } from '../../utils/util'
-import { validateFile } from '../../utils/fileValidator'
+import { needRealNameAuth } from '../../../utils/auth'
+import { showSuccess, showError, showToast, showProcessingFailedDialog } from '../../../utils/util'
+import { validateFile } from '../../../utils/fileValidator'
 
 Page({
   data: {

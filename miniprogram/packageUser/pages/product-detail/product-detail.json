@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "产品详情"
+  "navigationBarTitleText": "产品详情",
+  "usingComponents": {
+    "t-button": "tdesign-miniprogram/button/button"
+  }
 }

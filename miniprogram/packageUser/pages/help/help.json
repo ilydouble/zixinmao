@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "帮助中心"
+  "navigationBarTitleText": "帮助中心",
+  "usingComponents": {
+    "t-button": "tdesign-miniprogram/button/button"
+  }
 }
