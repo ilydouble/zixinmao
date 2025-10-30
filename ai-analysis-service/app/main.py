@@ -236,61 +236,34 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
     request_id = f"sync_req_{int(time.time() * 1000)}"
 
     try:
-        # 验证请求参数 - 必须提供file_base64或markdown_content之一
+        # 验证输入
         if not request.file_base64 and not request.markdown_content:
-            raise HTTPException(
-                status_code=400,
-                detail="必须提供file_base64或markdown_content之一"
-            )
+            raise HTTPException(status_code=400, detail="必须提供file_base64或markdown_content之一")
 
-        # 如果使用file_base64方式
+        # 验证文件输入
         if request.file_base64:
-            # 验证文件大小
-            estimated_file_size = len(request.file_base64) * 3 // 4
-            if estimated_file_size > settings.file.max_file_size:
-                raise HTTPException(
-                    status_code=413,
-                    detail=f"文件大小超过限制 ({settings.file.max_file_size // (1024*1024)}MB)"
-                )
-
-            # 验证MIME类型
+            file_size = len(request.file_base64) * 3 // 4
+            if file_size > settings.file.max_file_size:
+                raise HTTPException(status_code=413, detail=f"文件大小超过限制 ({settings.file.max_file_size // (1024*1024)}MB)")
             if not request.mime_type:
-                raise HTTPException(
-                    status_code=400,
-                    detail="使用file_base64时必须提供mime_type"
-                )
-
+                raise HTTPException(status_code=400, detail="使用file_base64时必须提供mime_type")
             if request.mime_type not in settings.file.allowed_mime_types:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"不支持的文件类型: {request.mime_type}"
-                )
-
-            logger.info(f"开始同步分析文档 - 类型: {request.report_type} | "
-                       f"MIME: {request.mime_type} | "
-                       f"文件大小: {estimated_file_size // 1024}KB | "
-                       f"request_id: {request_id}")
+                raise HTTPException(status_code=400, detail=f"不支持的文件类型: {request.mime_type}")
+            logger.info(f"📝 开始分析 | 类型: {request.report_type} | MIME: {request.mime_type} | 大小: {file_size // 1024}KB | ID: {request_id}")
         else:
-            # 使用markdown_content方式
-            logger.info(f"开始同步分析文档(Markdown) - 类型: {request.report_type} | "
-                       f"Markdown长度: {len(request.markdown_content)} | "
-                       f"request_id: {request_id}")
+            logger.info(f"📝 开始分析(Markdown) | 类型: {request.report_type} | 长度: {len(request.markdown_content)} | ID: {request_id}")
 
-        # 记录请求开始日志
+        # 记录算法日志
         if settings.log.algorithm_enable:
-            task_data = {
+            await algorithm_logger.log_request_start(request_id, {
                 "file_base64": request.file_base64 if request.file_base64 else None,
-                "markdown_content": request.markdown_content[:500] if request.markdown_content else None,  # 只记录前500字符
+                "markdown_content": request.markdown_content[:500] if request.markdown_content else None,
                 "mime_type": request.mime_type,
                 "report_type": request.report_type.value,
-                "custom_prompt": request.custom_prompt,
-                "name": None,
-                "id_card": None,
-                "mobile_no": None
-            }
-            await algorithm_logger.log_request_start(request_id, task_data)
+                "custom_prompt": request.custom_prompt
+            })
 
-        # 直接调用AI分析服务
+        # AI分析
         start_time = time.time()
         result = await ai_service.analyze_document(
             file_base64=request.file_base64,
@@ -299,60 +272,43 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
             report_type=request.report_type.value,
             custom_prompt=request.custom_prompt,
             request_id=request_id,
-            file_name=request.file_name or "document.pdf"  # 传递文件名
+            file_name=request.file_name or "document.pdf"
         )
         processing_time = time.time() - start_time
 
-        # 记录请求完成日志
+        # 记录完成日志
         if settings.log.algorithm_enable:
             await algorithm_logger.log_request_complete(request_id, result, processing_time)
 
+        # 生成HTML报告
+        html_report = None
         if result['success']:
-            # 🔧 方式2：自动生成HTML报告
-            logger.info(f"开始生成HTML报告 | request_id: {request_id}")
-            html_start_time = time.time()
-
             try:
                 html_report = await html_report_service.generate_html_report(
                     analysis_result=result['analysis_result'],
-                    report_type=request.report_type.value,
-                    name=request.name,
-                    id_card=request.id_card
+                    report_type=request.report_type.value
                 )
-                html_generation_time = time.time() - html_start_time
-                logger.info(f"HTML报告生成成功 | 长度: {len(html_report):,} 字符 | 耗时: {html_generation_time:.2f}s | request_id: {request_id}")
-            except Exception as html_error:
-                logger.error(f"HTML报告生成失败: {str(html_error)} | request_id: {request_id}")
-                html_report = None  # HTML生成失败不影响主流程
+                logger.info(f"✅ HTML报告生成成功 | 长度: {len(html_report):,} | ID: {request_id}")
+            except Exception as e:
+                logger.error(f"❌ HTML报告生成失败: {str(e)} | ID: {request_id}")
 
-            return AnalysisResponse(
-                success=True,
-                request_id=request_id,
-                analysis_result=result['analysis_result'],
-                processing_time=result['processing_time'],
-                html_report=html_report
-            )
-        else:
-            return AnalysisResponse(
-                success=False,
-                request_id=request_id,
-                error_message=result['error_message'],
-                processing_time=result['processing_time']
-            )
+        # 返回响应
+        return AnalysisResponse(
+            success=result['success'],
+            request_id=request_id,
+            analysis_result=result.get('analysis_result'),
+            error_message=result.get('error_message'),
+            processing_time=processing_time,
+            html_report=html_report
+        )
 
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"同步分析文档时发生错误: {str(e)} | request_id: {request_id}")
-
-        # 记录错误日志
+        logger.error(f"❌ 分析失败: {str(e)} | ID: {request_id}")
         if settings.log.algorithm_enable:
             await algorithm_logger.log_error(request_id, "sync_analysis_error", str(e))
-
-        raise HTTPException(
-            status_code=500,
-            detail=f"服务器内部错误: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"服务器内部错误: {str(e)}")
 
 
 @app.get("/task/{task_id}", response_model=TaskStatusResponse)

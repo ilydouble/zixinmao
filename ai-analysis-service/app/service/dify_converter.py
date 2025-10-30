@@ -304,7 +304,7 @@ class DifyToVisualizationConverter:
 
         debt_items.append(
             DebtItem(
-                type = "统计",
+                type = "总计",
                 institutions = sum([debt.institutions for debt in debt_items]),
                 accounts = sum([debt.accounts for debt in debt_items]),
                 credit_limit = sum([debt.credit_limit for debt in debt_items]),

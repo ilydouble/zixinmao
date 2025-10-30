@@ -29,11 +29,11 @@ class DifyLoanDetail(BaseModel):
     business_type: str = Field(..., description="业务类型")
     start_end_date: str = Field(..., description="起止日期")
     status: str = Field(..., description="当前状态")
-    overdue_history: bool = Field(..., description="是否有逾期历史")
-    total_overdue_months: int = Field(..., description="总逾期月数")
-    over_90_days: bool = Field(..., description="是否有90天以上逾期")
-    is_consumer_loan: bool = Field(..., description="是否为消费贷款")
-    is_revolving_loan: bool = Field(..., description="是否为循环贷款")
+    overdue_history: Optional[bool] = Field(None, description="是否有逾期历史")
+    total_overdue_months: Optional[int] = Field(None, description="总逾期月数")
+    over_90_days: Optional[bool] = Field(None, description="是否有90天以上逾期")
+    is_consumer_loan: Optional[bool] = Field(None, description="是否为消费贷款")
+    is_revolving_loan: Optional[bool] = Field(None, description="是否为循环贷款")
 
 
 class DifyCreditCardDetail(BaseModel):
@@ -44,11 +44,11 @@ class DifyCreditCardDetail(BaseModel):
     used_limit: int = Field(..., description="已用额度(元)")
     large_installment_limit: Optional[int] = Field(None, description="大额专项分期额度(元)")
     large_installment_balance: Optional[int] = Field(None, description="大额专项分期余额(元)")
-    usage_rate: str = Field(..., description="使用率")
+    usage_rate: Optional[str] = Field(None, description="使用率")
     status: str = Field(..., description="当前状态")
-    overdue_history: bool = Field(..., description="是否有逾期历史")
-    total_overdue_months: int = Field(..., description="总逾期月数")
-    over_90_days: bool = Field(..., description="是否有90天以上逾期")
+    overdue_history: Optional[bool] = Field(None, description="是否有逾期历史")
+    total_overdue_months: Optional[int] = Field(None, description="总逾期月数")
+    over_90_days: Optional[bool] = Field(None, description="是否有90天以上逾期")
 
 
 class DifyQueryRecord(BaseModel):
