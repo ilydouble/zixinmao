@@ -199,10 +199,10 @@ class DifyToVisualizationConverter:
             pass
 
         return PersonalInfo(
-            name=basic_info.name,
+            name=basic_info.name or "未知",
             age=age,
-            marital_status=basic_info.marital_status,
-            id_card=basic_info.id_card
+            marital_status=basic_info.marital_status or "未知",
+            id_card=basic_info.id_card or "未知"
         )
 
     @staticmethod
@@ -214,26 +214,28 @@ class DifyToVisualizationConverter:
     ) -> StatCard:
         """转换统计概览"""
         # 计算总授信额度
-        total_credit = sum(loan.credit_limit for loan in loan_details)
-        total_credit += sum(card.credit_limit for card in credit_card_details)
+        total_credit = sum(loan.credit_limit or 0 for loan in loan_details)
+        total_credit += sum(card.credit_limit or 0 for card in credit_card_details)
 
         # 计算总负债金额
-        total_debt = sum(loan.balance for loan in loan_details)
-        total_debt += sum(card.used_limit for card in credit_card_details)
+        total_debt = sum(loan.balance or 0 for loan in loan_details)
+        total_debt += sum(card.used_limit or 0 for card in credit_card_details)
 
         # 计算总机构数（去重）
         institutions = set()
         for loan in loan_details:
-            institutions.add(loan.institution)
+            if loan.institution:
+                institutions.add(loan.institution)
         for card in credit_card_details:
-            institutions.add(card.institution)
+            if card.institution:
+                institutions.add(card.institution)
 
         # 计算贷款机构数
-        loan_institutions = set(loan.institution for loan in loan_details)
+        loan_institutions = set(loan.institution for loan in loan_details if loan.institution)
 
         # 计算历史逾期月份
-        overdue_months = sum(loan.total_overdue_months for loan in loan_details)
-        overdue_months += sum(card.total_overdue_months for card in credit_card_details)
+        overdue_months = sum(loan.total_overdue_months or 0 for loan in loan_details)
+        overdue_months += sum(card.total_overdue_months or 0 for card in credit_card_details)
 
         # 计算近3月查询次数
         from datetime import datetime, timedelta
@@ -244,9 +246,10 @@ class DifyToVisualizationConverter:
         for record in query_records:
             try:
                 # query_date现在是date类型，需要转换为datetime进行比较
-                query_datetime = datetime.combine(record.query_date, datetime.min.time())
-                if query_datetime >= three_months_ago:
-                    query_count_3m += 1
+                if record.query_date:
+                    query_datetime = datetime.combine(record.query_date, datetime.min.time())
+                    if query_datetime >= three_months_ago:
+                        query_count_3m += 1
             except:
                 pass
 
@@ -269,9 +272,9 @@ class DifyToVisualizationConverter:
 
         # 统计信用卡
         if credit_card_details:
-            card_institutions = set(card.institution for card in credit_card_details)
-            card_credit = sum(card.credit_limit for card in credit_card_details)
-            card_balance = sum(card.used_limit for card in credit_card_details)
+            card_institutions = set(card.institution for card in credit_card_details if card.institution)
+            card_credit = sum(card.credit_limit or 0 for card in credit_card_details)
+            card_balance = sum(card.used_limit or 0 for card in credit_card_details)
             card_usage_rate = f"{(card_balance / card_credit * 100):.1f}%" if card_credit > 0 else "0%"
 
             debt_items.append(
@@ -287,9 +290,9 @@ class DifyToVisualizationConverter:
 
         # 统计贷款
         if loan_details:
-            loan_institutions = set(loan.institution for loan in loan_details)
-            loan_credit = sum(loan.credit_limit for loan in loan_details)
-            loan_balance = sum(loan.balance for loan in loan_details)
+            loan_institutions = set(loan.institution for loan in loan_details if loan.institution)
+            loan_credit = sum(loan.credit_limit or 0 for loan in loan_details)
+            loan_balance = sum(loan.balance or 0 for loan in loan_details)
             loan_usage_rate = "-"
 
             debt_items.append(
@@ -306,10 +309,10 @@ class DifyToVisualizationConverter:
         debt_items.append(
             DebtItem(
                 type = "总计",
-                institutions = sum([debt.institutions for debt in debt_items]),
-                accounts = sum([debt.accounts for debt in debt_items]),
-                credit_limit = sum([debt.credit_limit for debt in debt_items]),
-                balance = sum([debt.balance for debt in debt_items]),
+                institutions = sum([debt.institutions or 0 for debt in debt_items]),
+                accounts = sum([debt.accounts or 0 for debt in debt_items]),
+                credit_limit = sum([debt.credit_limit or 0 for debt in debt_items]),
+                balance = sum([debt.balance or 0 for debt in debt_items]),
                 usage_rate = "-"
             )
         )
@@ -341,10 +344,12 @@ class DifyToVisualizationConverter:
 
         for loan in loan_details:
             # 判断是否为银行
-            is_bank = any(keyword in loan.institution for keyword in bank_keywords)
+            is_bank = any(keyword in (loan.institution or "") for keyword in bank_keywords)
 
             # 计算使用率
-            usage_rate = f"{(loan.balance / loan.credit_limit * 100):.1f}%" if loan.credit_limit > 0 else "0%"
+            credit_limit = loan.credit_limit or 0
+            balance = loan.balance or 0
+            usage_rate = f"{(balance / credit_limit * 100):.1f}%" if credit_limit > 0 else "0%"
 
             # 计算剩余期限
             remaining_period = "未知"
@@ -385,11 +390,11 @@ class DifyToVisualizationConverter:
                     pass
 
             loan_data = {
-                "institution": loan.institution,
-                "credit_limit": loan.credit_limit,
-                "balance": loan.balance,
-                "business_type": loan.business_type,
-                "period": loan.start_end_date,
+                "institution": loan.institution or "未知",
+                "credit_limit": credit_limit,
+                "balance": balance,
+                "business_type": loan.business_type or "未知",
+                "period": loan.start_end_date or "未知",
                 "remaining_period": remaining_period,
                 "usage_rate": usage_rate
             }
@@ -481,14 +486,14 @@ class DifyToVisualizationConverter:
             avg_period = "未知"
 
         # 计算最高和最小余额
-        balances = [loan.balance for loan in loan_details if loan.balance > 0]
+        balances = [loan.balance for loan in loan_details if loan.balance and loan.balance > 0]
         max_balance = max(balances) if balances else 0
         min_balance = min(balances) if balances else 0
 
         # 统计机构类型
         bank_keywords = ["银行"]
-        has_bank = any(any(kw in loan.institution for kw in bank_keywords) for loan in loan_details)
-        has_non_bank = any(not any(kw in loan.institution for kw in bank_keywords) for loan in loan_details)
+        has_bank = any(any(kw in (loan.institution or "") for kw in bank_keywords) for loan in loan_details)
+        has_non_bank = any(not any(kw in (loan.institution or "") for kw in bank_keywords) for loan in loan_details)
 
         if has_bank and has_non_bank:
             institution_types = "银行+非银机构"
@@ -517,17 +522,17 @@ class DifyToVisualizationConverter:
             if isinstance(card.overdue_history, bool):
                 overdue_history_str = "有" if card.overdue_history else "无"
             else:
-                overdue_history_str = str(card.overdue_history)
+                overdue_history_str = str(card.overdue_history) if card.overdue_history is not None else "未知"
 
             cards.append(
                 CreditCardDetail(
                     id=idx,
-                    institution=card.institution,
-                    credit_limit=card.credit_limit,
-                    used_amount=card.used_limit,
+                    institution=card.institution or "未知",
+                    credit_limit=card.credit_limit or 0,
+                    used_amount=card.used_limit or 0,
                     installment_balance=card.large_installment_balance or 0,
-                    usage_rate=card.usage_rate,
-                    status=card.status,
+                    usage_rate=card.usage_rate or "0%",
+                    status=card.status or "未知",
                     overdue_history=overdue_history_str
                 )
             )
@@ -551,8 +556,8 @@ class DifyToVisualizationConverter:
             )
 
         # 计算总额度和已用额度
-        total_credit = sum(card.credit_limit for card in credit_card_details)
-        used_credit = sum(card.used_limit for card in credit_card_details)
+        total_credit = sum(card.credit_limit or 0 for card in credit_card_details)
+        used_credit = sum(card.used_limit or 0 for card in credit_card_details)
         available_credit = total_credit - used_credit
 
         # 计算使用率
@@ -595,16 +600,16 @@ class DifyToVisualizationConverter:
 
         # 处理贷款逾期
         for loan in loan_details:
-            if loan.overdue_history and loan.total_overdue_months > 0:
-                inst_name = loan.institution
+            if loan.overdue_history and loan.total_overdue_months and loan.total_overdue_months > 0:
+                inst_name = loan.institution or "未知机构"
                 if inst_name not in overdue_institutions:
                     overdue_institutions[inst_name] = {
                         "机构名称": inst_name,
                         "总逾期月数": 0,
                         "90天以上逾期月数": 0,
-                        "当前状态": loan.status
+                        "当前状态": loan.status or "未知"
                     }
-                overdue_institutions[inst_name]["总逾期月数"] += loan.total_overdue_months
+                overdue_institutions[inst_name]["总逾期月数"] += (loan.total_overdue_months or 0)
                 if loan.over_90_days:
                     overdue_institutions[inst_name]["90天以上逾期月数"] += 1
 
@@ -617,16 +622,16 @@ class DifyToVisualizationConverter:
             elif isinstance(card.overdue_history, str):
                 has_overdue = card.overdue_history.lower() == "true"
 
-            if has_overdue and card.total_overdue_months > 0:
-                inst_name = card.institution
+            if has_overdue and card.total_overdue_months and card.total_overdue_months > 0:
+                inst_name = card.institution or "未知机构"
                 if inst_name not in overdue_institutions:
                     overdue_institutions[inst_name] = {
                         "机构名称": inst_name,
                         "总逾期月数": 0,
                         "90天以上逾期月数": 0,
-                        "当前状态": card.status
+                        "当前状态": card.status or "未知"
                     }
-                overdue_institutions[inst_name]["总逾期月数"] += card.total_overdue_months
+                overdue_institutions[inst_name]["总逾期月数"] += (card.total_overdue_months or 0)
 
                 # 处理布尔类型的over_90_days
                 is_over_90 = False
@@ -706,18 +711,18 @@ class DifyToVisualizationConverter:
         result = []
         for period_name, period_start in periods.items():
             # 筛选该时间段内的查询记录（query_date是date类型，需要转换period_start为date）
-            query_records_time = [q for q in query_records if q.query_date >= period_start.date()]
+            query_records_time = [q for q in query_records if q.query_date and q.query_date >= period_start.date()]
 
             result.append(
                 QueryRecord(
                     period=period_name,
-                    loan_approval=len([q for q in query_records_time if "贷款审批" in q.reason]),
-                    credit_card_approval=len([q for q in query_records_time if "信用卡审批" in q.reason]),
-                    guarantee_review=len([q for q in query_records_time if "担保资格审查" in q.reason]),
-                    insurance_review=len([q for q in query_records_time if "保前审查" in q.reason]),
-                    credit_review=len([q for q in query_records_time if "资信审查" in q.reason]),
-                    non_post_loan=len([q for q in query_records_time if "本人查询" not in q.reason and "贷后管理" not in q.reason]),
-                    self_query=len([q for q in query_records_time if "本人查询" in q.reason]),
+                    loan_approval=len([q for q in query_records_time if q.reason and "贷款审批" in q.reason]),
+                    credit_card_approval=len([q for q in query_records_time if q.reason and "信用卡审批" in q.reason]),
+                    guarantee_review=len([q for q in query_records_time if q.reason and "担保资格审查" in q.reason]),
+                    insurance_review=len([q for q in query_records_time if q.reason and "保前审查" in q.reason]),
+                    credit_review=len([q for q in query_records_time if q.reason and "资信审查" in q.reason]),
+                    non_post_loan=len([q for q in query_records_time if q.reason and "本人查询" not in q.reason and "贷后管理" not in q.reason]),
+                    self_query=len([q for q in query_records_time if q.reason and "本人查询" in q.reason]),
                 )
             )
 
@@ -814,7 +819,7 @@ class DifyToVisualizationConverter:
             LoanChart(
                 institution=loan.institution,
                 credit_limit=loan.credit_limit,
-                balance=loan.balance
+                balance=loan.balance if loan.balance is not None else 0
             )
             for loan in loan_details
         ]

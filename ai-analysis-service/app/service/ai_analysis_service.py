@@ -127,8 +127,11 @@ class AIAnalysisService:
             "负债构成": [
                 {
                     "类型": item.type,
-                    "金额": item.amount,
-                    "占比": item.percentage
+                    "机构数": item.institutions,
+                    "账户数": item.accounts,
+                    "授信额度": item.credit_limit,
+                    "余额": item.balance,
+                    "使用率": item.usage_rate
                 }
                 for item in debt_composition
             ],
