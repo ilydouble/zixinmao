@@ -26,13 +26,13 @@ class AIAnalysisService:
         self.timeout = settings.ai.api_timeout
 
         # PDF转Markdown服务配置
-        self.pdf_to_markdown_url = "http://115.190.121.59:7860/api/process-base64"
-        self.pdf_to_markdown_timeout = 120  # 2分钟超时
+        self.pdf_to_markdown_url = settings.pdf.to_markdown_url
+        self.pdf_to_markdown_timeout = settings.pdf.to_markdown_timeout
 
         # Dify工作流服务配置
-        self.dify_workflow_url = "http://115.190.121.59:18080/v1/workflows/run"
-        self.dify_api_key = "Bearer app-jUMXA7eLhbiNGnsE14lhLUNt"
-        self.dify_timeout = 300  # 5分钟超时
+        self.dify_workflow_url = settings.dify.workflow_url
+        self.dify_api_key = settings.dify.workflow_api_key
+        self.dify_timeout = settings.dify.api_timeout
 
     async def convert_pdf_to_markdown(
         self,

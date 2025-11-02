@@ -35,13 +35,9 @@ Page({
     
     // 产品推荐
     productRecommendations: [] as any[],
-    matchStatus: '',
-    
-    // AI分析
-    aiAnalysis: [] as any[],
-    suitabilityRating: '',
-    optimizationSuggestions: [] as any[],
-    riskWarning: ''
+
+    // AI专家分析
+    aiExpertAnalysis: null as any
   },
 
   onLoad(options: any) {
@@ -99,11 +95,7 @@ Page({
           overdueAnalysis: analysisResult.overdue_analysis,
           queryRecords: analysisResult.query_records || [],
           productRecommendations: analysisResult.product_recommendations || [],
-          matchStatus: analysisResult.match_status || '',
-          aiAnalysis: analysisResult.ai_analysis || [],
-          suitabilityRating: analysisResult.suitability_rating || '',
-          optimizationSuggestions: analysisResult.optimization_suggestions || [],
-          riskWarning: analysisResult.risk_warning || ''
+          aiExpertAnalysis: analysisResult.ai_expert_analysis || null
         })
       } else {
         throw new Error((result.result as any)?.error || '加载报告失败')

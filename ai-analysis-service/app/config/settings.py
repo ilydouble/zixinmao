@@ -72,6 +72,26 @@ class DifyConfig(BaseSettings):
     api_base_url: str
     api_key: str
     api_timeout: int
+    workflow_url: str
+    workflow_api_key: str
+
+
+class OpenAIConfig(BaseSettings):
+    """OpenAI配置（用于GPT-4o模型）"""
+    model_config = SettingsConfigDict(env_file=BASE_DIR / ".env", env_prefix="OPENAI_")
+    base_url: str
+    api_key: str
+    model: str = "gpt-4o"
+    timeout: int = 100
+    temperature: float = 0.7
+
+
+class PDFConfig(BaseSettings):
+    """PDF转Markdown服务配置"""
+    model_config = SettingsConfigDict(env_file=BASE_DIR / ".env", env_prefix="PDF_")
+    to_markdown_url: str
+    to_markdown_timeout: int = 120
+
 
 class Settings:
     """统一的配置入口"""
@@ -83,6 +103,8 @@ class Settings:
     queue = QueueConfig()
     file = FileConfig()
     dify = DifyConfig()
+    openai = OpenAIConfig()
+    pdf = PDFConfig()
 
 try:
     settings = Settings()

@@ -17,9 +17,11 @@
   <view wx:else class="report-content">
     <!-- 头部 -->
     <view class="report-header">
-      <text class="report-title">个人征信分析报告</text>
-      <text class="report-subtitle">{{personalInfo.name}} | 报告编号: {{reportId}}</text>
+      <text class="report-title">{{personalInfo.name}}个人征信分析报告</text>
+      <text class="report-subtitle">报告时间: {{reportData.report_date}}</text>
+      <text class="report-subtitle">报告编号: {{reportData.report_number}}</text>
     </view>
+
 
     <!-- 个人信息卡片 -->
     <view class="section personal-section">
@@ -136,7 +138,7 @@
           <text class="summary-label">最小单笔</text>
           <text class="summary-value">{{loanSummary.min_balance}}元</text>
         </view>
-        <view class="summary-item full-width">
+        <view class="summary-item">
           <text class="summary-label">机构类型</text>
           <text class="summary-value">{{loanSummary.institution_types}}</text>
         </view>
@@ -358,73 +360,94 @@
     <!-- 产品推荐 -->
     <view class="section" wx:if="{{productRecommendations.length > 0}}">
       <view class="section-title">
-        <text class="title-icon">🎯</text>
+        <text class="title-icon">💳</text>
         <text class="title-text">产品推荐</text>
       </view>
 
-      <view class="match-status">
-        <text class="match-text">{{matchStatus}}</text>
-      </view>
-
       <view class="product-list">
-        <view wx:for="{{productRecommendations}}" wx:key="product_name" class="product-card">
-          <view class="product-header">
-            <text class="product-name">{{item.product_name}}</text>
-            <text class="product-match">匹配度: {{item.match_score}}</text>
-          </view>
-          <view class="product-info">
-            <view class="product-info-item">
-              <text class="product-label">额度范围</text>
-              <text class="product-value">{{item.credit_range}}</text>
-            </view>
-            <view class="product-info-item">
-              <text class="product-label">利率</text>
-              <text class="product-value">{{item.interest_rate}}</text>
-            </view>
-            <view class="product-info-item">
-              <text class="product-label">期限</text>
-              <text class="product-value">{{item.term}}</text>
+        <view wx:for="{{productRecommendations}}" wx:key="product_name" class="product-card-new">
+          <!-- 产品标题栏 -->
+          <view class="product-title-bar">
+            <view class="product-bank">{{item.bank}}</view>
+            <view class="product-rating-new">
+              <text wx:for="{{item.rating}}" wx:for-item="star" wx:key="*this" class="star-icon">⭐</text>
             </view>
           </view>
-          <view class="product-features">
-            <text class="feature-label">产品特点：</text>
-            <text class="feature-text">{{item.features}}</text>
+
+          <!-- 产品名称 -->
+          <view class="product-name-new">{{item.product_name}}</view>
+
+          <!-- 产品详情 -->
+          <view class="product-details">
+            <view class="detail-item">
+              <text class="detail-label">最高额度</text>
+              <text class="detail-value">{{item.max_credit}}</text>
+            </view>
+            <view class="detail-divider"></view>
+            <view class="detail-item">
+              <text class="detail-label">年利率</text>
+              <text class="detail-value">{{item.min_rate}}</text>
+            </view>
+          </view>
+
+          <!-- 推荐建议 -->
+          <view class="product-recommendation">
+            <text class="recommendation-label">💡 推荐理由</text>
+            <text class="recommendation-text">{{item.suggestion}}</text>
           </view>
         </view>
       </view>
     </view>
 
-    <!-- AI分析 -->
-    <view class="section ai-section">
+    <!-- AI专家分析 -->
+    <view class="section" wx:if="{{aiExpertAnalysis}}">
       <view class="section-title">
         <text class="title-icon">🤖</text>
-        <text class="title-text">AI智能分析</text>
+        <text class="title-text">AI专家分析</text>
       </view>
 
-      <view class="suitability-rating">
-        <text class="rating-label">适合贷款申请程度</text>
-        <text class="rating-value">{{suitabilityRating}}</text>
+      <!-- 适合度评级卡片 -->
+      <view class="ai-suitability-card">
+        <view class="ai-suitability-icon">🎯</view>
+        <text class="ai-suitability-label">贷款申请适合度</text>
+        <text class="ai-suitability-value">{{aiExpertAnalysis.suitability_rating}}</text>
       </view>
 
-      <view class="ai-points">
-        <text class="points-title">分析要点</text>
-        <view wx:for="{{aiAnalysis}}" wx:key="index" class="ai-point">
-          <text class="point-category">{{item.category}}</text>
-          <text class="point-content">{{item.content}}</text>
+      <!-- 总结性分析 -->
+      <view class="ai-subsection">
+        <view class="ai-subsection-header">
+          <text class="ai-subsection-icon">📊</text>
+          <text class="ai-subsection-title">总结性分析</text>
+        </view>
+        <view class="ai-analysis-list">
+          <view wx:for="{{aiExpertAnalysis.analysis_points}}" wx:key="number" class="ai-analysis-item">
+            <view class="ai-point-number">{{item.number}}</view>
+            <text class="ai-point-content">{{item.content}}</text>
+          </view>
         </view>
       </view>
 
-      <view class="optimization-suggestions" wx:if="{{optimizationSuggestions.length > 0}}">
-        <text class="suggestions-title">优化建议</text>
-        <view wx:for="{{optimizationSuggestions}}" wx:key="index" class="suggestion-item">
-          <text class="suggestion-icon">💡</text>
-          <text class="suggestion-text">{{item}}</text>
+      <!-- 优化建议 -->
+      <view class="ai-subsection">
+        <view class="ai-subsection-header">
+          <text class="ai-subsection-icon">💡</text>
+          <text class="ai-subsection-title">优化建议</text>
+        </view>
+        <view class="ai-suggestions-list">
+          <view wx:for="{{aiExpertAnalysis.optimization_suggestions}}" wx:key="index" class="ai-suggestion-item">
+            <text class="ai-suggestion-bullet">•</text>
+            <text class="ai-suggestion-text">{{item}}</text>
+          </view>
         </view>
       </view>
 
-      <view class="risk-warning" wx:if="{{riskWarning}}">
-        <text class="warning-icon">⚠️</text>
-        <text class="warning-text">{{riskWarning}}</text>
+      <!-- 风险提示 -->
+      <view class="ai-risk-card">
+        <view class="ai-risk-header">
+          <text class="ai-risk-icon">⚠️</text>
+          <text class="ai-risk-title">风险提示</text>
+        </view>
+        <text class="ai-risk-text">{{aiExpertAnalysis.risk_warning}}</text>
       </view>
     </view>
 

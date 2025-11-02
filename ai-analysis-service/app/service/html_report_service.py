@@ -19,7 +19,6 @@ import json
 import subprocess
 from typing import Any, Dict, Optional
 from loguru import logger
-from datetime import datetime
 from app.models.visualization_model import VisualizationReportData
 
 
@@ -67,12 +66,11 @@ class HTMLReportService:
             # 1. 数据验证和转换
             data = self._validate_and_convert_data(analysis_result)
 
-            # 2. 生成报告元数据
-            report_date, report_number = self._generate_report_metadata()
-            logger.debug(f"报告元数据 - 日期: {report_date}, 编号: {report_number}")
+            # 2. 直接使用数据中的报告元数据（后端必然返回）
+            logger.debug(f"使用报告元数据 - 日期: {data.report_date}, 编号: {data.report_number}")
 
             # 3. 生成HTML
-            html_content = self._build_html(data, report_date, report_number)
+            html_content = self._build_html(data)
 
             logger.info(f"✅ HTML报告生成成功, 长度: {len(html_content):,} 字符")
             return html_content
@@ -118,31 +116,15 @@ class HTMLReportService:
         # 不支持的数据类型
         raise ValueError(f"不支持的数据类型: {type(analysis_result)}, 需要Dict或VisualizationReportData对象")
 
-    def _generate_report_metadata(self) -> tuple[str, str]:
-        """
-        生成报告元数据（日期和编号）
-
-        Returns:
-            (报告日期, 报告编号) 元组
-        """
-        now = datetime.now()
-        report_date = now.strftime("%Y-%m-%d")
-        report_number = now.strftime("%Y%m%d%H%M%S")
-        return report_date, report_number
-
     def _build_html(
         self,
-        data: VisualizationReportData,
-        report_date: str,
-        report_number: str
+        data: VisualizationReportData
     ) -> str:
         """
         构建HTML报告
 
         Args:
-            data: 可视化报告数据对象
-            report_date: 报告日期
-            report_number: 报告编号
+            data: 可视化报告数据对象（包含report_date和report_number）
 
         Returns:
             完整的HTML字符串
@@ -151,13 +133,13 @@ class HTMLReportService:
             RuntimeError: 如果生成失败
         """
         try:
-            logger.debug(f"开始构建HTML，报告日期: {report_date}, 报告编号: {report_number}")
+            logger.debug(f"开始构建HTML，报告日期: {data.report_date}, 报告编号: {data.report_number}")
 
             # 将Pydantic模型转换为字典
             data_dict = data.model_dump()
 
             # 创建JavaScript执行代码
-            js_code = self._create_js_execution_code(data_dict, report_date, report_number)
+            js_code = self._create_js_execution_code(data_dict)
 
             # 使用Node.js执行JavaScript生成HTML
             html_content = self._execute_js_code(js_code)
@@ -171,19 +153,15 @@ class HTMLReportService:
 
     def _create_js_execution_code(
         self,
-        data_dict: Dict[str, Any],
-        report_date: str,
-        report_number: str
+        data_dict: Dict[str, Any]
     ) -> str:
         """
         创建JavaScript执行代码
 
-        将模板代码、数据和参数组合成可执行的JavaScript代码
+        将模板代码和数据组合成可执行的JavaScript代码
 
         Args:
-            data_dict: 报告数据字典
-            report_date: 报告日期
-            report_number: 报告编号
+            data_dict: 报告数据字典（包含report_date和report_number）
 
         Returns:
             完整的JavaScript代码字符串
@@ -212,11 +190,11 @@ class HTMLReportService:
         js_code = f"""
 {template_code}
 
-// 报告数据
+// 报告数据（包含report_date和report_number）
 const reportData = {data_json};
 
 // 生成HTML报告
-const html = generateVisualizationReport(reportData, '{report_date}', '{report_number}');
+const html = generateVisualizationReport(reportData);
 
 // 输出HTML到标准输出
 console.log(html);

@@ -24,11 +24,14 @@ from app.models.visualization_model import (
     QueryRecord,
     ProductRecommendation,
     AIAnalysisPoint,
+    AIExpertAnalysis,
     CreditUsageAnalysis,
     OverdueAnalysis,
     LoanSummary,
     LoanChart
 )
+from app.service.product_recommendation_service import ProductRecommendationService
+from app.service.ai_analysis_service import AIAnalysisService
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +105,8 @@ class DifyToVisualizationConverter:
 
             # 4. 转换贷款明细
             bank_loans, non_bank_loans = DifyToVisualizationConverter._convert_loan_details(
-                dify_output.loan_details
+                dify_output.loan_details,
+                dify_output.basic_info.report_date
             )
 
             # 5. 转换贷款汇总
@@ -134,25 +138,30 @@ class DifyToVisualizationConverter:
 
             # 10. 生成产品推荐（基于分析结果）
             product_recommendations = DifyToVisualizationConverter._generate_product_recommendations(
-                stats, credit_usage, overdue_analysis
+                personal_info, stats, debt_composition, bank_loans, non_bank_loans,
+                loan_summary, credit_cards, credit_usage, overdue_analysis, query_records
             )
 
-            # 11. 生成AI分析
-            ai_analysis = DifyToVisualizationConverter._generate_ai_analysis(
-                stats, credit_usage, overdue_analysis
+            # 11. 生成AI专家分析
+            ai_expert_analysis = DifyToVisualizationConverter._generate_ai_analysis(
+                personal_info, stats, debt_composition, bank_loans, non_bank_loans,
+                loan_summary, credit_cards, credit_usage, overdue_analysis, query_records,
+                product_recommendations
             )
 
             # 12. 生成图表数据
             loan_charts = \
                 DifyToVisualizationConverter._generate_loan_chart_data(dify_output.loan_details)
 
-            # query_chart_labels, query_chart_loan_data, query_chart_card_data, query_chart_guarantee_data = \
-            #     DifyToVisualizationConverter._generate_query_chart_data(query_records)
-
+            # 生成报告编号和日期（统一格式）
+            now = datetime.now()
+            report_date = now.strftime("%Y-%m-%d")
+            report_number = now.strftime("%Y%m%d%H%M%S")
+            
             # 构建完整的可视化数据Pydantic对象
             visualization_report = VisualizationReportData(
-                report_number=dify_output.basic_info.report_number,
-                report_date=dify_output.basic_info.report_date,
+                report_number=report_number,
+                report_date=report_date,
                 personal_info=personal_info,
                 stats=stats,
                 debt_composition=debt_composition,
@@ -164,15 +173,7 @@ class DifyToVisualizationConverter:
                 overdue_analysis=overdue_analysis,
                 query_records=query_records,
                 product_recommendations=product_recommendations,
-                match_status="根据您的信用状况，为您推荐以下产品",
-                ai_analysis=ai_analysis,
-                suitability_rating="良好" if overdue_analysis.severity_level == "无逾期" else "一般",
-                optimization_suggestions=[
-                    "保持良好的还款记录",
-                    "合理控制信用卡使用率",
-                    "减少短期内的查询次数"
-                ],
-                risk_warning="请注意保护个人信用记录" if overdue_analysis.severity_level == "无逾期" else "存在逾期记录，请及时处理",
+                ai_expert_analysis=ai_expert_analysis,
                 loan_charts=loan_charts,
                 query_charts=query_records
             )
@@ -317,11 +318,19 @@ class DifyToVisualizationConverter:
 
     @staticmethod
     def _convert_loan_details(
-        loan_details: List[DifyLoanDetail]
+        loan_details: List[DifyLoanDetail],
+        report_date_str: str
     ) -> tuple[List[LoanDetail], List[LoanDetail]]:
         """转换贷款明细，分为银行贷款和非银机构贷款"""
         bank_loans = []
         non_bank_loans = []
+
+        # 解析报告日期
+        try:
+            report_date = parse_report_date(report_date_str)
+        except Exception as e:
+            logger.warning(f"解析报告日期失败: {report_date_str}, 错误: {str(e)}")
+            report_date = None
 
         # 银行关键词
         bank_keywords = ["银行"]
@@ -337,8 +346,43 @@ class DifyToVisualizationConverter:
             # 计算使用率
             usage_rate = f"{(loan.balance / loan.credit_limit * 100):.1f}%" if loan.credit_limit > 0 else "0%"
 
-            # 计算剩余期限（简化处理）
+            # 计算剩余期限
             remaining_period = "未知"
+            if loan.start_end_date and report_date:
+                try:
+                    # 解析日期格式 "2022.02.26-2024.02.26"
+                    date_parts = loan.start_end_date.split('-')
+                    if len(date_parts) == 2:
+                        end_date_str = date_parts[1].strip()
+
+                        # 解析结束日期
+                        end_date = datetime.strptime(end_date_str, "%Y.%m.%d")
+
+                        # 计算剩余期限
+                        remaining_days = (end_date - report_date).days
+
+                        if remaining_days < 0:
+                            remaining_period = "已到期"
+                        elif remaining_days == 0:
+                            remaining_period = "今日到期"
+                        else:
+                            # 转换为年和月
+                            remaining_years = remaining_days // 365
+                            remaining_months = (remaining_days % 365) // 30
+
+                            if remaining_years > 0:
+                                if remaining_months > 0:
+                                    remaining_period = f"{remaining_years}年{remaining_months}个月"
+                                else:
+                                    remaining_period = f"{remaining_years}年"
+                            elif remaining_months > 0:
+                                remaining_period = f"{remaining_months}个月"
+                            else:
+                                remaining_period = f"{remaining_days}天"
+                except Exception as e:
+                    # 如果解析失败，保持为"未知"
+                    logger.debug(f"解析贷款剩余期限失败: {loan.start_end_date}, 错误: {str(e)}")
+                    pass
 
             loan_data = {
                 "institution": loan.institution,
@@ -398,8 +442,43 @@ class DifyToVisualizationConverter:
                 institution_types="无"
             )
 
-        # 计算平均期限（简化处理，假设为1年）
-        avg_period = "1年"
+        # 计算平均期限
+        valid_periods = []
+        for loan in loan_details:
+            if loan.start_end_date:
+                try:
+                    # 解析日期格式 "2022.02.26-2024.02.26"
+                    date_parts = loan.start_end_date.split('-')
+                    if len(date_parts) == 2:
+                        start_date_str = date_parts[0].strip()
+                        end_date_str = date_parts[1].strip()
+
+                        # 解析开始和结束日期
+                        start_date = datetime.strptime(start_date_str, "%Y.%m.%d")
+                        end_date = datetime.strptime(end_date_str, "%Y.%m.%d")
+
+                        # 计算期限（年）
+                        period_days = (end_date - start_date).days
+                        period_years = period_days / 365.25  # 考虑闰年
+
+                        if period_years > 0:  # 只添加有效的期限
+                            valid_periods.append(period_years)
+                except Exception as e:
+                    # 如果解析失败，跳过该记录
+                    logger.debug(f"解析贷款期限失败: {loan.start_end_date}, 错误: {str(e)}")
+                    continue
+
+        # 计算平均期限
+        if valid_periods:
+            avg_period_years = sum(valid_periods) / len(valid_periods)
+            # 格式化输出
+            if avg_period_years >= 1:
+                avg_period = f"{avg_period_years:.1f}年"
+            else:
+                avg_period_months = avg_period_years * 12
+                avg_period = f"{avg_period_months:.1f}个月"
+        else:
+            avg_period = "未知"
 
         # 计算最高和最小余额
         balances = [loan.balance for loan in loan_details if loan.balance > 0]
@@ -646,126 +725,85 @@ class DifyToVisualizationConverter:
 
     @staticmethod
     def _generate_product_recommendations(
+        personal_info: PersonalInfo,
         stats: StatCard,
+        debt_composition: List[DebtItem],
+        bank_loans: List[LoanDetail],
+        non_bank_loans: List[LoanDetail],
+        loan_summary: LoanSummary,
+        credit_cards: List[CreditCardDetail],
         credit_usage: CreditUsageAnalysis,
-        overdue_analysis: OverdueAnalysis
+        overdue_analysis: OverdueAnalysis,
+        query_records: List[QueryRecord]
     ) -> List[ProductRecommendation]:
-        """生成产品推荐"""
-        recommendations = []
+        """
+        生成产品推荐
+        使用大模型根据用户信用状况推荐合适的金融产品
+        """
+        try:
+            # 创建产品推荐服务实例
+            recommendation_service = ProductRecommendationService()
 
-        # 根据信用状况推荐产品
-        has_overdue = overdue_analysis.severity_level != "无逾期"
-        usage_rate = credit_usage.usage_percentage
+            # 调用服务生成推荐
+            recommendations = recommendation_service.generate_recommendations(
+                personal_info=personal_info,
+                stats=stats,
+                debt_composition=debt_composition,
+                bank_loans=bank_loans,
+                non_bank_loans=non_bank_loans,
+                loan_summary=loan_summary,
+                credit_cards=credit_cards,
+                credit_usage=credit_usage,
+                overdue_analysis=overdue_analysis,
+                query_records=query_records
+            )
 
-        if not has_overdue and usage_rate < 50:
-            # 信用良好，推荐优质产品
-            recommendations.append(ProductRecommendation(
-                bank="工商银行",
-                product_name="融e借",
-                min_rate="3.85%",
-                max_credit="80",
-                rating=5,
-                suggestion="信用记录良好，强烈推荐申请"
-            ))
-            recommendations.append(ProductRecommendation(
-                bank="建设银行",
-                product_name="快贷",
-                min_rate="4.35%",
-                max_credit="50",
-                rating=4,
-                suggestion="适合您的信用状况"
-            ))
-        elif not has_overdue and usage_rate < 70:
-            # 信用一般，推荐中等产品
-            recommendations.append(ProductRecommendation(
-                bank="招商银行",
-                product_name="闪电贷",
-                min_rate="5.6%",
-                max_credit="30",
-                rating=3,
-                suggestion="建议降低信用卡使用率后申请"
-            ))
-        else:
-            # 信用较差，推荐门槛较低的产品
-            recommendations.append(ProductRecommendation(
-                bank="微众银行",
-                product_name="微粒贷",
-                min_rate="7.2%",
-                max_credit="20",
-                rating=2,
-                suggestion="建议先改善信用状况"
-            ))
+            return recommendations
 
-        return recommendations
+        except Exception as e:
+            logger.error(f"大模型调用失败，返回空推荐列表: {str(e)}")
+            # 如果大模型调用失败，返回默认推荐
+            return []
 
     @staticmethod
     def _generate_ai_analysis(
+        personal_info: PersonalInfo,
         stats: StatCard,
+        debt_composition: List[DebtItem],
+        bank_loans: List[LoanDetail],
+        non_bank_loans: List[LoanDetail],
+        loan_summary: LoanSummary,
+        credit_cards: List[CreditCardDetail],
         credit_usage: CreditUsageAnalysis,
-        overdue_analysis: OverdueAnalysis
-    ) -> List[AIAnalysisPoint]:
-        """生成AI分析要点"""
-        analysis_points = []
-        point_number = 1
-
-        # 1. 负债分析
-        total_debt = stats.total_debt
-        total_credit = stats.total_credit
-        debt_ratio = (total_debt / total_credit * 100) if total_credit > 0 else 0
-
-        analysis_points.append(AIAnalysisPoint(
-            number=point_number,
-            content=f"总负债金额为{total_debt:,}元，负债率{debt_ratio:.1f}%，"
-                   f"{'负债率较高，建议降低负债' if debt_ratio > 70 else '负债率合理'}"
-        ))
-        point_number += 1
-
-        # 2. 信用卡使用率分析
-        usage_rate = credit_usage.usage_percentage
-        risk_level = credit_usage.risk_level
-
-        analysis_points.append(AIAnalysisPoint(
-            number=point_number,
-            content=f"信用卡使用率为{usage_rate:.1f}%，风险等级：{risk_level}，"
-                   f"{'建议降低使用率至70%以下' if usage_rate > 70 else '使用率合理'}"
-        ))
-        point_number += 1
-
-        # 3. 逾期分析
-        severity = overdue_analysis.severity_level
-        overdue_90plus = overdue_analysis.overdue_90plus
-
-        if severity != "无逾期":
-            analysis_points.append(AIAnalysisPoint(
-                number=point_number,
-                content=f"存在逾期记录，严重程度：{severity}，"
-                       f"{'有90天以上逾期，严重影响信用' if overdue_90plus > 0 else '逾期较轻微'}"
-            ))
-            point_number += 1
-
-        # 4. 查询次数分析
-        query_count = stats.query_count_3m
-        analysis_points.append(AIAnalysisPoint(
-            number=point_number,
-            content=f"近3个月查询次数为{query_count}次，"
-                   f"{'查询次数过多，建议减少申请' if query_count > 6 else '查询次数正常'}"
-        ))
-        point_number += 1
-
-        # 5. 综合建议
-        if severity == "无逾期" and usage_rate < 50 and query_count < 6:
-            suggestion = "信用状况良好，适合申请贷款"
-        elif severity == "无逾期" and usage_rate < 70:
-            suggestion = "信用状况一般，建议优化后申请"
-        else:
-            suggestion = "信用状况需要改善，建议先优化信用记录"
-
-        analysis_points.append(AIAnalysisPoint(
-            number=point_number,
-            content=suggestion
-        ))
-
-        return analysis_points
+        overdue_analysis: OverdueAnalysis,
+        query_records: List[QueryRecord],
+        product_recommendations: List[ProductRecommendation]
+    ) -> AIExpertAnalysis:
+        """
+        生成AI专家综合分析
+        使用GPT-4o模型生成智能分析
+        """
+        try:
+            # 使用AI分析服务
+            analysis_service = AIAnalysisService()
+            return analysis_service.generate_analysis(
+                personal_info=personal_info,
+                stats=stats,
+                debt_composition=debt_composition,
+                bank_loans=bank_loans,
+                non_bank_loans=non_bank_loans,
+                loan_summary=loan_summary,
+                credit_cards=credit_cards,
+                credit_usage=credit_usage,
+                overdue_analysis=overdue_analysis,
+                query_records=query_records,
+                product_recommendations=product_recommendations
+            )
+        except Exception as e:
+            logger.error(f"AI分析生成失败，使用默认分析: {str(e)}")
+            # 如果AI服务失败，使用默认分析
+            analysis_service = AIAnalysisService()
+            return analysis_service._get_default_analysis(stats, credit_usage, overdue_analysis)
 
     @staticmethod
     def _generate_loan_chart_data(
@@ -781,39 +819,5 @@ class DifyToVisualizationConverter:
             for loan in loan_details
         ]
 
-    @staticmethod
-    def _generate_query_chart_data(
-        query_records: List[QueryRecord]
-    ) -> tuple:
-        """生成查询记录图表数据"""
-        # 按时间段统计查询次数
-        from datetime import datetime, timedelta
-        from collections import defaultdict
-
-        period_stats = defaultdict(lambda: {"loan": 0, "card": 0, "guarantee": 0})
-
-        for record in query_records:
-            try:
-                # query_date现在是date类型，直接使用
-                period = record.query_date.strftime("%Y-%m")
-
-                if "贷款" in record.reason:
-                    period_stats[period]["loan"] += 1
-                elif "信用卡" in record.reason:
-                    period_stats[period]["card"] += 1
-                elif "担保" in record.reason:
-                    period_stats[period]["guarantee"] += 1
-            except:
-                pass
-
-        # 排序并提取数据
-        sorted_periods = sorted(period_stats.keys())[-6:]  # 最近6个月
-
-        labels = sorted_periods
-        loan_data = [period_stats[p]["loan"] for p in sorted_periods]
-        card_data = [period_stats[p]["card"] for p in sorted_periods]
-        guarantee_data = [period_stats[p]["guarantee"] for p in sorted_periods]
-
-        return labels, loan_data, card_data, guarantee_data
 
 

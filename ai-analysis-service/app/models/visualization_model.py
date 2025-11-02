@@ -130,12 +130,20 @@ class AIAnalysisPoint(BaseModel):
     content: str = Field(..., description="分析内容")
 
 
+class AIExpertAnalysis(BaseModel):
+    """AI专家综合分析"""
+    analysis_points: List[AIAnalysisPoint] = Field(..., description="总结性分析（详细分析要点）")
+    suitability_rating: str = Field(..., description="贷款申请适合度(非常适合/适合/一般/不太适合/不适合)")
+    optimization_suggestions: List[str] = Field(..., description="优化建议列表")
+    risk_warning: str = Field(..., description="风险提示")
+
+
 class VisualizationReportData(BaseModel):
     """可视化报告完整数据"""
     # 报告基本信息
-    # report_number: str = Field(..., description="报告编号")
-    # report_date: str = Field(..., description="报告时间")
-    
+    report_number: str = Field(..., description="报告编号（格式：YYYYMMDDHHmmss）")
+    report_date: str = Field(..., description="报告时间（格式：YYYY-MM-DD）")
+
     # 个人信息
     personal_info: PersonalInfo = Field(..., description="个人信息")
     
@@ -163,13 +171,9 @@ class VisualizationReportData(BaseModel):
     
     # 产品推荐
     product_recommendations: List[ProductRecommendation] = Field(..., description="产品推荐列表")
-    match_status: str = Field(..., description="匹配状态描述")
-    
-    # AI分析
-    ai_analysis: List[AIAnalysisPoint] = Field(..., description="AI分析要点")
-    suitability_rating: str = Field(..., description="适合贷款申请程度")
-    optimization_suggestions: List[str] = Field(..., description="优化建议列表")
-    risk_warning: str = Field(..., description="风险提示")
+
+    # AI专家分析
+    ai_expert_analysis: AIExpertAnalysis = Field(..., description="AI专家综合分析")
 
     query_charts: List[QueryRecord] = Field(..., description="查询记录图表")
 

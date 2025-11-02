@@ -129,3 +129,6 @@ miniprogram-2/
 ## 许可证
 
 MIT License
+
+## augment开发提示词
+开发背景：这是一个微信小程序的代码，代码分为三部分，小程序端miniprogram、云函数cloudFunctions和后端ai-analysis-service。后端部署在http://115.190.121.59:8005上（已部署服务可能与实际后端代码不一致），云函数直接上传部署，在微信开发者工具中调试。代码环境为conda的zixinmao。

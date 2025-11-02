@@ -14,31 +14,13 @@ function formatNumber(num) {
 
 /**
  * 生成完整的HTML报告
- * @param {Object} data - VisualizationReportData对象
- * @param {string} reportDate - 报告日期
- * @param {string} reportNumber - 报告编号
+ * @param {Object} data - VisualizationReportData对象（必须包含report_date和report_number）
  * @returns {string} 完整的HTML字符串
  */
-function generateVisualizationReport(data, reportDate = null, reportNumber = null) {
-    // 如果没有提供报告日期和编号，自动生成
-    if (!reportDate) {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        reportDate = `${year}-${month}-${day}`;
-    }
-
-    if (!reportNumber) {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        const hours = String(today.getHours()).padStart(2, '0');
-        const minutes = String(today.getMinutes()).padStart(2, '0');
-        const seconds = String(today.getSeconds()).padStart(2, '0');
-        reportNumber = `${year}${month}${day}${hours}${minutes}${seconds}`;
-    }
+function generateVisualizationReport(data) {
+    // 直接使用数据中的报告日期和编号（后端必然返回）
+    const reportDate = data.report_date;
+    const reportNumber = data.report_number;
 
     return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -59,7 +41,7 @@ function generateVisualizationReport(data, reportDate = null, reportNumber = nul
         ${generateCreditCardAnalysis(data)}
         ${generateOverdueAnalysis(data.overdue_analysis)}
         ${generateQueryRecords(data.query_records, data.query_charts)}
-        ${generateProductRecommendations(data.product_recommendations, data.match_status)}
+        ${generateProductRecommendations(data.product_recommendations)}
         ${generateAIAnalysis(data)}
         ${generateFooter(reportDate)}
     </div>
@@ -613,6 +595,35 @@ function generateStyles() {
             border-left-color: rgba(155, 89, 182, 0.8);
         }
 
+        .ai-analysis-item:nth-child(5) {
+            border-left-color: rgba(231, 76, 60, 0.8);
+        }
+
+        .ai-analysis-item:nth-child(6) {
+            border-left-color: rgba(26, 188, 156, 0.8);
+        }
+
+        .ai-analysis-item:nth-child(7) {
+            border-left-color: rgba(230, 126, 34, 0.8);
+        }
+
+        .ai-analysis-item:nth-child(8) {
+            border-left-color: rgba(142, 68, 173, 0.8);
+        }
+
+        .ai-analysis-item:nth-child(9) {
+            border-left-color: rgba(41, 128, 185, 0.8);
+        }
+
+        .ai-analysis-item:nth-child(10) {
+            border-left-color: rgba(22, 160, 133, 0.8);
+        }
+
+        /* 超过10条时循环使用颜色 */
+        .ai-analysis-item:nth-child(n+11) {
+            border-left-color: rgba(52, 152, 219, 0.8);
+        }
+
         .ai-analysis-number {
             width: 24px;
             height: 24px;
@@ -640,6 +651,35 @@ function generateStyles() {
 
         .ai-analysis-item:nth-child(4) .ai-analysis-number {
             background-color: rgba(155, 89, 182, 0.8);
+        }
+
+        .ai-analysis-item:nth-child(5) .ai-analysis-number {
+            background-color: rgba(231, 76, 60, 0.8);
+        }
+
+        .ai-analysis-item:nth-child(6) .ai-analysis-number {
+            background-color: rgba(26, 188, 156, 0.8);
+        }
+
+        .ai-analysis-item:nth-child(7) .ai-analysis-number {
+            background-color: rgba(230, 126, 34, 0.8);
+        }
+
+        .ai-analysis-item:nth-child(8) .ai-analysis-number {
+            background-color: rgba(142, 68, 173, 0.8);
+        }
+
+        .ai-analysis-item:nth-child(9) .ai-analysis-number {
+            background-color: rgba(41, 128, 185, 0.8);
+        }
+
+        .ai-analysis-item:nth-child(10) .ai-analysis-number {
+            background-color: rgba(22, 160, 133, 0.8);
+        }
+
+        /* 超过10条时循环使用颜色 */
+        .ai-analysis-item:nth-child(n+11) .ai-analysis-number {
+            background-color: rgba(52, 152, 219, 0.8);
         }
 
         .recommendation {
@@ -1248,7 +1288,7 @@ function generateLoanAnalysis(data) {
             <div class="loan-status-summary">
                 <div class="loan-status-item">
                     <span>贷款平均期限</span>
-                    <span>${data.loan_summary.avg_period}年</span>
+                    <span>${data.loan_summary.avg_period}</span>
                 </div>
                 <div class="loan-status-item">
                     <span>最高单笔贷款余额</span>
@@ -1799,12 +1839,12 @@ function generateQueryRecords(queryRecords, queryCharts) {
 /**
  * 生成产品推荐部分
  */
-function generateProductRecommendations(products, matchStatus) {
+function generateProductRecommendations(products) {
     if (!products || products.length === 0) {
         return `<div class="charts-container">
             <div class="chart-card">
                 <div class="chart-title">
-                    <span>🎯</span>
+                    <span>💳</span>
                     信贷产品匹配结果
                 </div>
                 <div class="info-item">
@@ -1822,7 +1862,7 @@ function generateProductRecommendations(products, matchStatus) {
             <td class="highlight">${product.bank}</td>
             <td>${product.product_name}</td>
             <td>${product.min_rate}</td>
-            <td>${product.max_credit}万元</td>
+            <td>${product.max_credit}</td>
             <td>${stars}</td>
             <td>${product.suggestion}</td>
         </tr>
@@ -1833,11 +1873,8 @@ function generateProductRecommendations(products, matchStatus) {
     <div class="charts-container">
         <div class="chart-card">
             <div class="chart-title">
-                <span>🎯</span>
+                <span>💳</span>
                 推荐产品列表
-            </div>
-            <div class="info-item" style="margin-bottom: 15px;">
-                <div class="info-value good">${matchStatus}</div>
             </div>
 
             <div class="data-table">
@@ -1865,14 +1902,18 @@ function generateProductRecommendations(products, matchStatus) {
  * 生成AI分析部分
  */
 function generateAIAnalysis(data) {
-    const analysisItems = data.ai_analysis.map(item => `
+    const analysis = data.ai_expert_analysis;
+
+    // 详细分析要点
+    const analysisItems = analysis.analysis_points.map(item => `
         <div class="ai-analysis-item">
             <div class="ai-analysis-number">${item.number}</div>
             <div class="ai-analysis-text">${item.content}</div>
         </div>
     `).join('');
 
-    const suggestionItems = data.optimization_suggestions.map((suggestion, index) => `
+    // 优化建议
+    const suggestionItems = analysis.optimization_suggestions.map((suggestion, index) => `
         ${index + 1}. ${suggestion}<br>
     `).join('');
 
@@ -1883,16 +1924,35 @@ function generateAIAnalysis(data) {
                 <span>🤖</span>
                 AI智能分析
             </div>
-            <div class="ai-analysis-grid">
-                ${analysisItems}
+
+            <!-- 适合度评级 -->
+            <div style="text-align: center; padding: 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; margin-bottom: 25px;">
+                <div style="color: rgba(255,255,255,0.9); font-size: 16px; margin-bottom: 10px;">贷款申请适合度</div>
+                <div style="color: white; font-size: 42px; font-weight: bold; margin: 15px 0;">${analysis.suitability_rating}</div>
             </div>
 
-            <div class="recommendation" style="margin-top: 20px;">
-                <strong>适合贷款申请程度：${data.suitability_rating}</strong><br><br>
-                <strong>优化建议：</strong><br>
-                ${suggestionItems}
-                <br>
-                <strong>风险提示：</strong> ${data.risk_warning}
+            <!-- 详细分析 -->
+            <div style="margin-bottom: 25px;">
+                <div style="font-weight: bold; font-size: 18px; margin-bottom: 15px; color: #333;">📊 总结性分析</div>
+                <div class="ai-analysis-grid">
+                    ${analysisItems}
+                </div>
+            </div>
+
+            <!-- 优化建议 -->
+            <div style="margin-bottom: 25px;">
+                <div style="font-weight: bold; font-size: 18px; margin-bottom: 15px; color: #333;">🎯 优化建议</div>
+                <div style="padding: 15px; background-color: #f5f7fa; border-radius: 8px; line-height: 1.8;">
+                    ${suggestionItems}
+                </div>
+            </div>
+
+            <!-- 风险提示 -->
+            <div style="padding: 20px; background-color: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800;">
+                <div style="font-weight: bold; font-size: 18px; margin-bottom: 10px; color: #e65100;">⚠️ 风险提示</div>
+                <div style="color: #e65100; line-height: 1.6;">
+                    ${analysis.risk_warning}
+                </div>
             </div>
         </div>
     </div>`;
