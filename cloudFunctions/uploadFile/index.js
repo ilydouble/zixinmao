@@ -243,14 +243,68 @@ function getTagsByType(reportType) {
 }
 
 exports.main = async (event, context) => {
-  const { fileBuffer, fileName, reportType } = event
+  const { fileBuffer, fileId, cloudPath, fileName, fileSize, reportType } = event
   const { OPENID } = cloud.getWXContext()
 
   try {
     console.log(`用户 ${OPENID} 上传文件: ${fileName}, 类型: ${reportType}`)
 
+    // 兼容旧版本：如果传入了 fileBuffer，使用旧逻辑
+    if (fileBuffer) {
+      console.log('使用旧版本上传逻辑（fileBuffer）')
+
+      // 1. 文件验证
+      const validation = validateFile(fileName, fileBuffer.length, reportType)
+      if (!validation.valid) {
+        throw new Error(validation.message)
+      }
+
+      // 2. 创建报告记录
+      const reportId = await createReportRecord(OPENID, {
+        reportType,
+        fileName,
+        fileSize: fileBuffer.length,
+        status: 'pending'
+      })
+
+      // 3. 上传文件到云存储
+      const uploadCloudPath = `uploads/${reportType}/${OPENID}/${Date.now()}_${fileName}`
+      const uploadResult = await cloud.uploadFile({
+        cloudPath: uploadCloudPath,
+        fileContent: Buffer.from(fileBuffer)
+      })
+
+      // 4. 更新报告记录的文件信息
+      await db.collection('reports').doc(reportId).update({
+        data: {
+          'input.cloudPath': uploadCloudPath,
+          'input.fileId': uploadResult.fileID,
+          'processing.status': 'uploaded',
+          'processing.currentStage': 'FILE_UPLOADED',
+          'processing.progress': 20,
+          'metadata.updatedAt': new Date()
+        }
+      })
+
+      // 5. 触发异步分析
+      await triggerAsyncAnalysis(reportId, uploadResult.fileID, reportType)
+
+      // 6. 立即返回报告ID
+      return {
+        success: true,
+        reportId: reportId,
+        message: '文件上传成功，正在分析中...'
+      }
+    }
+
+    // 新版本：文件已上传到云存储，只需创建报告记录
+    console.log('使用新版本上传逻辑（fileId）')
+    console.log('fileId:', fileId)
+    console.log('cloudPath:', cloudPath)
+    console.log('fileSize:', fileSize)
+
     // 1. 文件验证
-    const validation = validateFile(fileName, fileBuffer.length, reportType)
+    const validation = validateFile(fileName, fileSize || 0, reportType)
     if (!validation.valid) {
       throw new Error(validation.message)
     }
@@ -259,22 +313,15 @@ exports.main = async (event, context) => {
     const reportId = await createReportRecord(OPENID, {
       reportType,
       fileName,
-      fileSize: fileBuffer.length,
+      fileSize: fileSize || 0,
       status: 'pending'
     })
 
-    // 3. 上传文件到云存储
-    const cloudPath = `uploads/${reportType}/${OPENID}/${Date.now()}_${fileName}`
-    const uploadResult = await cloud.uploadFile({
-      cloudPath: cloudPath,
-      fileContent: Buffer.from(fileBuffer)
-    })
-
-    // 4. 更新报告记录的文件信息
+    // 3. 更新报告记录的文件信息
     await db.collection('reports').doc(reportId).update({
       data: {
         'input.cloudPath': cloudPath,
-        'input.fileId': uploadResult.fileID,
+        'input.fileId': fileId,
         'processing.status': 'uploaded',
         'processing.currentStage': 'FILE_UPLOADED',
         'processing.progress': 20,
@@ -282,10 +329,10 @@ exports.main = async (event, context) => {
       }
     })
 
-    // 5. 触发异步分析
-    await triggerAsyncAnalysis(reportId, uploadResult.fileID, reportType)
+    // 4. 触发异步分析
+    await triggerAsyncAnalysis(reportId, fileId, reportType)
 
-    // 6. 立即返回报告ID
+    // 5. 立即返回报告ID
     return {
       success: true,
       reportId: reportId,

@@ -185,18 +185,31 @@ Page({
       this.setData({
         uploading: true,
         uploadProgress: 0,
-        reportStatus: '正在上传文件...'
+        reportStatus: '正在上传文件到云存储...'
       })
 
-      // 读取文件内容
-      const fileBuffer = await this.readFileAsBuffer(selectedFile.path)
+      // 1. 先上传文件到云存储
+      const cloudPath = `uploads/flow/${Date.now()}_${selectedFile.name}`
+      const uploadResult = await wx.cloud.uploadFile({
+        cloudPath: cloudPath,
+        filePath: selectedFile.path
+      })
 
-      // 调用云函数上传和分析
+      console.log('云存储上传成功:', uploadResult.fileID)
+
+      this.setData({
+        uploadProgress: 50,
+        reportStatus: '文件上传成功，正在创建分析任务...'
+      })
+
+      // 2. 调用云函数创建报告并开始分析
       const result = await wx.cloud.callFunction({
         name: 'uploadFile',
         data: {
-          fileBuffer: fileBuffer,
+          fileId: uploadResult.fileID,
+          cloudPath: cloudPath,
           fileName: selectedFile.name,
+          fileSize: selectedFile.size,
           reportType: 'flow'
         }
       })
@@ -222,7 +235,7 @@ Page({
         this.setData({ selectedFile: null })
 
       } else {
-        throw new Error(response?.error || '上传失败')
+        throw new Error(response?.error || '创建分析任务失败')
       }
 
     } catch (error) {
@@ -230,7 +243,9 @@ Page({
       showError((error as any)?.message || '处理失败')
       this.setData({
         uploading: false,
-        generating: false
+        generating: false,
+        uploadProgress: 0,
+        reportStatus: ''
       })
     }
   },
