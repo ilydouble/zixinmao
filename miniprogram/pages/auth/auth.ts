@@ -171,11 +171,8 @@ Page({
    */
   onViewAgreement(e: any) {
     const { type } = e.currentTarget.dataset
-    // 这里可以跳转到协议页面
-    wx.showModal({
-      title: type === 'user' ? '用户协议' : '隐私政策',
-      content: '这里是协议内容...',
-      showCancel: false
+    wx.navigateTo({
+      url: `/packageUser/pages/agreement/agreement?type=${type}`
     })
   }
 })

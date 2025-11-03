@@ -24,21 +24,33 @@
       </view>
     </view>
 
+    <!-- 隐私协议勾选 -->
+    <view class="agreement-section">
+      <checkbox-group bind:change="onAgreementChange">
+        <label class="agreement-label">
+          <checkbox value="agree" checked="{{agreedToPolicy}}" color="#0052D9" />
+          <text class="agreement-text">
+            我已阅读并同意
+            <text class="agreement-link" bind:tap="onViewUserAgreement">《用户协议》</text>
+            和
+            <text class="agreement-link" bind:tap="onViewPrivacyPolicy">《隐私政策》</text>
+          </text>
+        </label>
+      </checkbox-group>
+    </view>
+
     <!-- 登录按钮 -->
     <view class="login-actions">
-      <t-button 
-        theme="primary" 
-        size="large" 
+      <t-button
+        theme="primary"
+        size="large"
         block
         loading="{{loading}}"
+        disabled="{{!agreedToPolicy}}"
         bind:tap="onWechatLogin"
       >
         微信快速登录
       </t-button>
-      
-      <view class="login-tips">
-        登录即表示同意《用户协议》和《隐私政策》
-      </view>
     </view>
   </view>
 </view>

@@ -26,7 +26,12 @@ Page({
 
     // 历史报告
     reportList: [] as any[],
-    loading: false
+    loading: false,
+
+    // 滑动删除相关
+    touchStartX: 0,
+    touchStartY: 0,
+    swipeIndex: -1 // 当前滑动的报告索引
   },
 
   onLoad() {
@@ -751,6 +756,104 @@ Page({
   },
 
   /**
+   * 点击报告项（非删除按钮区域）
+   */
+  onReportItemTap(e: any) {
+    const { index } = e.currentTarget.dataset
+
+    // 如果当前有打开的删除按钮，先关闭它
+    if (this.data.swipeIndex !== -1) {
+      this.setData({
+        swipeIndex: -1
+      })
+      return
+    }
+  },
+
+  /**
+   * 触摸开始
+   */
+  onTouchStart(e: any) {
+    const { index } = e.currentTarget.dataset
+    const touch = e.touches[0]
+
+    // 如果点击的不是当前打开的项，先关闭其他项
+    if (this.data.swipeIndex !== -1 && this.data.swipeIndex !== index) {
+      this.setData({
+        swipeIndex: -1
+      })
+    }
+
+    this.setData({
+      touchStartX: touch.clientX,
+      touchStartY: touch.clientY
+    })
+  },
+
+  /**
+   * 触摸移动
+   */
+  onTouchMove(e: any) {
+    const { index } = e.currentTarget.dataset
+    const touch = e.touches[0]
+    const deltaX = touch.clientX - (this.data.touchStartX || 0)
+    const deltaY = touch.clientY - (this.data.touchStartY || 0)
+
+    // 判断是否为横向滑动（横向移动距离大于纵向移动距离）
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+      // 向左滑动超过20px，显示删除按钮
+      if (deltaX < -20) {
+        if (this.data.swipeIndex !== index) {
+          this.setData({
+            swipeIndex: index
+          })
+        }
+      }
+      // 向右滑动超过20px，隐藏删除按钮
+      else if (deltaX > 20 && this.data.swipeIndex === index) {
+        this.setData({
+          swipeIndex: -1
+        })
+      }
+    }
+  },
+
+  /**
+   * 触摸结束
+   */
+  onTouchEnd(e: any) {
+    const { index } = e.currentTarget.dataset
+    const touch = e.changedTouches[0]
+    const deltaX = touch.clientX - (this.data.touchStartX || 0)
+    const deltaY = touch.clientY - (this.data.touchStartY || 0)
+
+    // 判断是否为横向滑动
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      // 向左滑动超过40px，锁定删除按钮显示
+      if (deltaX < -40) {
+        this.setData({
+          swipeIndex: index
+        })
+      }
+      // 向右滑动超过40px，关闭删除按钮
+      else if (deltaX > 40) {
+        this.setData({
+          swipeIndex: -1
+        })
+      }
+      // 滑动距离不够，保持当前状态
+      // 如果当前已经打开删除按钮，保持打开状态
+      // 如果当前未打开，保持关闭状态
+    }
+
+    // 重置触摸起始位置
+    this.setData({
+      touchStartX: 0,
+      touchStartY: 0
+    })
+  },
+
+  /**
    * 删除报告
    */
   async onDeleteReport(e: any) {
@@ -787,6 +890,12 @@ Page({
 
       if (result.result && (result.result as any).success) {
         showSuccess('报告已删除')
+
+        // 重置滑动状态
+        this.setData({
+          swipeIndex: -1
+        })
+
         // 刷新报告列表
         this.loadReportList()
       } else {

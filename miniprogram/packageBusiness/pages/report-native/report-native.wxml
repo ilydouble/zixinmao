@@ -170,6 +170,17 @@
                 <text class="table-cell">{{item.remaining_period}}</text>
                 <text class="table-cell">{{item.usage_rate}}</text>
               </view>
+              <!-- 银行合计 -->
+              <view class="table-row table-total">
+                <text class="table-cell total-label">银行合计</text>
+                <text class="table-cell">-</text>
+                <text class="table-cell total-value">{{bankLoanTotal.creditLimit}}</text>
+                <text class="table-cell total-value">{{bankLoanTotal.balance}}</text>
+                <text class="table-cell">-</text>
+                <text class="table-cell">-</text>
+                <text class="table-cell">-</text>
+                <text class="table-cell total-value">{{bankLoanTotal.usageRate}}%</text>
+              </view>
             </view>
           </scroll-view>
         </view>
@@ -200,6 +211,28 @@
                 <text class="table-cell">{{item.period}}</text>
                 <text class="table-cell">{{item.remaining_period}}</text>
                 <text class="table-cell">{{item.usage_rate}}</text>
+              </view>
+              <!-- 非银机构合计 -->
+              <view class="table-row table-total">
+                <text class="table-cell total-label">非银机构合计</text>
+                <text class="table-cell">-</text>
+                <text class="table-cell total-value">{{nonBankLoanTotal.creditLimit}}</text>
+                <text class="table-cell total-value">{{nonBankLoanTotal.balance}}</text>
+                <text class="table-cell">-</text>
+                <text class="table-cell">-</text>
+                <text class="table-cell">-</text>
+                <text class="table-cell total-value">{{nonBankLoanTotal.usageRate}}%</text>
+              </view>
+              <!-- 总合计 -->
+              <view class="table-row table-grand-total">
+                <text class="table-cell grand-total-label">合计</text>
+                <text class="table-cell">-</text>
+                <text class="table-cell grand-total-value">{{grandLoanTotal.creditLimit}}</text>
+                <text class="table-cell grand-total-value">{{grandLoanTotal.balance}}</text>
+                <text class="table-cell">-</text>
+                <text class="table-cell">-</text>
+                <text class="table-cell">-</text>
+                <text class="table-cell grand-total-value">{{grandLoanTotal.usageRate}}%</text>
               </view>
             </view>
           </scroll-view>
@@ -274,6 +307,17 @@
                 <text class="table-cell">{{item.usage_rate}}</text>
                 <text class="table-cell">{{item.status}}</text>
                 <text class="table-cell">{{item.overdue_history}}</text>
+              </view>
+              <!-- 信用卡合计 -->
+              <view class="table-row table-grand-total">
+                <text class="table-cell grand-total-label">合计</text>
+                <text class="table-cell">-</text>
+                <text class="table-cell grand-total-value">{{creditCardTotal.creditLimit}}</text>
+                <text class="table-cell grand-total-value">{{creditCardTotal.usedAmount}}</text>
+                <text class="table-cell grand-total-value">{{creditCardTotal.installmentBalance}}</text>
+                <text class="table-cell grand-total-value">{{creditCardTotal.usageRate}}%</text>
+                <text class="table-cell">-</text>
+                <text class="table-cell">-</text>
               </view>
             </view>
           </scroll-view>

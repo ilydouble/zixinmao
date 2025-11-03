@@ -113,10 +113,14 @@
       <view
         wx:for="{{reportList}}"
         wx:key="id"
-        class="report-item-wrapper"
+        class="report-item-wrapper {{swipeIndex === index ? 'swiping' : ''}}"
+        data-index="{{index}}"
+        bindtouchstart="onTouchStart"
+        bindtouchmove="onTouchMove"
+        bindtouchend="onTouchEnd"
       >
+        <!-- 报告内容 -->
         <view class="report-item-container">
-          <!-- 报告内容 -->
           <view class="report-item {{item.status === 'failed' ? 'failed' : ''}} {{item.status === 'processing' ? 'processing' : ''}}">
             <!-- 失败状态的醒目标签 -->
             <view wx:if="{{item.status === 'failed'}}" class="failed-badge">
@@ -159,12 +163,12 @@
               </view>
             </view>
           </view>
+        </view>
 
-          <!-- 删除按钮 -->
-          <view class="delete-btn" data-report="{{item}}" catchtap="onDeleteReport">
-            <text class="delete-icon">🗑️</text>
-            <text class="delete-text">删除</text>
-          </view>
+        <!-- 删除按钮 -->
+        <view class="delete-btn" data-report="{{item}}" catchtap="onDeleteReport">
+          <text class="delete-icon">🗑️</text>
+          <text class="delete-text">删除</text>
         </view>
       </view>
     </view>

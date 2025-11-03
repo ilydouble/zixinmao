@@ -3,7 +3,8 @@ import { login, getUserProfile, isAuthenticated } from '../../utils/auth'
 
 Page({
   data: {
-    loading: false
+    loading: false,
+    agreedToPolicy: false  // 是否同意隐私政策
   },
 
   onLoad() {
@@ -16,10 +17,50 @@ Page({
   },
 
   /**
+   * 隐私协议勾选变化
+   */
+  onAgreementChange(e: any) {
+    const agreed = e.detail.value.length > 0
+    this.setData({
+      agreedToPolicy: agreed
+    })
+  },
+
+  /**
+   * 查看用户协议
+   */
+  onViewUserAgreement(e: any) {
+    e.stopPropagation()
+    wx.navigateTo({
+      url: '/packageUser/pages/agreement/agreement?type=user'
+    })
+  },
+
+  /**
+   * 查看隐私政策
+   */
+  onViewPrivacyPolicy(e: any) {
+    e.stopPropagation()
+    wx.navigateTo({
+      url: '/packageUser/pages/agreement/agreement?type=privacy'
+    })
+  },
+
+  /**
    * 微信登录
    */
   async onWechatLogin() {
     if (this.data.loading) return
+
+    // 检查是否同意隐私政策
+    if (!this.data.agreedToPolicy) {
+      wx.showToast({
+        title: '请先阅读并同意用户协议和隐私政策',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
 
     this.setData({ loading: true })
     wx.showLoading({

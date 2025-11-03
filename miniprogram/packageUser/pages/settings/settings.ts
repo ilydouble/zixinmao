@@ -279,9 +279,8 @@ Page({
    * 用户协议
    */
   onUserAgreement() {
-    wx.showToast({
-      title: '用户协议页面开发中',
-      icon: 'none'
+    wx.navigateTo({
+      url: '/packageUser/pages/agreement/agreement?type=user'
     })
   },
 
@@ -289,9 +288,8 @@ Page({
    * 隐私政策
    */
   onPrivacyPolicy() {
-    wx.showToast({
-      title: '隐私政策页面开发中',
-      icon: 'none'
+    wx.navigateTo({
+      url: '/packageUser/pages/agreement/agreement?type=privacy'
     })
   }
 })

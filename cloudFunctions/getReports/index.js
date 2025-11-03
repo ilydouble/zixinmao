@@ -318,11 +318,26 @@ async function downloadReport(reportId, userId, fileType = 'json') {
       fileList: [fileUrl]
     })
     
+    // 生成更友好的文件名
+    let baseFileName = report.input.originalFileName || '报告'
+    // 移除原文件的扩展名（如 .pdf）
+    baseFileName = baseFileName.replace(/\.(pdf|PDF)$/, '')
+
+    // 根据文件类型生成文件名
+    let finalFileName
+    if (fileType === 'html') {
+      finalFileName = `${baseFileName}_分析报告.html`
+    } else if (fileType === 'pdf') {
+      finalFileName = `${baseFileName}_分析报告.pdf`
+    } else {
+      finalFileName = `${baseFileName}_分析数据.${fileType}`
+    }
+
     return {
       success: true,
       data: {
         downloadUrl: downloadUrl.fileList[0].tempFileURL,
-        fileName: `${report.input.originalFileName}_analysis.${fileType}`,
+        fileName: finalFileName,
         fileSize: report.output.fileInfo[`${fileType}FileSize`] || 0
       }
     }

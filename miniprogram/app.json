@@ -28,7 +28,8 @@
         "pages/support/support",
         "pages/help/help",
         "pages/settings/settings",
-        "pages/product-detail/product-detail"
+        "pages/product-detail/product-detail",
+        "pages/agreement/agreement"
       ]
     }
   ],
