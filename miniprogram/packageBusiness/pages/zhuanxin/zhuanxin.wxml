@@ -30,7 +30,7 @@
     <view wx:if="{{!selectedFile}}" class="upload-area">
       <view class="upload-content" bind:tap="onChooseFile">
         <view class="upload-icon">☁️</view>
-        <view class="upload-text">点击选择详版征信报告文件</view>
+        <view class="upload-text">点击选择详版信用报告文件</view>
         <view class="upload-desc">支持 PDF 文档或图片截图，最大 10MB</view>
       </view>
       <t-button theme="primary" size="medium" style="margin-top: 20rpx;" bind:tap="onChooseFile">
@@ -133,13 +133,13 @@
               <view class="report-title">{{item.title}}</view>
               <view class="report-date">{{item.date}}</view>
               <view wx:if="{{item.status === 'processing'}}" class="report-status processing">
-                AI正在进行深度征信分析... {{item.progress}}%
+                AI正在进行深度信用分析... {{item.progress}}%
               </view>
               <view wx:elif="{{item.status === 'failed'}}" class="report-status failed">
                 文件损坏或分析出错 - 点击重新生成专业报告
               </view>
               <view wx:elif="{{item.status === 'completed'}}" class="report-status completed">
-                专业征信分析完成 - 点击查看详细报告
+                深度信用分析完成 - 点击查看详细报告
               </view>
             </view>
             <view class="report-tag">详版</view>

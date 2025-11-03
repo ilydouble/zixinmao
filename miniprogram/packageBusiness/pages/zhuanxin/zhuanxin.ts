@@ -104,7 +104,7 @@ Page({
         const file = res.tempFiles[0]
 
         // 使用统一的文件验证
-        const validation = validateFile(`详版征信报告截图.${file.tempFilePath.split('.').pop()}`, file.size, 'detail')
+        const validation = validateFile(`详版信用报告截图.${file.tempFilePath.split('.').pop()}`, file.size, 'detail')
         if (!validation.valid) {
           showError(validation.message!)
           return
@@ -112,7 +112,7 @@ Page({
 
         this.setData({
           selectedFile: {
-            name: `详版征信报告截图.${file.tempFilePath.split('.').pop()}`,
+            name: `详版信用报告截图.${file.tempFilePath.split('.').pop()}`,
             size: file.size,
             path: file.tempFilePath,
             type: 'image'
@@ -674,7 +674,7 @@ Page({
         // 转换数据格式以适配现有UI
         const reports = (result.result as any).data.reports.map((report: any) => ({
           id: report.reportId,
-          title: `详版征信分析报告 - ${report.fileName}`,
+          title: `深度信用分析报告 - ${report.fileName}`,
           date: new Date(report.createdAt).toLocaleDateString(),
           status: report.status,
           progress: report.progress,

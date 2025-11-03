@@ -142,13 +142,13 @@
               <view class="report-title">{{item.title}}</view>
               <view class="report-date">{{item.date}}</view>
               <view wx:if="{{item.status === 'processing'}}" class="report-status processing">
-                AI正在分析征信数据... {{item.progress}}%
+                AI正在分析信用数据... {{item.progress}}%
               </view>
               <view wx:elif="{{item.status === 'failed'}}" class="report-status failed">
                 文件损坏或分析出错 - 点击重新生成
               </view>
               <view wx:elif="{{item.status === 'completed'}}" class="report-status completed">
-                征信分析完成 - 点击查看详情
+                信用分析完成 - 点击查看详情
               </view>
             </view>
             <view class="report-actions">

@@ -57,7 +57,7 @@
       
       <view class="faq-item">
         <view class="faq-question">❓ 为什么需要实名认证？</view>
-        <view class="faq-answer">为了合规和保护用户权益，征信相关功能需要实名认证。</view>
+        <view class="faq-answer">为了合规和保护用户权益，信用报告分析功能需要实名认证。</view>
       </view>
       
       <view class="faq-item">
