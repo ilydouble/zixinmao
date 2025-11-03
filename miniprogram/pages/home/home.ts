@@ -1,5 +1,5 @@
 // home.ts - 首页
-import { getCurrentUser, isAuthenticated, needRealNameAuth } from '../../utils/auth'
+import { getCurrentUser, needRealNameAuth, isAuthenticated } from '../../utils/auth'
 // 引用 fileValidator 以消除"未使用"警告（实际在分包中使用）
 import '../../utils/fileValidator'
 
@@ -16,7 +16,7 @@ interface Banner {
 
 Page({
   data: {
-    userInfo: null,
+    userInfo: null as any,
     banners: [] as Banner[],
     currentBanner: 0,
     loading: true,
@@ -34,9 +34,9 @@ Page({
     // 先加载 Banner 配置（不依赖登录状态）
     this.loadBanners()
 
-    this.checkAuth()
+    // ✅ 修复审核问题：允许用户未登录时浏览首页
+    // 不再强制跳转到登录页，只加载用户信息（如果已登录）
     this.loadUserInfo()
-    this.checkDevMode()
 
     console.log('📱 页面 onLoad 结束')
   },
@@ -49,18 +49,6 @@ Page({
     if (this.data.banners.length === 0) {
       console.log('⚠️ banners 为空，重新加载')
       this.loadBanners()
-    }
-  },
-
-  /**
-   * 检查登录状态
-   */
-  checkAuth() {
-    // 如果未登录，跳转到登录页
-    if (!isAuthenticated()) {
-      wx.redirectTo({
-        url: '/pages/login/login'
-      })
     }
   },
 
@@ -166,6 +154,24 @@ Page({
     }
 
     if (link) {
+      // ✅ 修复审核问题：先检查登录状态
+      if (!isAuthenticated()) {
+        wx.showModal({
+          title: '需要登录',
+          content: '使用此功能需要先登录，是否前往登录？',
+          confirmText: '去登录',
+          cancelText: '稍后再说',
+          success: (res) => {
+            if (res.confirm) {
+              wx.navigateTo({
+                url: `/pages/login/login`
+              })
+            }
+          }
+        })
+        return
+      }
+
       // 检查是否需要实名认证（征信相关功能）
       if ((link.includes('jianxin') || link.includes('zhuanxin')) && needRealNameAuth()) {
         wx.navigateTo({
@@ -192,6 +198,24 @@ Page({
   navigateToPage(e: any) {
     const { url } = e.currentTarget.dataset
 
+    // ✅ 修复审核问题：先检查登录状态
+    if (!isAuthenticated()) {
+      wx.showModal({
+        title: '需要登录',
+        content: '使用此功能需要先登录，是否前往登录？',
+        confirmText: '去登录',
+        cancelText: '稍后再说',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: `/pages/login/login`
+            })
+          }
+        }
+      })
+      return
+    }
+
     // 检查是否需要实名认证
     if ((url.includes('jianxin') || url.includes('zhuanxin')) && needRealNameAuth()) {
       wx.navigateTo({
@@ -210,6 +234,15 @@ Page({
     const { product } = e.currentTarget.dataset
     wx.navigateTo({
       url: `/pages/product-detail/product-detail?product=${product}`
+    })
+  },
+
+  /**
+   * 去登录
+   */
+  goToLogin() {
+    wx.navigateTo({
+      url: '/pages/login/login'
     })
   }
 })

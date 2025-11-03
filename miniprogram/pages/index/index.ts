@@ -1,39 +1,28 @@
 // index.ts - 入口页面
-import { isAuthenticated } from '../../utils/auth'
-
 Page({
   data: {
     loading: true
   },
 
   onLoad() {
-    this.checkAuthAndRedirect()
+    this.redirectToHome()
   },
 
   /**
-   * 检查认证状态并跳转
+   * ✅ 修复审核问题：直接跳转到首页，允许用户未登录时浏览
    */
-  async checkAuthAndRedirect() {
+  async redirectToHome() {
     try {
-      // 检查本地登录状态
-      const isLoggedIn = isAuthenticated()
-
-      if (isLoggedIn) {
-        // 已登录，跳转到首页（使用 switchTab）
-        wx.switchTab({
-          url: '/pages/home/home'
-        })
-      } else {
-        // 未登录，跳转到登录页
-        wx.redirectTo({
-          url: '/pages/login/login'
-        })
-      }
+      // 直接跳转到首页，不检查登录状态
+      // 用户可以在首页浏览功能介绍，点击功能时再提示登录
+      wx.switchTab({
+        url: '/pages/home/home'
+      })
     } catch (error) {
-      console.error('检查登录状态失败:', error)
-      // 出错时跳转到登录页
-      wx.redirectTo({
-        url: '/pages/login/login'
+      console.error('跳转首页失败:', error)
+      // 出错时也跳转到首页
+      wx.switchTab({
+        url: '/pages/home/home'
       })
     }
   }

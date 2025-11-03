@@ -6,7 +6,7 @@
       <view class="notice-icon">🔐</view>
       <view class="notice-text">
         <view class="notice-title">需要实名认证</view>
-        <view class="notice-desc">使用征信分析功能需要先完成实名认证</view>
+        <view class="notice-desc">使用信用报告分析功能需要先完成实名认证</view>
       </view>
       <t-button theme="primary" size="small" bind:tap="goToAuth">
         去认证
@@ -30,8 +30,8 @@
 
   <!-- 功能介绍 -->
   <view class="feature-intro">
-    <view class="intro-title">📄 简信宝 · 简版征信分析</view>
-    <view class="intro-desc">快速解读征信报告核心信息，提供基础信用评估</view>
+    <view class="intro-title">📄 简信宝 · 信用报告解读</view>
+    <view class="intro-desc">快速解读个人信用报告核心信息，提供基础信用评估</view>
     <view class="intro-features">
       <view class="feature-tag">快速分析</view>
       <view class="feature-tag">核心信息</view>
@@ -44,7 +44,7 @@
     <view wx:if="{{!selectedFile}}" class="upload-area">
       <view class="upload-content" bind:tap="onChooseFile">
         <view class="upload-icon">☁️</view>
-        <view class="upload-text">点击选择征信报告文件</view>
+        <view class="upload-text">点击选择信用报告文件</view>
         <view class="upload-desc">支持 PDF 文档或图片截图，最大 10MB</view>
       </view>
       <t-button theme="primary" size="medium" style="margin-top: 20rpx;" bind:tap="onChooseFile">

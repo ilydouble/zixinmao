@@ -32,6 +32,21 @@
   font-weight: 700;
 }
 
+/* 登录按钮 */
+.login-btn {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 12rpx 32rpx;
+  border-radius: 32rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10rpx);
+}
+
+.login-text {
+  font-size: 28rpx;
+  color: #fff;
+  font-weight: 500;
+}
+
 /* Banner 轮播 */
 .banner-section {
   margin: 24rpx;

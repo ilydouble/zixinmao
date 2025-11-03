@@ -6,7 +6,7 @@
       <view class="notice-icon">🔐</view>
       <view class="notice-text">
         <view class="notice-title">需要实名认证</view>
-        <view class="notice-desc">使用专业征信分析功能需要先完成实名认证</view>
+        <view class="notice-desc">使用深度信用分析功能需要先完成实名认证</view>
       </view>
       <t-button theme="primary" size="small" bind:tap="goToAuth">
         去认证
@@ -16,8 +16,8 @@
 
   <!-- 功能介绍 -->
   <view class="feature-intro">
-    <view class="intro-title">📘 专信宝 · 专业版征信分析</view>
-    <view class="intro-desc">深度解析征信报告，提供专业级风险评估和建议</view>
+    <view class="intro-title">📘 专信宝 · 深度信用分析</view>
+    <view class="intro-desc">深度解析个人信用报告，提供专业级风险评估和建议</view>
     <view class="intro-features">
       <view class="feature-tag">深度分析</view>
       <view class="feature-tag">风险评估</view>
