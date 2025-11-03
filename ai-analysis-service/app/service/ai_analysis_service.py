@@ -120,9 +120,11 @@ class AIAnalysisService:
             },
             "信贷概况": {
                 "总授信额度": stats.total_credit,
-                "总负债": stats.total_debt,
-                "可用额度": stats.total_credit - stats.total_debt,
-                "近3个月查询次数": stats.query_count_3m
+                "总负债金额": stats.total_debt,
+                "总机构数": stats.total_institutions,
+                "贷款机构数": stats.loan_institutions,
+                "历史逾期月份": stats.overdue_months,
+                "近3月查询次数": stats.query_count_3m
             },
             "负债构成": [
                 {
@@ -136,50 +138,73 @@ class AIAnalysisService:
                 for item in debt_composition
             ],
             "贷款汇总": {
-                "贷款机构数": loan_summary.institution_count,
-                "贷款笔数": loan_summary.loan_count,
-                "贷款总额": loan_summary.total_amount,
-                "剩余待还": loan_summary.remaining_amount,
-                "平均贷款期限": loan_summary.avg_period
+                "平均贷款期限": loan_summary.avg_period,
+                "最高单笔贷款余额": loan_summary.max_balance,
+                "最小单笔贷款余额": loan_summary.min_balance,
+                "贷款机构类型": loan_summary.institution_types,
+                "银行贷款笔数": len(bank_loans),
+                "非银行贷款笔数": len(non_bank_loans)
             },
             "银行贷款": [
                 {
                     "机构": loan.institution,
-                    "账户状态": loan.account_status,
-                    "贷款金额": loan.loan_amount,
+                    "业务类型": loan.business_type,
+                    "授信额度": loan.credit_limit,
                     "余额": loan.balance,
-                    "剩余期限": loan.remaining_period
+                    "剩余期限": loan.remaining_period,
+                    "使用率": loan.usage_rate
                 }
                 for loan in bank_loans[:5]  # 只取前5条
             ],
             "非银行贷款": [
                 {
                     "机构": loan.institution,
-                    "账户状态": loan.account_status,
-                    "贷款金额": loan.loan_amount,
+                    "业务类型": loan.business_type,
+                    "授信额度": loan.credit_limit,
                     "余额": loan.balance,
-                    "剩余期限": loan.remaining_period
+                    "剩余期限": loan.remaining_period,
+                    "使用率": loan.usage_rate
                 }
                 for loan in non_bank_loans[:5]  # 只取前5条
             ],
             "信用卡情况": {
                 "信用卡数量": len(credit_cards),
-                "总授信额度": credit_usage.total_limit,
-                "已用额度": credit_usage.used_amount,
+                "总授信额度": credit_usage.total_credit,
+                "已用额度": credit_usage.used_credit,
                 "使用率": f"{credit_usage.usage_percentage:.1f}%",
                 "风险等级": credit_usage.risk_level
             },
+            "信用卡明细": [
+                {
+                    "机构": card.institution,
+                    "授信额度": card.credit_limit,
+                    "已用额度": card.used_amount,
+                    "使用率": card.usage_rate,
+                    "当前状态": card.status,
+                    "历史逾期": card.overdue_history
+                }
+                for card in credit_cards[:5]  # 只取前5条
+            ],
             "逾期分析": {
                 "严重程度": overdue_analysis.severity_level,
-                "逾期机构数": overdue_analysis.overdue_institutions,
-                "90天以上逾期": overdue_analysis.overdue_90plus,
-                "最高逾期金额": overdue_analysis.max_overdue_amount
+                "逾期机构数": len(overdue_analysis.institutions),
+                "90天以上逾期月数": overdue_analysis.overdue_90plus,
+                "30-90天逾期月数": overdue_analysis.overdue_30_90,
+                "30天以内逾期月数": overdue_analysis.overdue_under_30
             },
-            "查询记录": {
-                "近3个月贷款审批": sum(1 for q in query_records if "贷款审批" in q.query_reason),
-                "近3个月信用卡审批": sum(1 for q in query_records if "信用卡审批" in q.query_reason),
-                "近3个月担保审查": sum(1 for q in query_records if "担保" in q.query_reason)
-            }
+            "查询记录明细": [
+                {
+                    "时间段": q.period,
+                    "贷款审批": q.loan_approval,
+                    "信用卡审批": q.credit_card_approval,
+                    "担保资格审查": q.guarantee_review,
+                    "保前审查": q.insurance_review,
+                    "资信审查": q.credit_review,
+                    "非贷后管理查询": q.non_post_loan,
+                    "本人查询": q.self_query
+                }
+                for q in query_records
+            ]
         }
     
     def _build_prompt(self, user_summary: dict, product_recommendations: List[ProductRecommendation]) -> str:

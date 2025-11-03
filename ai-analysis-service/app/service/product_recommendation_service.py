@@ -128,6 +128,8 @@ class ProductRecommendationService:
         """构建用户信息摘要"""
         return {
             "个人信息": {
+                "姓名": personal_info.name,
+                "身份证号": personal_info.id_card,
                 "年龄": personal_info.age,
                 "婚姻状况": personal_info.marital_status
             },
@@ -150,30 +152,74 @@ class ProductRecommendationService:
                 }
                 for item in debt_composition
             ],
-            "贷款情况": {
-                "银行贷款数": len(bank_loans),
-                "非银贷款数": len(non_bank_loans),
-                "平均期限": loan_summary.avg_period,
-                "最高余额": loan_summary.max_balance,
-                "最低余额": loan_summary.min_balance,
-                "机构类型": loan_summary.institution_types
+            "贷款汇总": {
+                "平均贷款期限": loan_summary.avg_period,
+                "最高单笔贷款余额": loan_summary.max_balance,
+                "最小单笔贷款余额": loan_summary.min_balance,
+                "贷款机构类型": loan_summary.institution_types,
+                "银行贷款笔数": len(bank_loans),
+                "非银行贷款笔数": len(non_bank_loans)
             },
+            "银行贷款": [
+                {
+                    "机构": loan.institution,
+                    "业务类型": loan.business_type,
+                    "授信额度": loan.credit_limit,
+                    "余额": loan.balance,
+                    "剩余期限": loan.remaining_period,
+                    "使用率": loan.usage_rate
+                }
+                for loan in bank_loans[:5]  # 只取前5条
+            ],
+            "非银行贷款": [
+                {
+                    "机构": loan.institution,
+                    "业务类型": loan.business_type,
+                    "授信额度": loan.credit_limit,
+                    "余额": loan.balance,
+                    "剩余期限": loan.remaining_period,
+                    "使用率": loan.usage_rate
+                }
+                for loan in non_bank_loans[:5]  # 只取前5条
+            ],
             "信用卡情况": {
                 "信用卡数量": len(credit_cards),
-                "使用率": f"{credit_usage.usage_percentage}%",
-                "风险等级": credit_usage.risk_level,
-                "总额度": credit_usage.total_credit,
+                "总授信额度": credit_usage.total_credit,
                 "已用额度": credit_usage.used_credit,
-                "可用额度": credit_usage.available_credit
+                "使用率": f"{credit_usage.usage_percentage:.1f}%",
+                "风险等级": credit_usage.risk_level
             },
-            "逾期情况": {
+            "信用卡明细": [
+                {
+                    "机构": card.institution,
+                    "授信额度": card.credit_limit,
+                    "已用额度": card.used_amount,
+                    "使用率": card.usage_rate,
+                    "当前状态": card.status,
+                    "历史逾期": card.overdue_history
+                }
+                for card in credit_cards[:5]  # 只取前5条
+            ],
+            "逾期分析": {
                 "严重程度": overdue_analysis.severity_level,
-                "90天以上逾期": overdue_analysis.overdue_90plus,
-                "逾期机构数": len(overdue_analysis.institutions)
+                "逾期机构数": len(overdue_analysis.institutions),
+                "90天以上逾期月数": overdue_analysis.overdue_90plus,
+                "30-90天逾期月数": overdue_analysis.overdue_30_90,
+                "30天以内逾期月数": overdue_analysis.overdue_under_30
             },
-            "查询记录": {
-                "近3月查询": stats.query_count_3m
-            }
+            "查询记录明细": [
+                {
+                    "时间段": q.period,
+                    "贷款审批": q.loan_approval,
+                    "信用卡审批": q.credit_card_approval,
+                    "担保资格审查": q.guarantee_review,
+                    "保前审查": q.insurance_review,
+                    "资信审查": q.credit_review,
+                    "非贷后管理查询": q.non_post_loan,
+                    "本人查询": q.self_query
+                }
+                for q in query_records
+            ]
         }
     
     def _build_products_summary(self) -> List[dict]:
