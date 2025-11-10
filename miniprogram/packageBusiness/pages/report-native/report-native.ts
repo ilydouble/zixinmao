@@ -222,8 +222,8 @@ Page({
     return '#F44336'
   },
 
-  // 下载HTML报告
-  async downloadHTMLReport() {
+  // 下载PDF报告
+  async downloadPDFReport() {
     try {
       wx.showLoading({ title: '准备下载...' })
 
@@ -232,24 +232,24 @@ Page({
         data: {
           action: 'downloadReport',
           reportId: this.data.reportId,
-          fileType: 'html'
+          fileType: 'pdf'
         }
       })
 
       if (result.result && (result.result as any).success) {
         const downloadData = (result.result as any).data
         const downloadUrl = downloadData.downloadUrl
-        const fileName = downloadData.fileName || `报告_${this.data.reportId}.html`
+        const fileName = downloadData.fileName || `报告_${this.data.reportId}.pdf`
 
-        console.log('HTML报告下载链接:', downloadUrl)
+        console.log('PDF报告下载链接:', downloadUrl)
         console.log('文件名:', fileName)
 
-        // 下载HTML文件
+        // 下载PDF文件
         wx.downloadFile({
           url: downloadUrl,
           success: (res) => {
             if (res.statusCode === 200) {
-              console.log('HTML文件下载成功:', res.tempFilePath)
+              console.log('PDF文件下载成功:', res.tempFilePath)
               wx.hideLoading()
 
               // 获取系统信息，判断平台
@@ -259,7 +259,7 @@ Page({
               if (isIOS) {
                 // iOS平台：直接分享文件（推荐方式）
                 wx.showModal({
-                  title: 'HTML报告已准备好',
+                  title: 'PDF报告已准备好',
                   content: 'iOS系统建议使用"分享文件"功能：\n\n1. 发送到"文件传输助手"\n2. 在聊天中长按文件\n3. 选择"用Safari打开"查看报告\n4. 或选择"存储到文件"保存',
                   confirmText: '分享文件',
                   cancelText: '取消',
@@ -291,8 +291,8 @@ Page({
               } else {
                 // Android平台：也使用分享方式
                 wx.showModal({
-                  title: 'HTML报告已准备好',
-                  content: '建议使用"分享文件"功能：\n\n1. 选择浏览器或其他应用\n2. 即可查看完整的HTML报告\n\n文件名：' + fileName,
+                  title: 'PDF报告已准备好',
+                  content: '建议使用"分享文件"功能：\n\n1. 选择浏览器或其他应用\n2. 即可查看完整的PDF报告\n\n文件名：' + fileName,
                   confirmText: '分享文件',
                   cancelText: '取消',
                   success: (modalRes) => {
@@ -303,7 +303,7 @@ Page({
                         fileName: fileName,
                         success: () => {
                           wx.showToast({
-                            title: '分享成功，可用浏览器打开',
+                            title: '分享成功，可用PDF阅读器打开',
                             icon: 'success',
                             duration: 3000
                           })

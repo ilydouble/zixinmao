@@ -67,7 +67,8 @@ class AnalysisResponse(BaseModel):
     error_message: Optional[str] = Field(None, description="错误信息")
     processing_time: float = Field(..., description="处理时间（秒）")
     html_report: Optional[str] = Field(None, description="HTML格式的可视化报告")
-    
+    pdf_report: Optional[str] = Field(None, description="PDF格式的可视化报告（base64编码）")
+
     class Config:
         schema_extra = {
             "example": {
@@ -79,7 +80,9 @@ class AnalysisResponse(BaseModel):
                     "risk_assessment": {}
                 },
                 "error_message": None,
-                "processing_time": 15.5
+                "processing_time": 15.5,
+                "html_report": "<html>...</html>",
+                "pdf_report": "JVBERi0xLjQK..."
             }
         }
 

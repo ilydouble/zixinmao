@@ -1,15 +1,42 @@
+# Web Framework
 fastapi==0.104.1
 uvicorn==0.24.0
+
+# Data Validation
 pydantic==2.5.0
 pydantic-settings==2.1.0
+
+# HTTP Client
 httpx==0.25.2
+
+# File Upload
 python-multipart==0.0.6
+
+# Environment Variables
 python-dotenv==1.0.0
+
+# Logging
 loguru==0.7.2
+
+# PDF Processing
 PyPDF2==3.0.1
+
+# Async File Operations
 aiofiles==23.2.0
+
+# Rate Limiting
 asyncio-throttle==1.0.2
+
+# Database
 pymysql>=1.1.0
+
+# HTTP Requests
 requests>=2.31.0
+
+# Encryption
 pycryptodome>=3.23.0
-pymysql>=1.1.0
+
+# HTML to PDF Conversion (Async API required for FastAPI)
+# 注意: 安装后需要运行 "python -m playwright install chromium" 来下载浏览器引擎
+# 系统依赖: 需要在服务器上运行 "python -m playwright install-deps" 安装系统库
+playwright>=1.40.0

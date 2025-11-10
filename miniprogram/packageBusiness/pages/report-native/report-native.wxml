@@ -497,9 +497,9 @@
 
     <!-- 底部操作按钮 -->
     <view class="action-buttons">
-      <button class="action-button primary" bindtap="downloadHTMLReport">
+      <button class="action-button primary" bindtap="downloadPDFReport">
         <text class="button-icon">📥</text>
-        <text class="button-text">下载HTML报告</text>
+        <text class="button-text">下载PDF报告</text>
       </button>
       <button class="action-button" open-type="share">
         <text class="button-icon">📤</text>

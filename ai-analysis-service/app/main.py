@@ -282,6 +282,7 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
 
         # 生成HTML报告
         html_report = None
+        pdf_report = None
         if result['success']:
             try:
                 html_report = await html_report_service.generate_html_report(
@@ -292,6 +293,22 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
             except Exception as e:
                 logger.error(f"❌ HTML报告生成失败: {str(e)} | ID: {request_id}")
 
+            # 生成PDF报告
+            if html_report:
+                try:
+                    from service.pdf_report_service import pdf_report_service
+                    import base64
+
+                    pdf_bytes = await pdf_report_service.convert_html_to_pdf(
+                        html_content=html_report,
+                        pdf_filename=request.file_name or "report.pdf"
+                    )
+                    # 将PDF转换为base64编码
+                    pdf_report = base64.b64encode(pdf_bytes).decode('utf-8')
+                    logger.info(f"✅ PDF报告生成成功 | 大小: {len(pdf_bytes):,} 字节 | ID: {request_id}")
+                except Exception as e:
+                    logger.error(f"❌ PDF报告生成失败: {str(e)} | ID: {request_id}")
+
         # 返回响应
         return AnalysisResponse(
             success=result['success'],
@@ -299,7 +316,8 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
             analysis_result=result.get('analysis_result'),
             error_message=result.get('error_message'),
             processing_time=processing_time,
-            html_report=html_report
+            html_report=html_report,
+            pdf_report=pdf_report
         )
 
     except HTTPException:

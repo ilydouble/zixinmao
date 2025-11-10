@@ -51,18 +51,20 @@ exports.main = async (event, context) => {
 
         console.log(`🤖 [异步任务] AI分析完成: ${reportId}, 耗时: ${analysisEndTime - analysisStartTime}ms`)
 
-        // 🔧 提取分析结果和HTML报告
+        // 🔧 提取分析结果、HTML报告和PDF报告
         const analysisResult = aiResult.analysisResult || aiResult  // 兼容旧格式
         const htmlReport = aiResult.htmlReport || null
+        const pdfReport = aiResult.pdfReport || null
 
         console.log(`📊 [异步任务] 分析结果提取完成`)
         console.log(`  - JSON数据: ${analysisResult ? '✅' : '❌'}`)
         console.log(`  - HTML报告: ${htmlReport ? `✅ (${htmlReport.length}字符)` : '❌'}`)
+        console.log(`  - PDF报告: ${pdfReport ? `✅ (${pdfReport.length}字符)` : '❌'}`)
 
-        // 4. 生成报告文件（JSON + HTML）
+        // 4. 生成报告文件（JSON + HTML + PDF）
         console.log(`📄 [异步任务] 开始生成报告文件: ${reportId}`)
         await updateReportStatus(reportId, 'processing', 'GENERATING_REPORTS', 80)
-        const reportFiles = await generateReportFiles(analysisResult, reportId, reportType, htmlReport)
+        const reportFiles = await generateReportFiles(analysisResult, reportId, reportType, htmlReport, pdfReport)
         console.log(`📄 [异步任务] 报告文件生成完成: ${reportId}`)
 
         // 5. 更新完成状态
@@ -236,9 +238,11 @@ async function analyzeWithAI(fileBuffer, reportType, reportId) {
     if (response.status === 200 && response.data.success) {
       const analysisResult = response.data.analysis_result
       const htmlReport = response.data.html_report  // 🔧 提取HTML报告
+      const pdfReport = response.data.pdf_report    // 🔧 提取PDF报告（base64编码）
 
       console.log(`AI分析完成: ${reportId}, 处理时间: ${response.data.processing_time}s`)
       console.log(`HTML报告: ${htmlReport ? '已生成' : '未生成'}, 长度: ${htmlReport ? htmlReport.length : 0}`)
+      console.log(`PDF报告: ${pdfReport ? '已生成' : '未生成'}, 长度: ${pdfReport ? pdfReport.length : 0}`)
 
       // 保存处理时间信息
       await db.collection('reports').doc(reportId).update({
@@ -249,10 +253,11 @@ async function analyzeWithAI(fileBuffer, reportType, reportId) {
         }
       })
 
-      // 返回分析结果和HTML报告
+      // 返回分析结果、HTML报告和PDF报告
       return {
         analysisResult: analysisResult,
-        htmlReport: htmlReport  // 🔧 返回HTML报告
+        htmlReport: htmlReport,  // 🔧 返回HTML报告
+        pdfReport: pdfReport     // 🔧 返回PDF报告
       }
     } else {
       const errorMsg = response.data.error_message || 'AI分析服务返回失败'
@@ -322,7 +327,7 @@ async function analyzeWithAI(fileBuffer, reportType, reportId) {
 /**
  * 生成报告文件
  */
-async function generateReportFiles(analysisResult, reportId, reportType, htmlReport = null) {
+async function generateReportFiles(analysisResult, reportId, reportType, htmlReport = null, pdfReport = null) {
   try {
     const reportFiles = {}
 
@@ -355,19 +360,29 @@ async function generateReportFiles(analysisResult, reportId, reportType, htmlRep
     })
 
     reportFiles.htmlUrl = htmlUploadResult.fileID
-    
-    // 3. 生成PDF报告（简化版，实际可能需要更复杂的PDF生成）
-    const pdfPath = `reports/${reportType}/${reportId}/report.pdf`
-    // 这里可以集成PDF生成库，暂时使用HTML内容
-    const pdfUploadResult = await cloud.uploadFile({
-      cloudPath: pdfPath,
-      fileContent: Buffer.from(htmlContent, 'utf8')
-    })
-    
-    reportFiles.pdfUrl = pdfUploadResult.fileID
-    
+
+    // 3. 生成PDF报告
+    // 🔧 使用后端生成的PDF报告（base64编码）
+    if (!pdfReport) {
+      console.warn(`⚠️ 后端未生成PDF报告，reportId: ${reportId}，将跳过PDF存储`)
+      reportFiles.pdfUrl = null
+    } else {
+      const pdfPath = `reports/${reportType}/${reportId}/report.pdf`
+
+      // 将base64编码的PDF转换为Buffer
+      const pdfBuffer = Buffer.from(pdfReport, 'base64')
+      console.log(`📄 使用后端生成的PDF报告, 大小: ${pdfBuffer.length} 字节`)
+
+      const pdfUploadResult = await cloud.uploadFile({
+        cloudPath: pdfPath,
+        fileContent: pdfBuffer
+      })
+
+      reportFiles.pdfUrl = pdfUploadResult.fileID
+    }
+
     return reportFiles
-    
+
   } catch (error) {
     throw new Error(`报告文件生成失败: ${error.message}`)
   }
