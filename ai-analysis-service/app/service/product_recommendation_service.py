@@ -21,6 +21,7 @@ from app.models.visualization_model import (
     ProductRecommendation
 )
 from app.config.settings import settings
+from app.models.report_model import CustomerInfo
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +46,7 @@ class ProductRecommendationService:
     def _load_products(self) -> List[dict]:
         """加载产品数据"""
         try:
-            products_file = Path(__file__).parent.parent / "data" / "products.json"
+            products_file = Path(__file__).parent.parent / "data" / "product_standard.json"
             with open(products_file, 'r', encoding='utf-8') as f:
                 products = json.load(f)
             logger.info(f"成功加载 {len(products)} 个产品")
@@ -53,6 +54,247 @@ class ProductRecommendationService:
         except Exception as e:
             logger.error(f"加载产品数据失败: {str(e)}")
             return []
+        
+    def _filter_product(
+            self,
+            personal_info: PersonalInfo,
+            stats: StatCard,
+            debt_composition: List[DebtItem],
+            bank_loans: List[LoanDetail],
+            non_bank_loans: List[LoanDetail],
+            loan_summary: LoanSummary,
+            credit_cards: List[CreditCardDetail],
+            credit_usage: CreditUsageAnalysis,
+            overdue_analysis: OverdueAnalysis,
+            query_records: List[QueryRecord],
+            customer_info: CustomerInfo = None) -> List[dict]:
+        """
+        筛选符合条件的产品
+
+        Args:
+            personal_info: 个人信息
+            customer_info: 客户信息
+            其他参数用于后续扩展筛选条件
+
+        Returns:
+            符合条件的产品列表
+        """
+        try:
+            result = []
+
+            # 检查是否缴纳公积金
+            if customer_info is not None and customer_info.hasProvidentFund is False:
+                logger.info(f"用户未缴纳公积金，不推荐任何产品")
+                return []
+
+            # 获取用户年龄
+            try:
+                user_age = int(personal_info.age)
+            except (ValueError, TypeError):
+                logger.warning(f"无法解析用户年龄: {personal_info.age}，将不进行年龄筛选")
+                user_age = None
+
+            for product in self.products:
+                product_name = product.get('product_name', '未知产品')
+
+                # 检查年龄范围
+                if user_age is not None:
+                    age_range = product.get("age_range")
+                    if age_range and not self._check_age_in_range(user_age, age_range):
+                        logger.debug(f"产品 {product_name} 年龄要求 {age_range} 不符合用户年龄 {user_age}")
+                        continue
+
+                # 检查优质单位要求
+                if product.get("admission_conditions_quality_unit"):
+                    if not self._check_quality_unit_requirement(customer_info):
+                        logger.debug(f"产品 {product_name} 要求优质单位，用户不符合条件")
+                        continue
+
+                # 检查公积金基数要求
+                required_provident_fund_base = product.get("admission_conditions_provident_fund_base")
+                if required_provident_fund_base is not None:
+                    if not self._check_provident_fund_base_requirement(customer_info, required_provident_fund_base):
+                        logger.debug(f"产品 {product_name} 要求公积金基数 > {required_provident_fund_base}，用户不符合条件")
+                        continue
+
+                # 检查当前逾期要求
+                overdue_requirements_current = product.get("overdue_requirements_current")
+                if overdue_requirements_current == "无":
+                    if not self._check_no_current_overdue_requirement(credit_cards):
+                        logger.debug(f"产品 {product_name} 要求无当前逾期，用户信用卡存在非正常状态")
+                        continue
+
+                # 其他筛选条件可在此添加
+                # 例如：公积金连续缴存月数等
+
+                result.append(product)
+
+            logger.info(f"筛选后产品数量: {len(result)}/{len(self.products)}")
+            return result
+
+        except Exception as e:
+            logger.error(f"筛选产品数据失败: {str(e)}")
+            return []
+
+    def _check_age_in_range(self, age: int, age_range: str) -> bool:
+        """
+        检查年龄是否在指定范围内
+
+        Args:
+            age: 用户年龄（整数）
+            age_range: 年龄范围字符串，格式如 "18-65" 或 "18-65岁"
+
+        Returns:
+            True 表示年龄符合范围，False 表示不符合
+        """
+        try:
+            # 移除"岁"字符
+            age_range = age_range.replace("岁", "").strip()
+
+            # 分割年龄范围
+            if "-" not in age_range:
+                logger.warning(f"年龄范围格式不正确: {age_range}")
+                return True  # 格式不正确时默认符合
+
+            parts = age_range.split("-")
+            if len(parts) != 2:
+                logger.warning(f"年龄范围格式不正确: {age_range}")
+                return True
+
+            try:
+                min_age = int(parts[0].strip())
+                max_age = int(parts[1].strip())
+            except ValueError:
+                logger.warning(f"年龄范围包含非数字: {age_range}")
+                return True
+
+            # 检查年龄是否在范围内
+            return min_age <= age <= max_age
+
+        except Exception as e:
+            logger.error(f"检查年龄范围失败: {str(e)}, age_range: {age_range}")
+            return True  # 出错时默认符合
+
+    def _check_quality_unit_requirement(self, customer_info: CustomerInfo) -> bool:
+        """
+        检查是否满足优质单位要求
+
+        优质单位包括：机关及事业单位、国有企业、大型上市公司及大型民企
+
+        Args:
+            customer_info: 客户信息
+
+        Returns:
+            True 表示满足优质单位要求，False 表示不满足
+        """
+        # 定义优质单位列表
+        quality_units = [
+            "机关及事业单位",
+            "国有企业",
+            "大型上市公司及大型民企"
+        ]
+
+        try:
+            # 如果没有提供客户信息，默认不符合
+            if not customer_info:
+                logger.debug("未提供客户信息，无法验证优质单位要求")
+                return False
+
+            # 获取单位性质
+            company_nature = customer_info.companyNature
+
+            # 如果没有提供单位性质，默认不符合
+            if not company_nature:
+                logger.debug("未提供单位性质，无法验证优质单位要求")
+                return False
+
+            # 检查单位性质是否在优质单位列表中
+            is_quality_unit = company_nature in quality_units
+
+            if is_quality_unit:
+                logger.debug(f"用户单位性质 '{company_nature}' 符合优质单位要求")
+            else:
+                logger.debug(f"用户单位性质 '{company_nature}' 不符合优质单位要求")
+
+            return is_quality_unit
+
+        except Exception as e:
+            logger.error(f"检查优质单位要求失败: {str(e)}")
+            return False  # 出错时默认不符合
+
+    def _check_provident_fund_base_requirement(self, customer_info: CustomerInfo, required_base: int) -> bool:
+        """
+        检查是否满足公积金基数要求
+
+        Args:
+            customer_info: 客户信息
+            required_base: 产品要求的最低公积金基数
+
+        Returns:
+            True 表示满足公积金基数要求，False 表示不满足
+        """
+        try:
+            # 如果没有提供客户信息，默认不符合
+            if not customer_info:
+                logger.debug(f"未提供客户信息，无法验证公积金基数要求 (要求: > {required_base})")
+                return False
+
+            # 获取用户的公积金基数
+            user_provident_fund_base = customer_info.providentFundBase
+
+            # 如果用户没有缴纳公积金或未提供公积金基数，默认不符合
+            if user_provident_fund_base is None:
+                logger.debug(f"用户未提供公积金基数，无法满足要求 (要求: > {required_base})")
+                return False
+
+            # 检查公积金基数是否大于要求值
+            meets_requirement = user_provident_fund_base > required_base
+
+            if meets_requirement:
+                logger.debug(f"用户公积金基数 {user_provident_fund_base} 符合要求 (要求: > {required_base})")
+            else:
+                logger.debug(f"用户公积金基数 {user_provident_fund_base} 不符合要求 (要求: > {required_base})")
+
+            return meets_requirement
+
+        except Exception as e:
+            logger.error(f"检查公积金基数要求失败: {str(e)}, required_base: {required_base}")
+            return False  # 出错时默认不符合
+
+    def _check_no_current_overdue_requirement(self, credit_cards: List[CreditCardDetail]) -> bool:
+        """
+        检查是否满足无当前逾期要求
+
+        当产品要求 overdue_requirements_current 为 "无" 时，
+        所有信用卡的 status 都必须为 "正常"
+
+        Args:
+            credit_cards: 信用卡列表
+
+        Returns:
+            True 表示满足无当前逾期要求，False 表示不满足
+        """
+        try:
+            # 如果没有信用卡，默认符合要求
+            if not credit_cards:
+                logger.debug("用户无信用卡，符合无当前逾期要求")
+                return True
+
+            # 检查所有信用卡状态
+            for card in credit_cards:
+                card_status = card.status
+
+                # 如果信用卡状态不是 "正常"，则不符合要求
+                if card_status != "正常":
+                    logger.debug(f"信用卡 {card.institution} 状态为 '{card_status}'，不符合无当前逾期要求")
+                    return False
+
+            logger.debug(f"所有 {len(credit_cards)} 张信用卡状态都为正常，符合无当前逾期要求")
+            return True
+
+        except Exception as e:
+            logger.error(f"检查无当前逾期要求失败: {str(e)}")
+            return False  # 出错时默认不符合
     
     def generate_recommendations(
         self,
@@ -65,7 +307,8 @@ class ProductRecommendationService:
         credit_cards: List[CreditCardDetail],
         credit_usage: CreditUsageAnalysis,
         overdue_analysis: OverdueAnalysis,
-        query_records: List[QueryRecord]
+        query_records: List[QueryRecord],
+        customer_info: CustomerInfo = None,
     ) -> List[ProductRecommendation]:
         """
         生成产品推荐
@@ -91,9 +334,16 @@ class ProductRecommendationService:
                 personal_info, stats, debt_composition, bank_loans, non_bank_loans,
                 loan_summary, credit_cards, credit_usage, overdue_analysis, query_records
             )
-            
+
+            # 筛选产品数据
+            filtered_products = self._filter_product(
+                personal_info, stats, debt_composition, bank_loans, non_bank_loans,
+                loan_summary, credit_cards, credit_usage, overdue_analysis, query_records,
+                customer_info
+            )
+
             # 构建产品信息摘要
-            products_summary = self._build_products_summary()
+            products_summary = self._build_products_summary(filtered_products)
             
             # 构建提示词
             prompt = self._build_prompt(user_summary, products_summary)
@@ -222,21 +472,30 @@ class ProductRecommendationService:
             ]
         }
     
-    def _build_products_summary(self) -> List[dict]:
+    def _build_products_summary(self, products: List[dict]) -> List[dict]:
         """构建产品信息摘要"""
         return [
             {
                 "银行": product["bank_name"],
                 "产品名称": product["product_name"],
-                "年龄要求": product["product_features"]["age_range"],
-                "最高额度": product["product_features"]["max_credit"],
-                "最长期限": product["product_features"]["max_period"],
-                "利率": product["product_features"]["min_rate"],
-                "还款方式": product["product_features"]["repayment_methods"],
+                "地区": product["region"],
+                "年龄要求": product["age_range"],
+                "最高额度": product["max_credit"],
+                "最长期限": product["max_period"],
+                "利率": product["min_rate"],
+                "还款方式": product["repayment_methods"],
                 "准入条件": product["admission_conditions"],
-                "征信要求": product["credit_requirements"]
+                "准入条件-优质单位": product["admission_conditions_quality_unit"],
+                "准入条件-公积金基数": product["admission_conditions_provident_fund_base"],
+                "准入条件-公积金连续缴存月数": product["admission_conditions_provident_fund_months"],
+                "查询要求": product["query_requirements"],
+                "逾期要求": product["overdue_requirements"],
+                "负债要求": product["debt_requirements"],
+                "信用卡使用率要求": product["credit_card_usage_rate"],
+                "征信白户是否准入": product["white_user_allowed"],
+                "额度算法": product["credit_calculation"]
             }
-            for product in self.products
+            for product in products
         ]
     
     def _build_prompt(self, user_summary: dict, products_summary: List[dict]) -> str:

@@ -8,6 +8,23 @@ class ReportType(str, Enum):
     SIMPLE = "simple"  # 简版征信
     DETAIL = "detail"  # 详版征信
 
+
+class CustomerInfo(BaseModel):
+    """客户群体信息"""
+    customerType: Optional[str] = Field(None, description="客户群体类型：授薪类客群/自雇类客群")
+    includeProductMatch: Optional[bool] = Field(None, description="是否包含产品匹配")
+
+    # 授薪类客群字段
+    companyNature: Optional[str] = Field(None, description="单位性质（授薪类）：机关及事业单位/国有企业/大型上市公司及大型民企/私企")
+    hasProvidentFund: Optional[bool] = Field(None, description="是否缴纳公积金（授薪类，bool类型）")
+    providentFundBase: Optional[int] = Field(None, description="公积金基数（授薪类，整型，未缴纳时为null）")
+
+    # 自雇类客群字段
+    selfEmploymentType: Optional[str] = Field(None, description="自雇经营类型（自雇类）：个体工商户/小微企业主")
+    companyName: Optional[str] = Field(None, description="公司名称（自雇类）")
+    cashFlow: Optional[str] = Field(None, description="流水（自雇类，包含产品匹配时）")
+
+
 class AnalysisRequest(BaseModel):
     # 支持两种输入方式：file_base64 或 markdown_content
     file_base64: Optional[str] = Field(None, description="文件的base64编码（与markdown_content二选一）")
@@ -20,7 +37,7 @@ class AnalysisRequest(BaseModel):
     name: Optional[str] = Field(None, description="姓名")
     id_card: Optional[str] = Field(None, description="身份证号")
     mobile_no: Optional[str] = Field(None, description="手机号码")
-    customer_info: Optional[Dict[str, Any]] = Field(None, description="客户群体信息")
+    customer_info: Optional[CustomerInfo] = Field(None, description="客户群体信息")
 
     class Config:
         schema_extra = {
@@ -34,10 +51,10 @@ class AnalysisRequest(BaseModel):
                 "mobile_no": "188",
                 "customer_info": {
                     "customerType": "授薪类客群",
-                    "includeProductMatch": False,
+                    "includeProductMatch": True,
                     "companyNature": "大型上市公司及大型民企",
-                    "hasProvidentFund": "是",
-                    "providentFundBase": "5000"
+                    "hasProvidentFund": True,
+                    "providentFundBase": 5000
                 }
             }
         }

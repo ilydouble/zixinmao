@@ -553,19 +553,37 @@ Page({
 
     // 验证客户群体信息
     if (!customerInfo.customerType) {
-      showError('请先填写客户群体信息')
+      wx.showModal({
+        title: '提示',
+        content: '请先填写客户群体信息',
+        showCancel: false,
+        confirmText: '我知道了',
+        confirmColor: '#007AFF'
+      })
       return
     }
 
     const validation = this.validateCustomerInfo()
     if (!validation.valid) {
-      showError(validation.message!)
+      wx.showModal({
+        title: '提示',
+        content: validation.message || '客户群体信息不完整',
+        showCancel: false,
+        confirmText: '我知道了',
+        confirmColor: '#007AFF'
+      })
       return
     }
 
     // 验证文件是否已选择
     if (!selectedFile) {
-      showError('请先选择信用报告文件')
+      wx.showModal({
+        title: '提示',
+        content: '请先选择信用报告文件',
+        showCancel: false,
+        confirmText: '我知道了',
+        confirmColor: '#007AFF'
+      })
       return
     }
 

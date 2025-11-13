@@ -32,6 +32,7 @@ from app.models.visualization_model import (
 )
 from app.service.product_recommendation_service import ProductRecommendationService
 from app.service.ai_analysis_service import AIAnalysisService
+from app.models.report_model import CustomerInfo
 
 logger = logging.getLogger(__name__)
 
@@ -70,13 +71,14 @@ class DifyToVisualizationConverter:
     """Dify数据到可视化数据的转换器"""
 
     @staticmethod
-    def convert(dify_output: DifyWorkflowOutput, request_id: str = None) -> VisualizationReportData:
+    def convert(dify_output: DifyWorkflowOutput, request_id: str = None, customer_info: CustomerInfo = None) -> VisualizationReportData:
         """
         将Dify工作流输出转换为可视化报告数据
 
         Args:
             dify_output: Dify工作流输出数据
             request_id: 请求ID
+            customer_info: 客户信息（来自请求，用于产品推荐）
 
         Returns:
             可视化报告数据Pydantic对象
@@ -137,10 +139,14 @@ class DifyToVisualizationConverter:
             )
 
             # 10. 生成产品推荐（基于分析结果）
-            product_recommendations = DifyToVisualizationConverter._generate_product_recommendations(
-                personal_info, stats, debt_composition, bank_loans, non_bank_loans,
-                loan_summary, credit_cards, credit_usage, overdue_analysis, query_records
-            )
+            if customer_info is not None and customer_info.includeProductMatch:
+                product_recommendations = DifyToVisualizationConverter._generate_product_recommendations(
+                    personal_info, stats, debt_composition, bank_loans, non_bank_loans,
+                    loan_summary, credit_cards, credit_usage, overdue_analysis, query_records,
+                    customer_info
+                )
+            else:
+                product_recommendations = None
 
             # 11. 生成AI专家分析
             ai_expert_analysis = DifyToVisualizationConverter._generate_ai_analysis(
@@ -739,7 +745,8 @@ class DifyToVisualizationConverter:
         credit_cards: List[CreditCardDetail],
         credit_usage: CreditUsageAnalysis,
         overdue_analysis: OverdueAnalysis,
-        query_records: List[QueryRecord]
+        query_records: List[QueryRecord],
+        customer_info: CustomerInfo = None
     ) -> List[ProductRecommendation]:
         """
         生成产品推荐
@@ -760,7 +767,8 @@ class DifyToVisualizationConverter:
                 credit_cards=credit_cards,
                 credit_usage=credit_usage,
                 overdue_analysis=overdue_analysis,
-                query_records=query_records
+                query_records=query_records,
+                customer_info=customer_info,
             )
 
             return recommendations

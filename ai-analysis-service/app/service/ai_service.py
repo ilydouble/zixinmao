@@ -14,6 +14,7 @@ from config.settings import settings
 from utils.prompts import get_prompt_template
 from utils.log_manager import algorithm_logger
 from app.models.dify_model import DifyWorkflowOutput, DifyWorkflowResponse
+from app.models.report_model import CustomerInfo
 from app.service.dify_converter import DifyToVisualizationConverter
 
 
@@ -121,7 +122,8 @@ class AIAnalysisService:
         report_type: str = None,
         custom_prompt: Optional[str] = None,
         request_id: str = None,
-        file_name: str = "document.pdf"
+        file_name: str = "document.pdf",
+        customer_info: CustomerInfo = None
     ) -> Dict[str, Any]:
         """
         分析文档
@@ -139,6 +141,7 @@ class AIAnalysisService:
             custom_prompt: 自定义提示词
             request_id: 请求ID
             file_name: 文件名
+            customer_info: 客户信息（包含includeProductMatch等字段）
 
         Returns:
             分析结果字典
@@ -210,7 +213,7 @@ class AIAnalysisService:
 
                         # 🆕 使用转换器将Dify数据转换为可视化格式
                         logger.info(f"🔄 [数据转换] 开始转换Dify数据为可视化格式, request_id: {request_id}")
-                        visualization_report = DifyToVisualizationConverter.convert(dify_output, request_id)
+                        visualization_report = DifyToVisualizationConverter.convert(dify_output, request_id, customer_info)
                         logger.info(f"✅ [数据转换] 转换完成, request_id: {request_id}")
 
                         # 转换为Dict保存到数据库

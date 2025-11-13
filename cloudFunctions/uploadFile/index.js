@@ -74,8 +74,8 @@ async function createReportRecord(userId, fileInfo, customerInfo = null) {
       uploadTime: new Date(),
       cloudPath: null,
       fileId: null,
-      // 客户群体信息
-      customerInfo: customerInfo || {}
+      // 客户群体信息（如果为空则设置为null）
+      customerInfo: customerInfo && Object.keys(customerInfo).length > 0 ? customerInfo : null
     },
 
     // 处理信息
