@@ -73,46 +73,51 @@
 .agreement-section {
   margin-top: 60rpx;
   margin-bottom: 40rpx;
-  padding: 0 40rpx;
+  padding: 0 32rpx;
+  display: flex;
+  justify-content: center;
 }
 
 .agreement-item {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 12rpx;
+  width: 100%;
 }
 
 .agreement-label {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 0;
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.6;
 }
 
 /* 调整复选框样式 */
 .agreement-label checkbox {
   flex-shrink: 0;
-  transform: scale(0.9);
-}
-
-.agreement-text {
-  font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.95);
-  line-height: 1.5;
-  text-align: center;
-  white-space: nowrap;
-  flex-shrink: 0;
+  transform: scale(0.6);
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+  margin-right: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0;
+  background: transparent;
+  border: 2rpx solid rgba(255, 255, 255, 0.6);
+}
+
+.checkbox-spacer {
+  width: 10rpx;
+  flex-shrink: 0;
 }
 
 .agreement-link {
   color: #fff;
-  text-decoration: underline;
-  font-weight: 500;
+  font-weight: 600;
   padding: 0 2rpx;
   cursor: pointer;
 }

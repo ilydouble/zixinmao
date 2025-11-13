@@ -13,7 +13,8 @@ Page({
     },
     agreements: {
       userAgreement: false,
-      privacyPolicy: false
+      privacyPolicy: false,
+      disclaimer: false
     }
   },
 
@@ -95,8 +96,8 @@ Page({
       return false
     }
     
-    if (!agreements.userAgreement || !agreements.privacyPolicy) {
-      showError('请同意用户协议和隐私政策')
+    if (!agreements.userAgreement || !agreements.privacyPolicy || !agreements.disclaimer) {
+      showError('请同意用户协议、隐私政策和免责声明')
       return false
     }
     
@@ -171,11 +172,18 @@ Page({
    */
   onViewAgreement(e: any) {
     const { type } = e.currentTarget.dataset
-    const url = type === 'user'
-      ? '/packageUser/pages/userAgreement/userAgreement'
-      : '/packageUser/pages/privacyPolicy/privacyPolicy'
-    wx.navigateTo({
-      url
-    })
+    let url = ''
+
+    if (type === 'user') {
+      url = '/packageUser/pages/userAgreement/userAgreement'
+    } else if (type === 'privacy') {
+      url = '/packageUser/pages/privacyPolicy/privacyPolicy'
+    } else if (type === 'disclaimer') {
+      url = '/packageUser/pages/disclaimer/disclaimer'
+    }
+
+    if (url) {
+      wx.navigateTo({ url })
+    }
   }
 })

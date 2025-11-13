@@ -30,14 +30,15 @@
         <checkbox-group bind:change="onAgreementChange">
           <label class="agreement-label">
             <checkbox value="agree" checked="{{agreedToPolicy}}" color="#0052D9" />
+            <view class="checkbox-spacer"></view>
+            <text>我已阅读并同意</text>
+            <text class="agreement-link" catchtap="onViewUserAgreement">《用户协议》</text>
+            <text>、</text>
+            <text class="agreement-link" catchtap="onViewPrivacyPolicy">《隐私政策》</text>
+            <text>和</text>
+            <text class="agreement-link" catchtap="onViewDisclaimer">《免责声明》</text>
           </label>
         </checkbox-group>
-        <view class="agreement-text">
-          <text>我已阅读并同意</text>
-          <text class="agreement-link" catchtap="onViewUserAgreement">《用户协议》</text>
-          <text>和</text>
-          <text class="agreement-link" catchtap="onViewPrivacyPolicy">《隐私政策》</text>
-        </view>
       </view>
     </view>
 

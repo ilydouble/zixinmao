@@ -291,5 +291,14 @@ Page({
     wx.navigateTo({
       url: '/packageUser/pages/privacyPolicy/privacyPolicy'
     })
+  },
+
+  /**
+   * 免责声明
+   */
+  onDisclaimer() {
+    wx.navigateTo({
+      url: '/packageUser/pages/disclaimer/disclaimer'
+    })
   }
 })

@@ -94,7 +94,6 @@
 
 .agreement-link {
   color: #0b3a95;
-  text-decoration: underline;
 }
 
 /* 提交按钮 */

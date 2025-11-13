@@ -42,14 +42,19 @@
 }
 
 .content-text {
+  color: #666;
+  margin-bottom: 16rpx;
   display: block;
-  color: #555;
-  margin: 0;
-  padding: 0;
-  text-align: justify;
-  letter-spacing: 0.5rpx;
-  white-space: normal;
-  word-break: break-all;
+  word-wrap: break-word;
   overflow-wrap: break-word;
+}
+
+.content-text text {
+  display: inline;
+  word-break: break-all;
+}
+
+.content-text:last-child {
+  margin-bottom: 0;
 }
 

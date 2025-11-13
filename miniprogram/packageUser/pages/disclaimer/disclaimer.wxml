@@ -1,4 +1,4 @@
-<!--userAgreement.wxml-->
+<!--disclaimer.wxml-->
 <view class="container">
   <view class="agreement-content">
     <view class="agreement-title">{{title}}</view>

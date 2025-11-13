@@ -45,6 +45,15 @@ Page({
   },
 
   /**
+   * 查看免责声明
+   */
+  onViewDisclaimer(e: any) {
+    wx.navigateTo({
+      url: '/packageUser/pages/disclaimer/disclaimer'
+    })
+  },
+
+  /**
    * 微信登录
    */
   async onWechatLogin() {

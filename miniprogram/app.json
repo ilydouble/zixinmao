@@ -30,7 +30,8 @@
         "pages/settings/settings",
         "pages/product-detail/product-detail",
         "pages/userAgreement/userAgreement",
-        "pages/privacyPolicy/privacyPolicy"
+        "pages/privacyPolicy/privacyPolicy",
+        "pages/disclaimer/disclaimer"
       ]
     }
   ],

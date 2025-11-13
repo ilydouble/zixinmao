@@ -66,6 +66,16 @@
           <text class="agreement-link" data-type="privacy" bind:tap="onViewAgreement">《隐私政策》</text>
         </text>
       </view>
+
+      <view class="agreement-item">
+        <checkbox-group bind:change="onAgreementChange" data-agreement="disclaimer">
+          <checkbox value="agree" checked="{{agreements.disclaimer}}" />
+        </checkbox-group>
+        <text class="agreement-text">
+          我已阅读并同意
+          <text class="agreement-link" data-type="disclaimer" bind:tap="onViewAgreement">《免责声明》</text>
+        </text>
+      </view>
     </view>
 
     <!-- 提交按钮 -->
