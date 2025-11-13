@@ -36,6 +36,54 @@ class ReportService:
         self.ai_api_url = settings.ai.api_url
         self.ai_api_key = settings.ai.api_key
 
+    def _build_customer_info_markdown(self, customer_info: dict) -> str:
+        """
+        构建客户群体信息的Markdown格式
+
+        Args:
+            customer_info: 客户群体信息字典
+
+        Returns:
+            Markdown格式的客户信息
+        """
+        if not customer_info:
+            return "暂无客户群体信息"
+
+        markdown = ""
+
+        # 基本信息
+        customer_type = customer_info.get('customerType', '未指定')
+        include_product_match = customer_info.get('includeProductMatch', False)
+
+        markdown += f"**客户群体类型**: {customer_type}\n\n"
+        markdown += f"**是否包含产品匹配**: {'是' if include_product_match else '否'}\n\n"
+
+        # 授薪类客群信息
+        if customer_type == '授薪类客群':
+            markdown += "### 授薪类客群详情\n\n"
+            company_nature = customer_info.get('companyNature', '未指定')
+            has_provident_fund = customer_info.get('hasProvidentFund', '未指定')
+            provident_fund_base = customer_info.get('providentFundBase', '未指定')
+
+            markdown += f"- **单位性质**: {company_nature}\n"
+            markdown += f"- **是否缴纳公积金**: {has_provident_fund}\n"
+            if has_provident_fund == '是':
+                markdown += f"- **公积金基数**: {provident_fund_base}\n"
+
+        # 自雇类客群信息
+        elif customer_type == '自雇类客群':
+            markdown += "### 自雇类客群详情\n\n"
+            self_employment_type = customer_info.get('selfEmploymentType', '未指定')
+            company_name = customer_info.get('companyName', '未指定')
+            cash_flow = customer_info.get('cashFlow', '未指定')
+
+            markdown += f"- **自雇经营类型**: {self_employment_type}\n"
+            markdown += f"- **公司名称**: {company_name}\n"
+            if include_product_match:
+                markdown += f"- **流水**: {cash_flow}\n"
+
+        return markdown
+
 
     async def generate_credit_analysis(self, name: str, document: str) -> Tuple[bool, str]:
         """生成个人征信报告"""
@@ -236,11 +284,12 @@ class ReportService:
         mime_type: str,
         report_type: str,
         custom_prompt: Optional[str] = None,
-        request_id: str = None
+        request_id: str = None,
+        customer_info: Optional[dict] = None
     ) -> CommonResponse:
         """
         分析文档
-        
+
         Args:
             name: 姓名,
             id_card: 身份证号,
@@ -250,7 +299,8 @@ class ReportService:
             report_type: 报告类型
             custom_prompt: 自定义提示词
             request_id: 请求ID
-        
+            customer_info: 客户群体信息
+
         Returns:
             分析结果字典
         """
@@ -258,6 +308,8 @@ class ReportService:
         
         try:
             logger.info(f"开始调用AI API分析文档, request_id: {request_id}")
+            if customer_info:
+                logger.info(f"客户群体信息: {customer_info}")
 
             document = await self.process_document(pdf_base64=file_base64)
             credit_flag, credit_result = await self.generate_credit_analysis(name=name, document=document)
@@ -267,8 +319,19 @@ class ReportService:
                 big_data_result_markdown = ResponseBuilder.build_success_markdown_response(big_data_result)
             else:
                 big_data_result_markdown = ""
-            
+
+            # 构建客户信息部分
+            customer_info_markdown = ""
+            if customer_info:
+                customer_info_markdown = self._build_customer_info_markdown(customer_info)
+
             merge_markdown = f"""# 个人征信综合分析报告
+---
+
+## 客户群体信息
+
+{customer_info_markdown}
+
 ---
 
 ## 第一部分：个人征信报告

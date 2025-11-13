@@ -39,65 +39,253 @@
     </view>
   </view>
 
-  <!-- 上传区域 -->
-  <view class="card upload-card">
-    <view wx:if="{{!selectedFile}}" class="upload-area">
-      <view class="upload-content" bind:tap="onChooseFile">
-        <view class="upload-icon">☁️</view>
-        <view class="upload-text">点击选择信用报告文件</view>
-        <view class="upload-desc">支持 PDF 文档或图片截图，最大 10MB</view>
+  <!-- 统一的分析卡片 -->
+  <view class="card unified-analysis-card">
+    <!-- 卡片头部 -->
+    <view class="card-header-section compact">
+      <view class="card-title-icon">📋</view>
+      <view class="card-title-text">
+        <view class="card-title">信用报告分析</view>
       </view>
-      <t-button theme="primary" size="medium" style="margin-top: 20rpx;" bind:tap="onChooseFile">
-        选择文件
-      </t-button>
     </view>
 
-    <!-- 已选择文件 -->
-    <view wx:else class="selected-file">
-      <view class="file-info">
-        <view class="file-icon">📄</view>
-        <view class="file-details">
+    <!-- 第一部分：客户群体信息框 -->
+    <view class="info-card">
+      <view class="card-header">
+        <view class="card-title-icon">👥</view>
+        <view class="card-title-text">
+          <view class="card-title">客户群体信息</view>
+        </view>
+      </view>
+
+      <!-- 客户类型选择 - 勾选框式 -->
+      <view class="customer-type-checkbox-group">
+        <view class="checkbox-label">
+          <view class="checkbox-label-icon">👤</view>
+          <view class="checkbox-label-text">面向客群</view>
+        </view>
+        <view class="checkbox-item">
+          <view
+            class="checkbox {{customerInfo.customerType === '授薪类客群' ? 'checked' : ''}}"
+            bind:tap="onCustomerTypeChange"
+            data-type="0"
+          >
+            {{customerInfo.customerType === '授薪类客群' ? '✓' : ''}}
+          </view>
+          <view class="checkbox-text">授薪类客群</view>
+        </view>
+        <view class="checkbox-item">
+          <view
+            class="checkbox {{customerInfo.customerType === '自雇类客群' ? 'checked' : ''}}"
+            bind:tap="onCustomerTypeChange"
+            data-type="1"
+          >
+            {{customerInfo.customerType === '自雇类客群' ? '✓' : ''}}
+          </view>
+          <view class="checkbox-text">自雇类客群</view>
+        </view>
+      </view>
+
+      <!-- 产品匹配选择 - 开关式 -->
+      <view class="switch-container compact" wx:if="{{customerInfo.customerType}}">
+        <view class="switch-label compact">
+          <view class="switch-icon">🎁</view>
+          <view class="switch-text">产品匹配</view>
+        </view>
+        <switch
+          checked="{{customerInfo.includeProductMatch}}"
+          bindchange="onProductMatchChange"
+          class="custom-switch"
+        />
+      </view>
+
+      <!-- 授薪类客群表单 -->
+      <view wx:if="{{customerInfo.customerType === '授薪类客群'}}" class="form-section salaried-section fade-in compact">
+        <!-- 单位性质 -->
+        <view class="form-row compact">
+          <view class="form-label compact">单位性质 <text class="required">*</text></view>
+          <picker mode="selector" range="{{companyNatureOptions}}" bindchange="onCompanyNatureChange" class="picker-wrapper">
+            <view class="picker-input compact {{customerInfo.companyNature ? '' : 'placeholder'}}">
+              {{customerInfo.companyNature || '请选择单位性质'}}
+            </view>
+          </picker>
+        </view>
+
+        <!-- 是否缴纳公积金 -->
+        <view class="form-row compact">
+          <view class="form-label compact">公积金 <text class="required">*</text></view>
+          <view class="radio-group compact">
+            <view
+              class="radio-item compact {{customerInfo.hasProvidentFund === '是' ? 'active' : ''}}"
+              bind:tap="onProvidentFundChange"
+              data-value="0"
+            >
+              <view class="radio-circle"></view>
+              <text>是</text>
+            </view>
+            <view
+              class="radio-item compact {{customerInfo.hasProvidentFund === '否' ? 'active' : ''}}"
+              bind:tap="onProvidentFundChange"
+              data-value="1"
+            >
+              <view class="radio-circle"></view>
+              <text>否</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 公积金基数 -->
+        <view wx:if="{{customerInfo.hasProvidentFund === '是'}}" class="form-row compact fade-in">
+          <view class="form-label compact">基数 <text class="required">*</text></view>
+          <view class="input-wrapper compact">
+            <text class="input-prefix">¥</text>
+            <input
+              type="number"
+              placeholder="请输入公积金基数"
+              value="{{customerInfo.providentFundBase}}"
+              bindinput="onProvidentFundBaseInput"
+              class="form-input"
+            />
+          </view>
+        </view>
+      </view>
+
+      <!-- 自雇类客群表单 -->
+      <view wx:if="{{customerInfo.customerType === '自雇类客群'}}" class="form-section self-employed-section fade-in compact">
+        <!-- 自雇经营类型 -->
+        <view class="form-row compact">
+          <view class="form-label compact">经营类型 <text class="required">*</text></view>
+          <picker mode="selector" range="{{selfEmploymentTypeOptions}}" bindchange="onSelfEmploymentTypeChange" class="picker-wrapper">
+            <view class="picker-input compact {{customerInfo.selfEmploymentType ? '' : 'placeholder'}}">
+              {{customerInfo.selfEmploymentType || '请选择经营类型'}}
+            </view>
+          </picker>
+        </view>
+
+        <!-- 公司名称 -->
+        <view class="form-row compact">
+          <view class="form-label compact">公司名称 <text class="required">*</text></view>
+          <view class="input-wrapper compact">
+            <input
+              type="text"
+              placeholder="请输入公司名称"
+              value="{{customerInfo.companyName}}"
+              bindinput="onCompanyNameInput"
+              class="form-input"
+            />
+          </view>
+        </view>
+
+        <!-- 流水（仅在包含产品匹配时显示） -->
+        <view wx:if="{{customerInfo.includeProductMatch}}" class="form-row compact fade-in">
+          <view class="form-label compact">流水 <text class="required">*</text></view>
+          <view class="input-wrapper compact">
+            <text class="input-prefix">¥</text>
+            <input
+              type="text"
+              placeholder="请输入流水"
+              value="{{customerInfo.cashFlow}}"
+              bindinput="onCashFlowInput"
+              class="form-input"
+            />
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 第二部分：上传信用报告框 -->
+    <view class="info-card">
+      <view class="card-header">
+        <view class="card-title-icon">📄</view>
+        <view class="card-title-text">
+          <view class="card-title">上传信用报告</view>
+        </view>
+      </view>
+
+      <view wx:if="{{!selectedFile}}" class="upload-area compact">
+        <view class="upload-content" bind:tap="onChooseFile">
+          <view class="upload-icon">☁️</view>
+          <view class="upload-text">点击选择信用报告文件</view>
+          <view class="upload-desc">支持 PDF 文档或图片截图，最大 10MB</view>
+        </view>
+      </view>
+
+      <!-- 已选择文件 -->
+      <view wx:else class="selected-file compact">
+        <view class="file-info compact">
           <view class="file-name">{{selectedFile.name}}</view>
-          <view class="file-size">{{selectedFile.size}} 字节</view>
+          <view class="remove-btn-icon" bind:tap="onRemoveFile">×</view>
         </view>
-        <view class="file-actions">
-          <view class="remove-btn" bind:tap="onRemoveFile">✕</view>
-        </view>
+      </view>
+
+      <!-- 上传进度 -->
+      <view wx:if="{{uploading}}" class="progress-section compact">
+        <view class="progress-text">上传中... {{uploadProgress}}%</view>
+        <t-progress percentage="{{uploadProgress}}" theme="primary" />
       </view>
     </view>
 
-    <!-- 上传进度 -->
-    <view wx:if="{{uploading}}" class="progress-section">
-      <view class="progress-text">上传中... {{uploadProgress}}%</view>
-      <t-progress percentage="{{uploadProgress}}" theme="primary" />
-    </view>
+    <!-- 第三部分：开始分析框 -->
+    <view class="info-card">
+      <view class="card-header">
+        <view class="card-title-icon">🚀</view>
+        <view class="card-title-text">
+          <view class="card-title">开始分析</view>
+        </view>
+      </view>
 
-    <!-- 分析进度 -->
-    <view wx:if="{{generating}}" class="progress-section">
-      <view class="progress-text">{{reportStatus}} {{reportProgress}}%</view>
-      <t-progress percentage="{{reportProgress}}" theme="primary" />
-      <view class="cancel-section">
+      <!-- 验证状态提示 -->
+      <view class="validation-status compact">
+        <!-- 客户群体信息状态 -->
+        <view class="status-item compact">
+          <view class="status-icon {{isCustomerInfoCompleted ? 'completed' : 'pending'}}">
+            {{isCustomerInfoCompleted ? '✓' : '○'}}
+          </view>
+          <view class="status-text compact">
+            <view class="status-label">客户群体信息</view>
+          </view>
+        </view>
+
+        <!-- 文件上传状态 -->
+        <view class="status-item compact">
+          <view class="status-icon {{selectedFile ? 'completed' : 'pending'}}">
+            {{selectedFile ? '✓' : '○'}}
+          </view>
+          <view class="status-text compact">
+            <view class="status-label">信用报告文件</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 分析进度 -->
+      <view wx:if="{{generating}}" class="progress-section">
+        <view class="progress-text">{{reportStatus}} {{reportProgress}}%</view>
+        <t-progress percentage="{{reportProgress}}" theme="primary" />
+        <view class="cancel-section">
+          <t-button
+            theme="default"
+            size="medium"
+            bind:tap="onCancelAnalysis"
+            class="cancel-btn"
+          >
+            终止分析
+          </t-button>
+        </view>
+      </view>
+
+      <!-- 开始分析按钮 -->
+      <view wx:if="{{!uploading && !generating}}" class="action-section">
         <t-button
-          theme="default"
-          size="medium"
-          bind:tap="onCancelAnalysis"
-          class="cancel-btn"
+          theme="primary"
+          size="large"
+          block
+          bind:tap="onStartAnalysis"
+          class="analysis-btn"
         >
-          终止分析
+          <text class="btn-icon">🚀</text>
+          <text class="btn-text">开始分析</text>
         </t-button>
       </view>
-    </view>
-
-    <!-- 开始分析按钮 -->
-    <view wx:if="{{selectedFile && !uploading && !generating}}" class="action-section">
-      <t-button 
-        theme="primary" 
-        size="large" 
-        block
-        bind:tap="onStartAnalysis"
-      >
-        开始分析
-      </t-button>
     </view>
   </view>
 

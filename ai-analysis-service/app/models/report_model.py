@@ -20,6 +20,7 @@ class AnalysisRequest(BaseModel):
     name: Optional[str] = Field(None, description="姓名")
     id_card: Optional[str] = Field(None, description="身份证号")
     mobile_no: Optional[str] = Field(None, description="手机号码")
+    customer_info: Optional[Dict[str, Any]] = Field(None, description="客户群体信息")
 
     class Config:
         schema_extra = {
@@ -30,7 +31,14 @@ class AnalysisRequest(BaseModel):
                 "custom_prompt": "请分析这份银行流水...",
                 "name": "张三",
                 "id_card": "12131",
-                "mobile_no": "188"
+                "mobile_no": "188",
+                "customer_info": {
+                    "customerType": "授薪类客群",
+                    "includeProductMatch": False,
+                    "companyNature": "大型上市公司及大型民企",
+                    "hasProvidentFund": "是",
+                    "providentFundBase": "5000"
+                }
             }
         }
 

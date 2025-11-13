@@ -38,7 +38,29 @@ Page({
     // 滑动删除相关
     touchStartX: 0,
     touchStartY: 0,
-    swipeIndex: -1 // 当前滑动的报告索引
+    swipeIndex: -1, // 当前滑动的报告索引
+
+    // 客户群体信息收集
+    showCustomerForm: false, // 是否显示客户群体表单
+    customerInfo: {
+      customerType: '', // 授薪类/自雇类
+      includeProductMatch: false, // 是否包含产品匹配
+      // 授薪类字段
+      companyNature: '', // 单位性质
+      hasProvidentFund: '', // 是否缴纳公积金
+      providentFundBase: '', // 公积金基数
+      // 自雇类字段
+      selfEmploymentType: '', // 自雇经营类型
+      companyName: '', // 公司名称
+      cashFlow: '' // 流水
+    } as any,
+    isCustomerInfoCompleted: false, // 客户群体信息是否完整
+
+    // 下拉框选项
+    customerTypeOptions: ['授薪类客群', '自雇类客群'],
+    companyNatureOptions: ['机关及事业单位', '国有企业', '大型上市公司及大型民企', '私企'],
+    providentFundOptions: ['是', '否'],
+    selfEmploymentTypeOptions: ['个体工商户', '小微企业主']
   },
 
   onLoad() {
@@ -266,6 +288,255 @@ Page({
   },
 
   /**
+   * 显示客户群体表单
+   */
+  showCustomerForm() {
+    this.setData({ showCustomerForm: true })
+  },
+
+  /**
+   * 隐藏客户群体表单
+   */
+  hideCustomerForm() {
+    this.setData({ showCustomerForm: false })
+  },
+
+  /**
+   * 处理客户类型选择
+   */
+  onCustomerTypeChange(e: any) {
+    // 支持两种调用方式：picker 和 card 点击
+    let customerType: string
+
+    if (e.detail && e.detail.value !== undefined) {
+      // picker 方式
+      const index = e.detail.value
+      customerType = this.data.customerTypeOptions[index]
+    } else if (e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.type !== undefined) {
+      // card 点击方式
+      const typeIndex = e.currentTarget.dataset.type
+      customerType = this.data.customerTypeOptions[typeIndex]
+    } else {
+      return
+    }
+
+    this.setData({
+      'customerInfo.customerType': customerType,
+      'customerInfo.companyNature': '',
+      'customerInfo.hasProvidentFund': '',
+      'customerInfo.providentFundBase': '',
+      'customerInfo.selfEmploymentType': '',
+      'customerInfo.companyName': '',
+      'customerInfo.cashFlow': ''
+    }, () => {
+      this.updateCustomerInfoStatus()
+    })
+  },
+
+  /**
+   * 处理产品匹配选择
+   */
+  onProductMatchChange(e: any) {
+    this.setData({
+      'customerInfo.includeProductMatch': e.detail.value
+    }, () => {
+      this.updateCustomerInfoStatus()
+    })
+  },
+
+  /**
+   * 处理单位性质选择
+   */
+  onCompanyNatureChange(e: any) {
+    const index = e.detail.value
+    const companyNature = this.data.companyNatureOptions[index]
+    this.setData({
+      'customerInfo.companyNature': companyNature
+    }, () => {
+      this.updateCustomerInfoStatus()
+    })
+  },
+
+  /**
+   * 处理公积金选择
+   */
+  onProvidentFundChange(e: any) {
+    // 支持两种调用方式：picker 和 radio 点击
+    let hasProvidentFund: string
+
+    if (e.detail && e.detail.value !== undefined) {
+      // picker 方式
+      const index = e.detail.value
+      hasProvidentFund = this.data.providentFundOptions[index]
+    } else if (e.currentTarget && e.currentTarget.dataset && e.currentTarget.dataset.value !== undefined) {
+      // radio 点击方式
+      const valueIndex = e.currentTarget.dataset.value
+      hasProvidentFund = this.data.providentFundOptions[valueIndex]
+    } else {
+      return
+    }
+
+    this.setData({
+      'customerInfo.hasProvidentFund': hasProvidentFund,
+      'customerInfo.providentFundBase': '' // 重置公积金基数
+    }, () => {
+      this.updateCustomerInfoStatus()
+    })
+  },
+
+  /**
+   * 处理公积金基数输入
+   */
+  onProvidentFundBaseInput(e: any) {
+    this.setData({
+      'customerInfo.providentFundBase': e.detail.value
+    }, () => {
+      this.updateCustomerInfoStatus()
+    })
+  },
+
+  /**
+   * 处理自雇经营类型选择
+   */
+  onSelfEmploymentTypeChange(e: any) {
+    const index = e.detail.value
+    const selfEmploymentType = this.data.selfEmploymentTypeOptions[index]
+    this.setData({
+      'customerInfo.selfEmploymentType': selfEmploymentType
+    }, () => {
+      this.updateCustomerInfoStatus()
+    })
+  },
+
+  /**
+   * 处理公司名称输入
+   */
+  onCompanyNameInput(e: any) {
+    this.setData({
+      'customerInfo.companyName': e.detail.value
+    }, () => {
+      this.updateCustomerInfoStatus()
+    })
+  },
+
+  /**
+   * 处理流水输入
+   */
+  onCashFlowInput(e: any) {
+    this.setData({
+      'customerInfo.cashFlow': e.detail.value
+    }, () => {
+      this.updateCustomerInfoStatus()
+    })
+  },
+
+  /**
+   * 检查客户群体信息是否完整
+   *
+   * 验证逻辑：
+   * 1. 必须选择客群类型（授薪类或自雇类）
+   * 2. 授薪类客群：
+   *    - 必须填写：单位性质、是否缴纳公积金
+   *    - 如果选择"是"缴纳公积金，还需填写公积金基数
+   *    - 产品匹配选择不影响必填字段
+   * 3. 自雇类客群：
+   *    - 必须填写：自雇经营类型、公司名称
+   *    - 如果包含产品匹配，还需填写流水
+   *    - 如果不包含产品匹配，不需填写流水
+   */
+  isCustomerInfoComplete(): boolean {
+    const { customerInfo } = this.data
+
+    // 1. 必须选择客群类型
+    if (!customerInfo.customerType) {
+      return false
+    }
+
+    // 2. 授薪类客群的验证
+    if (customerInfo.customerType === '授薪类客群') {
+      // 必须填写：单位性质
+      if (!customerInfo.companyNature) {
+        return false
+      }
+      // 必须填写：是否缴纳公积金
+      if (!customerInfo.hasProvidentFund) {
+        return false
+      }
+      // 如果选择"是"缴纳公积金，必须填写公积金基数
+      if (customerInfo.hasProvidentFund === '是' && !customerInfo.providentFundBase) {
+        return false
+      }
+      // 产品匹配选择不影响必填字段，所以授薪类只要上述字段填写完整就可以
+      return true
+    }
+
+    // 3. 自雇类客群的验证
+    if (customerInfo.customerType === '自雇类客群') {
+      // 必须填写：自雇经营类型
+      if (!customerInfo.selfEmploymentType) {
+        return false
+      }
+      // 必须填写：公司名称
+      if (!customerInfo.companyName) {
+        return false
+      }
+      // 如果包含产品匹配，必须填写流水
+      if (customerInfo.includeProductMatch && !customerInfo.cashFlow) {
+        return false
+      }
+      // 如果不包含产品匹配，不需要填写流水
+      return true
+    }
+
+    return false
+  },
+
+  /**
+   * 更新客户群体信息完整状态
+   */
+  updateCustomerInfoStatus() {
+    const isCompleted = this.isCustomerInfoComplete()
+    this.setData({
+      isCustomerInfoCompleted: isCompleted
+    })
+  },
+
+  /**
+   * 验证客户群体信息
+   */
+  validateCustomerInfo(): { valid: boolean; message?: string } {
+    const { customerInfo } = this.data
+
+    if (!customerInfo.customerType) {
+      return { valid: false, message: '请选择客户群体类型' }
+    }
+
+    if (customerInfo.customerType === '授薪类客群') {
+      if (!customerInfo.companyNature) {
+        return { valid: false, message: '请选择单位性质' }
+      }
+      if (!customerInfo.hasProvidentFund) {
+        return { valid: false, message: '请选择是否缴纳公积金' }
+      }
+      if (customerInfo.hasProvidentFund === '是' && !customerInfo.providentFundBase) {
+        return { valid: false, message: '请填写公积金基数' }
+      }
+    } else if (customerInfo.customerType === '自雇类客群') {
+      if (!customerInfo.selfEmploymentType) {
+        return { valid: false, message: '请选择自雇经营类型' }
+      }
+      if (!customerInfo.companyName) {
+        return { valid: false, message: '请填写公司名称' }
+      }
+      if (customerInfo.includeProductMatch && !customerInfo.cashFlow) {
+        return { valid: false, message: '包含产品匹配时需要填写流水' }
+      }
+    }
+
+    return { valid: true }
+  },
+
+  /**
    * 开始上传和分析
    */
   async onStartAnalysis() {
@@ -274,10 +545,23 @@ Page({
       return
     }
 
-    const { selectedFile } = this.data
+    const { selectedFile, customerInfo } = this.data
 
+    // 验证客户群体信息
+    if (!customerInfo.customerType) {
+      showError('请先填写客户群体信息')
+      return
+    }
+
+    const validation = this.validateCustomerInfo()
+    if (!validation.valid) {
+      showError(validation.message!)
+      return
+    }
+
+    // 验证文件是否已选择
     if (!selectedFile) {
-      showError('请先选择文件')
+      showError('请先选择信用报告文件')
       return
     }
 
@@ -314,7 +598,9 @@ Page({
           cloudPath: cloudPath,
           fileName: selectedFile.name,
           fileSize: selectedFile.size,
-          reportType: 'simple'
+          reportType: 'simple',
+          // 传递客户群体信息
+          customerInfo: this.data.customerInfo
         }
       })
 

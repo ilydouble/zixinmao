@@ -22,7 +22,17 @@
   "custom_prompt": "string",     // 可选，自定义提示词
   "name": "string",              // 必填，姓名
   "id_card": "string",           // 必填，身份证号
-  "mobile_no": "string"          // 必填，手机号码
+  "mobile_no": "string",         // 必填，手机号码
+  "customer_info": {             // 可选，客户群体信息
+    "customerType": "string",    // 客户群体类型：授薪类客群/自雇类客群
+    "includeProductMatch": "boolean", // 是否包含产品匹配
+    "companyNature": "string",   // 单位性质（授薪类）
+    "hasProvidentFund": "string", // 是否缴纳公积金（授薪类）
+    "providentFundBase": "string", // 公积金基数（授薪类）
+    "selfEmploymentType": "string", // 自雇经营类型（自雇类）
+    "companyName": "string",     // 公司名称（自雇类）
+    "cashFlow": "string"         // 流水（自雇类，包含产品匹配时）
+  }
 }
 ```
 
@@ -47,7 +57,14 @@ curl -X POST "http://127.0.0.1:8000/analysis/report" \
     "custom_prompt": "请分析这份征信报告",
     "name": "张三",
     "id_card": "110101199001011234",
-    "mobile_no": "13812345678"
+    "mobile_no": "13812345678",
+    "customer_info": {
+      "customerType": "授薪类客群",
+      "includeProductMatch": false,
+      "companyNature": "大型上市公司及大型民企",
+      "hasProvidentFund": "是",
+      "providentFundBase": "5000"
+    }
   }'
 ```
 

@@ -59,7 +59,7 @@ function formatFileSize(bytes) {
 /**
  * 创建报告记录
  */
-async function createReportRecord(userId, fileInfo) {
+async function createReportRecord(userId, fileInfo, customerInfo = null) {
   const reportId = `report_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
   const reportData = {
@@ -73,7 +73,9 @@ async function createReportRecord(userId, fileInfo) {
       fileSize: fileInfo.fileSize,
       uploadTime: new Date(),
       cloudPath: null,
-      fileId: null
+      fileId: null,
+      // 客户群体信息
+      customerInfo: customerInfo || {}
     },
 
     // 处理信息
@@ -243,11 +245,14 @@ function getTagsByType(reportType) {
 }
 
 exports.main = async (event, context) => {
-  const { fileBuffer, fileId, cloudPath, fileName, fileSize, reportType } = event
+  const { fileBuffer, fileId, cloudPath, fileName, fileSize, reportType, customerInfo } = event
   const { OPENID } = cloud.getWXContext()
 
   try {
     console.log(`用户 ${OPENID} 上传文件: ${fileName}, 类型: ${reportType}`)
+    if (customerInfo) {
+      console.log(`客户群体信息:`, customerInfo)
+    }
 
     // 兼容旧版本：如果传入了 fileBuffer，使用旧逻辑
     if (fileBuffer) {
@@ -265,7 +270,7 @@ exports.main = async (event, context) => {
         fileName,
         fileSize: fileBuffer.length,
         status: 'pending'
-      })
+      }, customerInfo)
 
       // 3. 上传文件到云存储
       const uploadCloudPath = `uploads/${reportType}/${OPENID}/${Date.now()}_${fileName}`
@@ -315,7 +320,7 @@ exports.main = async (event, context) => {
       fileName,
       fileSize: fileSize || 0,
       status: 'pending'
-    })
+    }, customerInfo)
 
     // 3. 更新报告记录的文件信息
     await db.collection('reports').doc(reportId).update({

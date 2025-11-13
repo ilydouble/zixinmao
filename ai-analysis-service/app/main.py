@@ -566,6 +566,7 @@ async def generate_analysis_report(request: AnalysisRequest):
             name=request.name,
             id_card=request.id_card,
             mobile_no=request.mobile_no,
+            customer_info=request.customer_info,
         )
         
         # 将Pydantic模型转换为字典以便FastAPI序列化

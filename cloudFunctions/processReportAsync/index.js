@@ -186,6 +186,7 @@ async function analyzeWithAI(fileBuffer, reportType, reportId) {
     const reportDoc = await db.collection('reports').doc(reportId).get()
     const customPrompt = reportDoc.data.algorithm?.prompt || null
     const fileName = reportDoc.data.input?.fileName || 'document.pdf'
+    const customerInfo = reportDoc.data.input?.customerInfo || null
 
     // 将文件转换为base64
     const fileBase64 = fileBuffer.toString('base64')
@@ -200,7 +201,9 @@ async function analyzeWithAI(fileBuffer, reportType, reportId) {
       mime_type: mimeType,
       report_type: reportType,
       custom_prompt: customPrompt,
-      file_name: fileName
+      file_name: fileName,
+      // 添加客户群体信息
+      customer_info: customerInfo
     }
 
     // 更新算法调用信息
