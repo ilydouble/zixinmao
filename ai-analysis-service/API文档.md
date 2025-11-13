@@ -26,10 +26,10 @@
   "customer_info": {             // 可选，客户群体信息
     "customerType": "string",    // 客户群体类型：授薪类客群/自雇类客群
     "includeProductMatch": "boolean", // 是否包含产品匹配
-    "companyNature": "string",   // 单位性质（授薪类）
-    "hasProvidentFund": "string", // 是否缴纳公积金（授薪类）
-    "providentFundBase": "string", // 公积金基数（授薪类）
-    "selfEmploymentType": "string", // 自雇经营类型（自雇类）
+    "companyNature": "string",   // 单位性质（授薪类）：机关及事业单位/国有企业/大型上市公司及大型民企/私企
+    "hasProvidentFund": "boolean", // 是否缴纳公积金（授薪类，bool类型）
+    "providentFundBase": "integer|null", // 公积金基数（授薪类，整型，未缴纳时为null）
+    "selfEmploymentType": "string", // 自雇经营类型（自雇类）：个体工商户/小微企业主
     "companyName": "string",     // 公司名称（自雇类）
     "cashFlow": "string"         // 流水（自雇类，包含产品匹配时）
   }
@@ -43,8 +43,28 @@
 
 **报告类型说明**：
 - `flow` - 银行流水分析
-- `simple` - 简版征信报告分析  
+- `simple` - 简版征信报告分析
 - `detail` - 详版征信报告分析
+
+**客户群体信息字段说明**：
+
+#### 授薪类客群 (`customerType: "授薪类客群"`)
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| customerType | string | 是 | 固定值：`授薪类客群` |
+| companyNature | string | 是 | 单位性质，可选值：`机关及事业单位`、`国有企业`、`大型上市公司及大型民企`、`私企` |
+| hasProvidentFund | boolean | 是 | 是否缴纳公积金，`true` 表示是，`false` 表示否 |
+| providentFundBase | integer\|null | 条件必填 | 公积金基数（元），当 `hasProvidentFund` 为 `true` 时必填，为 `false` 时应为 `null` |
+| includeProductMatch | boolean | 否 | 是否包含产品匹配，默认 `false`，不影响必填字段 |
+
+#### 自雇类客群 (`customerType: "自雇类客群"`)
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| customerType | string | 是 | 固定值：`自雇类客群` |
+| selfEmploymentType | string | 是 | 自雇经营类型，可选值：`个体工商户`、`小微企业主` |
+| companyName | string | 是 | 公司名称 |
+| cashFlow | string | 条件必填 | 流水信息，当 `includeProductMatch` 为 `true` 时必填 |
+| includeProductMatch | boolean | 否 | 是否包含产品匹配，默认 `false` |
 
 **请求示例**：
 ```bash
@@ -62,8 +82,8 @@ curl -X POST "http://127.0.0.1:8000/analysis/report" \
       "customerType": "授薪类客群",
       "includeProductMatch": false,
       "companyNature": "大型上市公司及大型民企",
-      "hasProvidentFund": "是",
-      "providentFundBase": "5000"
+      "hasProvidentFund": true,
+      "providentFundBase": 5000
     }
   }'
 ```

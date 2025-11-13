@@ -47,8 +47,8 @@ Page({
       includeProductMatch: false, // 是否包含产品匹配
       // 授薪类字段
       companyNature: '', // 单位性质
-      hasProvidentFund: '', // 是否缴纳公积金
-      providentFundBase: '', // 公积金基数
+      hasProvidentFund: false, // 是否缴纳公积金（bool类型）
+      providentFundBase: null, // 公积金基数（整型，默认为null）
       // 自雇类字段
       selfEmploymentType: '', // 自雇经营类型
       companyName: '', // 公司名称
@@ -59,7 +59,7 @@ Page({
     // 下拉框选项
     customerTypeOptions: ['授薪类客群', '自雇类客群'],
     companyNatureOptions: ['机关及事业单位', '国有企业', '大型上市公司及大型民企', '私企'],
-    providentFundOptions: ['是', '否'],
+    providentFundOptions: [true, false], // 是否缴纳公积金（bool类型）
     selfEmploymentTypeOptions: ['个体工商户', '小微企业主']
   },
 
@@ -362,7 +362,7 @@ Page({
    */
   onProvidentFundChange(e: any) {
     // 支持两种调用方式：picker 和 radio 点击
-    let hasProvidentFund: string
+    let hasProvidentFund: boolean
 
     if (e.detail && e.detail.value !== undefined) {
       // picker 方式
@@ -378,7 +378,7 @@ Page({
 
     this.setData({
       'customerInfo.hasProvidentFund': hasProvidentFund,
-      'customerInfo.providentFundBase': '' // 重置公积金基数
+      'customerInfo.providentFundBase': null // 重置公积金基数为null
     }, () => {
       this.updateCustomerInfoStatus()
     })
@@ -388,8 +388,11 @@ Page({
    * 处理公积金基数输入
    */
   onProvidentFundBaseInput(e: any) {
+    const value = e.detail.value
+    // 将输入值转换为整型，如果为空则默认为null
+    const providentFundBase = value ? parseInt(value, 10) : null
     this.setData({
-      'customerInfo.providentFundBase': e.detail.value
+      'customerInfo.providentFundBase': providentFundBase
     }, () => {
       this.updateCustomerInfoStatus()
     })
@@ -436,8 +439,9 @@ Page({
    * 验证逻辑：
    * 1. 必须选择客群类型（授薪类或自雇类）
    * 2. 授薪类客群：
-   *    - 必须填写：单位性质、是否缴纳公积金
-   *    - 如果选择"是"缴纳公积金，还需填写公积金基数
+   *    - 必须填写：单位性质、是否缴纳公积金（bool类型）
+   *    - 如果选择缴纳公积金（true），还需填写公积金基数（整型，不为null）
+   *    - 如果不缴纳公积金（false），公积金基数为null
    *    - 产品匹配选择不影响必填字段
    * 3. 自雇类客群：
    *    - 必须填写：自雇经营类型、公司名称
@@ -458,12 +462,12 @@ Page({
       if (!customerInfo.companyNature) {
         return false
       }
-      // 必须填写：是否缴纳公积金
-      if (!customerInfo.hasProvidentFund) {
+      // 必须选择是否缴纳公积金（hasProvidentFund是bool类型，已选择则不为undefined）
+      if (customerInfo.hasProvidentFund === undefined || customerInfo.hasProvidentFund === null) {
         return false
       }
-      // 如果选择"是"缴纳公积金，必须填写公积金基数
-      if (customerInfo.hasProvidentFund === '是' && !customerInfo.providentFundBase) {
+      // 如果选择缴纳公积金（true），必须填写公积金基数（不为null）
+      if (customerInfo.hasProvidentFund && customerInfo.providentFundBase === null) {
         return false
       }
       // 产品匹配选择不影响必填字段，所以授薪类只要上述字段填写完整就可以
@@ -515,10 +519,10 @@ Page({
       if (!customerInfo.companyNature) {
         return { valid: false, message: '请选择单位性质' }
       }
-      if (!customerInfo.hasProvidentFund) {
+      if (customerInfo.hasProvidentFund === undefined || customerInfo.hasProvidentFund === null) {
         return { valid: false, message: '请选择是否缴纳公积金' }
       }
-      if (customerInfo.hasProvidentFund === '是' && !customerInfo.providentFundBase) {
+      if (customerInfo.hasProvidentFund && customerInfo.providentFundBase === null) {
         return { valid: false, message: '请填写公积金基数' }
       }
     } else if (customerInfo.customerType === '自雇类客群') {

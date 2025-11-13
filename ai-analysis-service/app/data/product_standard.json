@@ -1,0 +1,458 @@
+[
+  {
+    "region": "有北京银行网点地区",
+    "bank_name": "北京银行",
+    "product_name": "京e贷",
+    "age_range": "22-55",
+    "max_credit": "100万",
+    "max_period": "5年",
+    "min_rate": "3%",
+    "repayment_methods": "先息后本或等额本息",
+    "admission_conditions": "优质单位且公积金基数大于7000且公积金连续缴存满12个月",
+    "admission_conditions_quality_unit": true,
+    "admission_conditions_provident_fund_base": 7000,
+    "admission_conditions_provident_fund_months": 12,
+    "admission_conditions_consistent_unit": false,
+    "query_requirements": "2个月内≤4次且3个月内≤6次",
+    "query_requirements_stats": [
+      {
+        "months": 2,
+        "times": 4
+      },
+      {
+        "months": 3,
+        "times": 6
+      }
+    ],
+    "overdue_requirements": "无当前逾期且2年内无连2累6",
+    "overdue_requirements_current": "无",
+    "overdue_requirements_current_stats": [
+      {
+        "months": 24,
+        "consecutive_months": 2,
+        "cumulative_months": 6
+      }
+    ],
+    "overdue_requirements_history_stats": null,
+    "debt_requirements": "信用类负债小于100万",
+    "credit_card_usage_rate": "不超过70%",
+    "credit_card_count": null,
+    "loan_institutions_count": "≤4笔",
+    "non_bank_loans_count": "≤2笔",
+    "white_user_allowed": "否",
+    "credit_calculation": "公积金基数的15至25倍"
+  },
+  {
+    "region": "全国",
+    "bank_name": "工商银行",
+    "product_name": "融e借",
+    "age_range": "18-60",
+    "max_credit": "30万",
+    "max_period": "7年",
+    "min_rate": "3%",
+    "repayment_methods": "先息后本或等额本息或等额本金",
+    "admission_conditions": "优质单位且公积金基数大于4800元",
+    "admission_conditions_quality_unit": true,
+    "admission_conditions_provident_fund_base": 4800,
+    "admission_conditions_provident_fund_months": null,
+    "admission_conditions_consistent_unit": false,
+    "query_requirements": "1个月内≤3次",
+    "query_requirements_stats": [
+      {
+        "months": 1,
+        "times": 3
+      }
+    ],
+    "overdue_requirements": "无当前逾期且半年内无累3且历史逾期不能出现连2",
+    "overdue_requirements_current": "无",
+    "overdue_requirements_current_stats": [
+      {
+        "months": 6,
+        "consecutive_months": null,
+        "cumulative_months": 3
+      }
+    ],
+    "overdue_requirements_history_stats": [
+      {
+        "months": 60,
+        "consecutive_months": 2,
+        "cumulative_months": null
+      }
+    ],
+    "debt_requirements": "信用类负债小于100万",
+    "credit_card_usage_rate": "不超过80%",
+    "credit_card_count": null,
+    "loan_institutions_count": null,
+    "non_bank_loans_count": null,
+    "white_user_allowed": "是",
+    "credit_calculation": "公积金基数为4800至7199元按照公积金个人年缴存额12倍或公积金基数为7200至14399元按照公积金个人年缴存额16倍或公积金基数为14400元以上按照公积金个人年缴存额32倍"
+  },
+  {
+    "region": "全国",
+    "bank_name": "建设银行",
+    "product_name": "建易贷",
+    "age_range": "20-60",
+    "max_credit": "100万",
+    "max_period": "5年",
+    "min_rate": "3%",
+    "repayment_methods": "等额本息或按月付息随借随还",
+    "admission_conditions": "优质单位且公积金基数大于5000且公积金缴存连续满1年",
+    "admission_conditions_quality_unit": true,
+    "admission_conditions_provident_fund_base": 5000,
+    "admission_conditions_provident_fund_months": 12,
+    "admission_conditions_consistent_unit": false,
+    "query_requirements": "近1个月内≤4次且近3个月＜6次",
+    "query_requirements_stats": [
+      {
+        "months": 1,
+        "times": 4
+      },
+      {
+        "months": 3,
+        "times": 6
+      }
+    ],
+    "overdue_requirements": "无当前逾期且两年内不能出现连2累5",
+    "overdue_requirements_current": "无",
+    "overdue_requirements_current_stats": [
+      {
+        "months": 24,
+        "consecutive_months": 2,
+        "cumulative_months": 5
+      }
+    ],
+    "overdue_requirements_history_stats": null,
+    "debt_requirements": "信用负债不超过100万且总负债不超过个人公积金基数12倍的70%",
+    "credit_card_usage_rate": "不超过70%",
+    "credit_card_count": "＜6张",
+    "loan_institutions_count": null,
+    "non_bank_loans_count": null,
+    "white_user_allowed": "否",
+    "credit_calculation": "公积金基数的24倍减去建行信用负债"
+  },
+  {
+    "region": "全国",
+    "bank_name": "交通银行",
+    "product_name": "惠民贷",
+    "age_range": "20-60",
+    "max_credit": "80万",
+    "max_period": "5年",
+    "min_rate": "3.50%",
+    "repayment_methods": "等额本息或先息后本",
+    "admission_conditions": "公积金基数大于5000且公积金缴存满一年",
+    "admission_conditions_quality_unit": false,
+    "admission_conditions_provident_fund_base": 5000,
+    "admission_conditions_provident_fund_months": 12,
+    "admission_conditions_consistent_unit": false,
+    "query_requirements": "近2个月内贷款审批和信用卡审批查询＜8次",
+    "query_requirements_stats": null,
+    "overdue_requirements": "无当前逾期且半年内不能有逾期且近两年内不能有连2",
+    "overdue_requirements_current": "无",
+    "overdue_requirements_current_stats": [
+      {
+        "months": 6,
+        "consecutive_months": null,
+        "cumulative_months": 1
+      },
+      {
+        "months": 24,
+        "consecutive_months": 2,
+        "cumulative_months": null
+      }
+    ],
+    "overdue_requirements_history_stats": null,
+    "debt_requirements": "信用贷款和信用卡授信总额度不能超过150万",
+    "credit_card_usage_rate": "不超过80%",
+    "credit_card_count": null,
+    "loan_institutions_count": "≤4笔",
+    "non_bank_loans_count": null,
+    "white_user_allowed": "否",
+    "credit_calculation": "公积金基数的15至25倍"
+  },
+  {
+    "region": "有民生银行网点地区",
+    "bank_name": "民生银行",
+    "product_name": "民易贷",
+    "age_range": "22-60",
+    "max_credit": "50万",
+    "max_period": "3年",
+    "min_rate": "3.05%",
+    "repayment_methods": "先息后本或等额本息或随借随还",
+    "admission_conditions": "优质单位且公积金基数大于4000且公积金连续缴存大于6个月",
+    "admission_conditions_quality_unit": true,
+    "admission_conditions_provident_fund_base": 4000,
+    "admission_conditions_provident_fund_months": 6,
+    "admission_conditions_consistent_unit": false,
+    "query_requirements": "近2个月内审批查询≤4次且近6个月≤10次",
+    "query_requirements_stats": null,
+    "overdue_requirements": "无当前逾期且近2年内不能出现连3累6",
+    "overdue_requirements_current": "无",
+    "overdue_requirements_current_stats": [
+      {
+        "months": 24,
+        "consecutive_months": 3,
+        "cumulative_months": 6
+      }
+    ],
+    "overdue_requirements_history_stats": null,
+    "debt_requirements": "信用类负债小于100万",
+    "credit_card_usage_rate": "不超过70%",
+    "credit_card_count": null,
+    "loan_institutions_count": "≤2笔",
+    "non_bank_loans_count": "禁止",
+    "white_user_allowed": "否",
+    "credit_calculation": "公积金基数的36倍减去信用贷款余额减去信用卡分期余额"
+  },
+  {
+    "region": "全国",
+    "bank_name": "农业银行",
+    "product_name": "网捷贷",
+    "age_range": "18-60",
+    "max_credit": "100万",
+    "max_period": "5年",
+    "min_rate": "3%",
+    "repayment_methods": "等额本息或先息后本",
+    "admission_conditions": "优质单位且公积金缴存基数5000以上且连续缴存满1年且社保、公积金、个税缴存单位一致",
+    "admission_conditions_quality_unit": true,
+    "admission_conditions_provident_fund_base": 5000,
+    "admission_conditions_provident_fund_months": 12,
+    "admission_conditions_consistent_unit": true,
+    "query_requirements": "近3个月＜6次",
+    "query_requirements_stats": [
+      {
+        "months": 3,
+        "times": 6
+      }
+    ],
+    "overdue_requirements": "无当前逾期且近2年内不能出现连2累4",
+    "overdue_requirements_current": "无",
+    "overdue_requirements_current_stats": [
+      {
+        "months": 24,
+        "consecutive_months": 2,
+        "cumulative_months": 4
+      }
+    ],
+    "overdue_requirements_history_stats": null,
+    "debt_requirements": null,
+    "credit_card_usage_rate": "不超过80%",
+    "credit_card_count": null,
+    "loan_institutions_count": "≤6笔",
+    "non_bank_loans_count": null,
+    "white_user_allowed": "否",
+    "credit_calculation": "公积金缴存基数的24倍乘以0.85"
+  },
+  {
+    "region": "全国",
+    "bank_name": "邮政储蓄银行",
+    "product_name": "邮享贷",
+    "age_range": "22-60",
+    "max_credit": "50万",
+    "max_period": "7年",
+    "min_rate": "3%",
+    "repayment_methods": "等额本息或先息后本",
+    "admission_conditions": "优质单位且公积金基数大于5000且连续缴存满1年",
+    "admission_conditions_quality_unit": true,
+    "admission_conditions_provident_fund_base": 5000,
+    "admission_conditions_provident_fund_months": 12,
+    "admission_conditions_consistent_unit": false,
+    "query_requirements": "近6个月＜6次",
+    "query_requirements_stats": [
+      {
+        "months": 6,
+        "times": 6
+      }
+    ],
+    "overdue_requirements": "无当前逾期且5年内不能出现连2累3",
+    "overdue_requirements_current": "无",
+    "overdue_requirements_current_stats": [
+      {
+        "months": 60,
+        "consecutive_months": 2,
+        "cumulative_months": 3
+      }
+    ],
+    "overdue_requirements_history_stats": null,
+    "debt_requirements": null,
+    "credit_card_usage_rate": "不超过70%",
+    "credit_card_count": "≤5张",
+    "loan_institutions_count": null,
+    "non_bank_loans_count": null,
+    "white_user_allowed": "否",
+    "credit_calculation": "公积金缴存基数的30倍"
+  },
+  {
+    "region": "陕西全省",
+    "bank_name": "长安银行",
+    "product_name": "优享贷",
+    "age_range": "22-60",
+    "max_credit": "200万",
+    "max_period": "5年",
+    "min_rate": "3.25%",
+    "repayment_methods": "等额本息或等额本金或先息后本",
+    "admission_conditions": "公积金基数大于5000且公积金连续缴存满1年",
+    "admission_conditions_quality_unit": false,
+    "admission_conditions_provident_fund_base": 5000,
+    "admission_conditions_provident_fund_months": 12,
+    "admission_conditions_consistent_unit": false,
+    "query_requirements": "近3个月＜9次",
+    "query_requirements_stats": [
+      {
+        "months": 3,
+        "times": 9
+      }
+    ],
+    "overdue_requirements": "无当前逾期且近3年内不能出现连3累6",
+    "overdue_requirements_current": "无",
+    "overdue_requirements_current_stats": [
+      {
+        "months": 36,
+        "consecutive_months": 3,
+        "cumulative_months": 6
+      }
+    ],
+    "overdue_requirements_history_stats": null,
+    "debt_requirements": "信用类负债小于50万",
+    "credit_card_usage_rate": "不超过70%",
+    "credit_card_count": null,
+    "loan_institutions_count": null,
+    "non_bank_loans_count": "＜6笔",
+    "white_user_allowed": "否",
+    "credit_calculation": "普通单位公积金基数的24至36倍减去信用负债余额或优质单位公积金基数的48至60倍减去信用负债余额"
+  },
+  {
+    "region": "有招商银行网点地区",
+    "bank_name": "招商银行",
+    "product_name": "闪电贷",
+    "age_range": "22-60",
+    "max_credit": "50万",
+    "max_period": "5年",
+    "min_rate": "3.50%",
+    "repayment_methods": "等额本息或等额本金或先息后本",
+    "admission_conditions": "当前单位公积金缴存时间满6个月且公积金累计缴存满2年且公积金缴存基数大于5000",
+    "admission_conditions_quality_unit": false,
+    "admission_conditions_provident_fund_base": 5000,
+    "admission_conditions_provident_fund_months": 24,
+    "admission_conditions_consistent_unit": false,
+    "query_requirements": "近3个月＜6次",
+    "query_requirements_stats": [
+      {
+        "months": 3,
+        "times": 6
+      }
+    ],
+    "overdue_requirements": "无当前逾期且6个月内无连2累3且两年内不能出现连2累6",
+    "overdue_requirements_current": "无",
+    "overdue_requirements_current_stats": [
+      {
+        "months": 6,
+        "consecutive_months": 2,
+        "cumulative_months": 3
+      },
+      {
+        "months": 24,
+        "consecutive_months": 2,
+        "cumulative_months": 6
+      }
+    ],
+    "overdue_requirements_history_stats": null,
+    "debt_requirements": "信用类负债不超过70万",
+    "credit_card_usage_rate": "不超过80%",
+    "credit_card_count": null,
+    "loan_institutions_count": "≤4笔",
+    "non_bank_loans_count": null,
+    "white_user_allowed": "否",
+    "credit_calculation": "公积金基数的25倍减去（信用负债余额的0.5倍）"
+  },
+  {
+    "region": "有中信银行网点地区",
+    "bank_name": "中信银行",
+    "product_name": "信秒贷",
+    "age_range": "18-60",
+    "max_credit": "50万",
+    "max_period": "7年",
+    "min_rate": "3.28%",
+    "repayment_methods": "先息后本或等额本金或随借随还",
+    "admission_conditions": "公积金连续缴存满2年且公积金基数大于4000元",
+    "admission_conditions_quality_unit": false,
+    "admission_conditions_provident_fund_base": 4000,
+    "admission_conditions_provident_fund_months": 24,
+    "admission_conditions_consistent_unit": false,
+    "query_requirements": "2个月内＜4次且6个月内＜10次",
+    "query_requirements_stats": [
+      {
+        "months": 2,
+        "times": 4
+      },
+      {
+        "months": 6,
+        "times": 10
+      }
+    ],
+    "overdue_requirements": "无当前逾期且两年内不能出现连2累4且5年内不得出现连3累12",
+    "overdue_requirements_current": "无",
+    "overdue_requirements_current_stats": [
+      {
+        "months": 24,
+        "consecutive_months": 2,
+        "cumulative_months": 4
+      },
+      {
+        "months": 60,
+        "consecutive_months": 3,
+        "cumulative_months": 6
+      }
+    ],
+    "overdue_requirements_history_stats": null,
+    "debt_requirements": "负债总额不超过公积金基数的36倍",
+    "credit_card_usage_rate": "不超过80%",
+    "credit_card_count": null,
+    "loan_institutions_count": "＜3笔",
+    "non_bank_loans_count": null,
+    "white_user_allowed": "否",
+    "credit_calculation": "公积金基数的120倍减去信用类贷款授信额度"
+  },
+  {
+    "region": "全国",
+    "bank_name": "中国银行",
+    "product_name": "随心智贷",
+    "age_range": "18-57",
+    "max_credit": "50万",
+    "max_period": "5年",
+    "min_rate": "3%",
+    "repayment_methods": "等额本息或先息后本",
+    "admission_conditions": "公积金基数大于5000且公积金连续缴存满1年",
+    "admission_conditions_quality_unit": false,
+    "admission_conditions_provident_fund_base": 5000,
+    "admission_conditions_provident_fund_months": 12,
+    "admission_conditions_consistent_unit": false,
+    "query_requirements": "1个月内＜6次且12个月内＜20次",
+    "query_requirements_stats": [
+      {
+        "months": 1,
+        "times": 6
+      },
+      {
+        "months": 12,
+        "times": 20
+      }
+    ],
+    "overdue_requirements": "无当前逾期且5年内不能出现连3累6",
+    "overdue_requirements_current": "无",
+    "overdue_requirements_current_stats": [
+      {
+        "months": 60,
+        "consecutive_months": 3,
+        "cumulative_months": 6
+      }
+    ],
+    "overdue_requirements_history_stats": null,
+    "debt_requirements": null,
+    "credit_card_usage_rate": "不超过80%",
+    "credit_card_count": null,
+    "loan_institutions_count": null,
+    "non_bank_loans_count": null,
+    "white_user_allowed": "否",
+    "credit_calculation": "公积金基数的48倍减去信用类贷款负债"
+  }
+]

@@ -116,7 +116,7 @@
           <view class="form-label compact">公积金 <text class="required">*</text></view>
           <view class="radio-group compact">
             <view
-              class="radio-item compact {{customerInfo.hasProvidentFund === '是' ? 'active' : ''}}"
+              class="radio-item compact {{customerInfo.hasProvidentFund === true ? 'active' : ''}}"
               bind:tap="onProvidentFundChange"
               data-value="0"
             >
@@ -124,7 +124,7 @@
               <text>是</text>
             </view>
             <view
-              class="radio-item compact {{customerInfo.hasProvidentFund === '否' ? 'active' : ''}}"
+              class="radio-item compact {{customerInfo.hasProvidentFund === false ? 'active' : ''}}"
               bind:tap="onProvidentFundChange"
               data-value="1"
             >
@@ -135,7 +135,7 @@
         </view>
 
         <!-- 公积金基数 -->
-        <view wx:if="{{customerInfo.hasProvidentFund === '是'}}" class="form-row compact fade-in">
+        <view wx:if="{{customerInfo.hasProvidentFund === true}}" class="form-row compact fade-in">
           <view class="form-label compact">基数 <text class="required">*</text></view>
           <view class="input-wrapper compact">
             <text class="input-prefix">¥</text>
