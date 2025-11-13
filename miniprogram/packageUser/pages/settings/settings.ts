@@ -280,7 +280,7 @@ Page({
    */
   onUserAgreement() {
     wx.navigateTo({
-      url: '/packageUser/pages/agreement/agreement?type=user'
+      url: '/packageUser/pages/userAgreement/userAgreement'
     })
   },
 
@@ -289,7 +289,7 @@ Page({
    */
   onPrivacyPolicy() {
     wx.navigateTo({
-      url: '/packageUser/pages/agreement/agreement?type=privacy'
+      url: '/packageUser/pages/privacyPolicy/privacyPolicy'
     })
   }
 })

@@ -107,7 +107,7 @@
   </view>
 
   <!-- 定制化产品服务 -->
-  <view class="product-section">
+  <!-- <view class="product-section">
     <view class="section-title">定制化产品服务</view>
 
     <view
@@ -146,6 +146,6 @@
       </view>
       <view class="product-banner-icon">🏦</view>
     </view>
-  </view>
+  </view> -->
 </view>
 

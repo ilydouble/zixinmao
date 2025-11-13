@@ -171,8 +171,11 @@ Page({
    */
   onViewAgreement(e: any) {
     const { type } = e.currentTarget.dataset
+    const url = type === 'user'
+      ? '/packageUser/pages/userAgreement/userAgreement'
+      : '/packageUser/pages/privacyPolicy/privacyPolicy'
     wx.navigateTo({
-      url: `/packageUser/pages/agreement/agreement?type=${type}`
+      url
     })
   }
 })

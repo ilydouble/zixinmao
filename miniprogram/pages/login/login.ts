@@ -30,9 +30,8 @@ Page({
    * 查看用户协议
    */
   onViewUserAgreement(e: any) {
-    e.stopPropagation()
     wx.navigateTo({
-      url: '/packageUser/pages/agreement/agreement?type=user'
+      url: '/packageUser/pages/userAgreement/userAgreement'
     })
   },
 
@@ -40,9 +39,8 @@ Page({
    * 查看隐私政策
    */
   onViewPrivacyPolicy(e: any) {
-    e.stopPropagation()
     wx.navigateTo({
-      url: '/packageUser/pages/agreement/agreement?type=privacy'
+      url: '/packageUser/pages/privacyPolicy/privacyPolicy'
     })
   },
 
@@ -60,6 +58,12 @@ Page({
         duration: 2000
       })
       return
+    }
+
+    // 禁用登录按钮
+    const loginButton = this.selectComponent('.login-button')
+    if (loginButton) {
+      loginButton.disabled = true
     }
 
     this.setData({ loading: true })
@@ -106,5 +110,14 @@ Page({
         duration: 2000
       })
     }
+  },
+
+  /**
+   * 返回首页
+   */
+  onBackToHome() {
+    wx.switchTab({
+      url: '/pages/home/home'
+    })
   }
 })

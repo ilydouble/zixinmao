@@ -26,31 +26,32 @@
 
     <!-- 隐私协议勾选 -->
     <view class="agreement-section">
-      <checkbox-group bind:change="onAgreementChange">
-        <label class="agreement-label">
-          <checkbox value="agree" checked="{{agreedToPolicy}}" color="#0052D9" />
-          <text class="agreement-text">
-            我已阅读并同意
-            <text class="agreement-link" bind:tap="onViewUserAgreement">《用户协议》</text>
-            和
-            <text class="agreement-link" bind:tap="onViewPrivacyPolicy">《隐私政策》</text>
-          </text>
-        </label>
-      </checkbox-group>
+      <view class="agreement-item">
+        <checkbox-group bind:change="onAgreementChange">
+          <label class="agreement-label">
+            <checkbox value="agree" checked="{{agreedToPolicy}}" color="#0052D9" />
+          </label>
+        </checkbox-group>
+        <view class="agreement-text">
+          <text>我已阅读并同意</text>
+          <text class="agreement-link" catchtap="onViewUserAgreement">《用户协议》</text>
+          <text>和</text>
+          <text class="agreement-link" catchtap="onViewPrivacyPolicy">《隐私政策》</text>
+        </view>
+      </view>
     </view>
 
     <!-- 登录按钮 -->
     <view class="login-actions">
-      <t-button
-        theme="primary"
-        size="large"
-        block
-        loading="{{loading}}"
-        disabled="{{!agreedToPolicy}}"
-        bind:tap="onWechatLogin"
-      >
-        微信快速登录
-      </t-button>
+      <view class="button-group">
+        <view class="back-button" bind:tap="onBackToHome">
+          返回首页
+        </view>
+        <view class="login-button" bind:tap="onWechatLogin">
+          <text wx:if="{{!loading}}">微信快速登录</text>
+          <text wx:else>登录中...</text>
+        </view>
+      </view>
     </view>
   </view>
 </view>

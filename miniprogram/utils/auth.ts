@@ -225,10 +225,10 @@ export async function refreshUserInfo(): Promise<UserInfo | null> {
     const response = result.result as CloudResponse<UserInfo>
     if (response?.success && response?.userInfo) {
       const userInfo = response.userInfo
-      
-      
-      // 保存到本地存储
+
+      // 保存到本地存储并更新全局状态
       wx.setStorageSync(USER_INFO_KEY, userInfo)
+      updateGlobalUserState(userInfo, true)
       return userInfo
     } else {
       console.error('获取用户信息失败:', (result.result as any)?.message)
@@ -245,14 +245,15 @@ export async function refreshUserInfo(): Promise<UserInfo | null> {
  */
 export function logout(): void {
   updateGlobalUserState(null, false)
-  
+
   // 清除其他本地存储
   try {
     wx.removeStorageSync('currentOrg')
+    wx.removeStorageSync('userInfo')
   } catch (error) {
     console.error('清除本地存储失败:', error)
   }
-  
+
   wx.showToast({
     title: '已退出登录',
     icon: 'success'

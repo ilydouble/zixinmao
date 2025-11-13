@@ -29,7 +29,8 @@
         "pages/help/help",
         "pages/settings/settings",
         "pages/product-detail/product-detail",
-        "pages/agreement/agreement"
+        "pages/userAgreement/userAgreement",
+        "pages/privacyPolicy/privacyPolicy"
       ]
     }
   ],

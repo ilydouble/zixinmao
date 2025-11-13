@@ -57,7 +57,7 @@
       <t-avatar size="large" image="/images/default-avatar.png" />
       <view class="prompt-text">
         <view class="prompt-title">未登录</view>
-        <t-button theme="primary" size="small" bind:tap="onGetUserProfile">
+        <t-button theme="primary" size="small" bind:tap="onNavigateToLogin">
           点击登录
         </t-button>
       </view>

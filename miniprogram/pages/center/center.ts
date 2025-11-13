@@ -49,22 +49,36 @@ Page({
     const { statusBarHeight } = wx.getSystemInfoSync()
     this.setData({ statusBarHeight })
 
-    // 首次加载时先显示缓存数据，然后异步刷新
+    // 首次加载时先显示缓存数据
     this.loadUserInfo()
-    this.refreshAndLoadUserInfo()
+
+    // 只有在已登录的情况下才刷新用户信息
+    if (isAuthenticated()) {
+      this.refreshAndLoadUserInfo()
+    }
   },
 
   async onShow() {
-    // 页面显示时只有在从其他页面返回时才刷新
-    // 避免首次进入时重复刷新
-    if (this.data.userInfo) {
+    // 页面显示时检查登录状态
+    const isLoggedIn = isAuthenticated()
+
+    if (isLoggedIn) {
+      // 已登录：刷新用户信息
       await this.refreshAndLoadUserInfo()
+    } else if (this.data.isLoggedIn) {
+      // 从已登录状态变为未登录：清除用户信息
+      this.setData({
+        isLoggedIn: false,
+        userInfo: null
+      })
     }
   },
 
   async onPullDownRefresh() {
-    // 下拉刷新时重新从云端获取用户信息
-    await this.refreshAndLoadUserInfo()
+    // 下拉刷新时，只有在已登录的情况下才刷新用户信息
+    if (isAuthenticated()) {
+      await this.refreshAndLoadUserInfo()
+    }
     wx.stopPullDownRefresh()
   },
 
@@ -97,16 +111,22 @@ Page({
           refreshing: false
         })
       } else {
-        console.log('refreshAndLoadUserInfo: 刷新失败，加载本地缓存')
-        // 刷新失败时加载本地缓存
-        this.setData({ refreshing: false })
-        this.loadUserInfo()
+        console.log('refreshAndLoadUserInfo: 刷新失败，清除用户信息')
+        // 刷新失败时清除用户信息（表示已退出登录）
+        this.setData({
+          refreshing: false,
+          isLoggedIn: false,
+          userInfo: null
+        })
       }
     } catch (error) {
       console.error('刷新用户信息失败:', error)
-      // 即使刷新失败，也尝试加载本地缓存的信息
-      this.setData({ refreshing: false })
-      this.loadUserInfo()
+      // 刷新失败时清除用户信息
+      this.setData({
+        refreshing: false,
+        isLoggedIn: false,
+        userInfo: null
+      })
     }
   },
 
@@ -115,7 +135,7 @@ Page({
    */
   async loadUserInfo() {
     const isLoggedIn = isAuthenticated()
-    const userInfo = getCurrentUser()
+    const userInfo = isLoggedIn ? getCurrentUser() : null
 
     console.log('loadUserInfo 调用:', { isLoggedIn, avatarUrl: userInfo?.avatarUrl })
 
@@ -314,15 +334,12 @@ Page({
   },
 
   /**
-   * 获取用户授权信息
+   * 跳转到登录页面
    */
-  async onGetUserProfile() {
-    try {
-      await getUserProfile()
-      this.loadUserInfo()
-    } catch (error) {
-      console.error('获取用户信息失败:', error)
-    }
+  onNavigateToLogin() {
+    wx.navigateTo({
+      url: '/pages/login/login'
+    })
   },
 
   /**
