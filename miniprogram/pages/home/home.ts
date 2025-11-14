@@ -99,7 +99,7 @@ Page({
           title: '流水宝',
           bgColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
           link: '/packageBusiness/pages/liushui/liushui',
-          disabled: true
+          disabled: false
         },
         {
           id: 2,
@@ -113,7 +113,7 @@ Page({
           title: '专信宝',
           bgColor: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
           link: '/packageBusiness/pages/zhuanxin/zhuanxin',
-          disabled: true
+          disabled: false
         }
       ]
 
@@ -141,19 +141,21 @@ Page({
    * 点击 Banner
    */
   onBannerTap(e: any) {
-    const { link, disabled } = e.currentTarget.dataset
-
-    // 如果功能被禁用，显示提示
-    if (disabled) {
-      wx.showToast({
-        title: '功能开发中，敬请期待',
-        icon: 'none',
-        duration: 2000
-      })
-      return
-    }
+    const { link } = e.currentTarget.dataset
 
     if (link) {
+      // 检查是否是待开发功能（流水宝、专信宝）
+      if (link.includes('liushui') || link.includes('zhuanxin')) {
+        wx.showModal({
+          title: '功能开发中',
+          content: '该功能正在开发中，敬请期待！\n\n我们正在努力为您打造更好的体验。',
+          showCancel: false,
+          confirmText: '我知道了',
+          confirmColor: '#007AFF'
+        })
+        return
+      }
+
       // ✅ 修复审核问题：先检查登录状态
       if (!isAuthenticated()) {
         wx.showModal({
@@ -172,8 +174,8 @@ Page({
         return
       }
 
-      // 检查是否需要实名认证（征信相关功能）
-      if ((link.includes('jianxin') || link.includes('zhuanxin')) && needRealNameAuth()) {
+      // 检查是否需要实名认证（仅简信宝需要）
+      if (link.includes('jianxin') && needRealNameAuth()) {
         wx.navigateTo({
           url: `/pages/auth/auth?return=${encodeURIComponent(link)}`
         })
@@ -196,7 +198,40 @@ Page({
    * 导航到功能页面
    */
   navigateToPage(e: any) {
-    const { url } = e.currentTarget.dataset
+    console.log('navigateToPage 事件:', e)
+
+    // 获取 url，处理事件冒泡的情况
+    let url = e.currentTarget?.dataset?.url
+
+    console.log('从 currentTarget 获取的 url:', url)
+
+    // 如果 currentTarget 没有 url，尝试从 target 获取
+    if (!url && e.target?.dataset) {
+      url = e.target.dataset.url
+      console.log('从 target 获取的 url:', url)
+    }
+
+    // 如果仍然没有获取到 url，记录错误并返回
+    if (!url) {
+      console.error('无法获取 url 属性，事件对象:', e)
+      console.error('currentTarget.dataset:', e.currentTarget?.dataset)
+      console.error('target.dataset:', e.target?.dataset)
+      return
+    }
+
+    console.log('最终获取的 url:', url)
+
+    // 检查是否是待开发功能（流水宝、专信宝）
+    if (url.includes('liushui') || url.includes('zhuanxin')) {
+      wx.showModal({
+        title: '功能开发中',
+        content: '该功能正在开发中，敬请期待！\n\n我们正在努力为您打造更好的体验。',
+        showCancel: false,
+        confirmText: '我知道了',
+        confirmColor: '#007AFF'
+      })
+      return
+    }
 
     // ✅ 修复审核问题：先检查登录状态
     if (!isAuthenticated()) {
@@ -216,8 +251,8 @@ Page({
       return
     }
 
-    // 检查是否需要实名认证
-    if ((url.includes('jianxin') || url.includes('zhuanxin')) && needRealNameAuth()) {
+    // 检查是否需要实名认证（仅简信宝需要）
+    if (url.includes('jianxin') && needRealNameAuth()) {
       wx.navigateTo({
         url: `/pages/auth/auth?return=${encodeURIComponent(url)}`
       })

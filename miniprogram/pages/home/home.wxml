@@ -40,9 +40,8 @@
     >
       <swiper-item wx:for="{{banners}}" wx:key="id">
         <view
-          class="banner-item {{item.disabled ? 'disabled' : ''}}"
+          class="banner-item"
           data-link="{{item.link}}"
-          data-disabled="{{item.disabled}}"
           bind:tap="onBannerTap"
         >
           <!-- 如果有图片URL，显示图片；否则显示渐变背景 -->
@@ -52,14 +51,12 @@
               mode="aspectFill"
               class="banner-img"
             />
-            <view wx:if="{{item.disabled}}" class="banner-badge">开发中</view>
           </view>
           <view wx:else class="banner-bg" style="background: {{item.bgColor}}">
             <view class="banner-content">
               <text class="banner-title">{{item.title}}</text>
               <text class="banner-desc">{{item.description || '专业的' + item.title + '分析服务'}}</text>
             </view>
-            <view wx:if="{{item.disabled}}" class="banner-badge">开发中</view>
           </view>
         </view>
       </swiper-item>
@@ -80,28 +77,34 @@
   <view class="function-section">
     <view class="section-title">核心功能</view>
     <view class="function-grid">
-      <view class="function-item disabled">
+      <view
+        class="function-item"
+        data-url="/packageBusiness/pages/liushui/liushui"
+        catch:tap="navigateToPage"
+      >
         <view class="function-icon">💰</view>
         <view class="function-name">流水宝</view>
         <view class="function-desc">银行流水分析</view>
-        <view class="function-badge">开发中</view>
       </view>
 
       <view
         class="function-item"
         data-url="/packageBusiness/pages/jianxin/jianxin"
-        bind:tap="navigateToPage"
+        catch:tap="navigateToPage"
       >
         <view class="function-icon">📋</view>
         <view class="function-name">简信宝</view>
         <view class="function-desc">信用报告解读</view>
       </view>
 
-      <view class="function-item disabled">
+      <view
+        class="function-item"
+        data-url="/packageBusiness/pages/zhuanxin/zhuanxin"
+        catch:tap="navigateToPage"
+      >
         <view class="function-icon">📘</view>
         <view class="function-name">专信宝</view>
         <view class="function-desc">深度信用分析</view>
-        <view class="function-badge">开发中</view>
       </view>
     </view>
   </view>
