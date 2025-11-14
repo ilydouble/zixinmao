@@ -198,28 +198,14 @@ Page({
    * 导航到功能页面
    */
   navigateToPage(e: any) {
-    console.log('navigateToPage 事件:', e)
+    // 获取 url
+    const url = e.currentTarget?.dataset?.url
 
-    // 获取 url，处理事件冒泡的情况
-    let url = e.currentTarget?.dataset?.url
-
-    console.log('从 currentTarget 获取的 url:', url)
-
-    // 如果 currentTarget 没有 url，尝试从 target 获取
-    if (!url && e.target?.dataset) {
-      url = e.target.dataset.url
-      console.log('从 target 获取的 url:', url)
-    }
-
-    // 如果仍然没有获取到 url，记录错误并返回
+    // 如果无法获取 url，记录错误并返回
     if (!url) {
-      console.error('无法获取 url 属性，事件对象:', e)
-      console.error('currentTarget.dataset:', e.currentTarget?.dataset)
-      console.error('target.dataset:', e.target?.dataset)
+      console.error('无法获取 url 属性', e)
       return
     }
-
-    console.log('最终获取的 url:', url)
 
     // 检查是否是待开发功能（流水宝、专信宝）
     if (url.includes('liushui') || url.includes('zhuanxin')) {
