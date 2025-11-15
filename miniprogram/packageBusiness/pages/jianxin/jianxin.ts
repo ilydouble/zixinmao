@@ -207,7 +207,7 @@ Page({
         const file = res.tempFiles[0]
 
         // 使用统一的文件验证
-        const validation = validateFile(`财务报告截图.${file.tempFilePath.split('.').pop()}`, file.size, 'simple')
+        const validation = validateFile(`信用报告截图.${file.tempFilePath.split('.').pop()}`, file.size, 'simple')
         if (!validation.valid) {
           showError(validation.message!)
           return
@@ -215,7 +215,7 @@ Page({
 
         this.setData({
           selectedFile: {
-            name: `财务报告截图.${file.tempFilePath.split('.').pop()}`,
+            name: `信用报告截图.${file.tempFilePath.split('.').pop()}`,
             size: file.size,
             path: file.tempFilePath,
             type: 'image'
@@ -579,7 +579,7 @@ Page({
     if (!selectedFile) {
       wx.showModal({
         title: '提示',
-        content: '请先选择财务报告文件',
+        content: '请先选择信用报告文件',
         showCancel: false,
         confirmText: '我知道了',
         confirmColor: '#007AFF'

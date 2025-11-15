@@ -28,7 +28,7 @@ class Income_Service():
 
 ## Profile
 
-- Author: 财务数据处理专家  
+- Author: 信用数据处理专家  
 - Version: 1.0  
 - Language: 中文  
 - Description: 专门从社保数据中提取关键信息，用于个人收入认定和分析的AI助手  
@@ -80,7 +80,7 @@ class Income_Service():
 
 ## Profile
 
-- Author: 财务数据处理专家  
+- Author: 信用数据处理专家  
 - Version: 1.0  
 - Language: 中文  
 - Description: 专门从公积金数据中提取关键信息，用于个人收入认定和分析的AI助手  
@@ -129,7 +129,7 @@ class Income_Service():
 
 ## Profile
 
-- Author: 财务数据处理专家  
+- Author: 信用数据处理专家  
 - Version: 1.0  
 - Language: 中文  
 - Description: 专门从个税数据中提取关键信息，用于个人收入认定和分析的AI助手  
