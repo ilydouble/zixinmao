@@ -77,16 +77,14 @@
   <view class="function-section">
     <view class="section-title">核心功能</view>
     <view class="function-grid">
-      <view
-        class="function-item"
-        data-url="/packageBusiness/pages/liushui/liushui"
-        catch:tap="navigateToPage"
-      >
+      <!-- 流水宝 - 不可点击 -->
+      <view class="function-item function-item-disabled">
         <view class="function-icon">💰</view>
         <view class="function-name">流水宝</view>
         <view class="function-desc">银行流水分析</view>
       </view>
 
+      <!-- 简信宝 - 可点击 -->
       <view
         class="function-item"
         data-url="/packageBusiness/pages/jianxin/jianxin"
@@ -97,11 +95,8 @@
         <view class="function-desc">财务数据分析</view>
       </view>
 
-      <view
-        class="function-item"
-        data-url="/packageBusiness/pages/zhuanxin/zhuanxin"
-        catch:tap="navigateToPage"
-      >
+      <!-- 专信宝 - 不可点击 -->
+      <view class="function-item function-item-disabled">
         <view class="function-icon">📘</view>
         <view class="function-name">专信宝</view>
         <view class="function-desc">深度财务分析</view>
@@ -110,7 +105,7 @@
   </view>
 
   <!-- 定制化产品服务 -->
-  <!-- <view class="product-section">
+  <view class="product-section">
     <view class="section-title">定制化产品服务</view>
 
     <view
@@ -120,7 +115,7 @@
     >
       <view class="product-banner-content">
         <view class="product-banner-title">电子签</view>
-        <view class="product-banner-desc">本地化部署，为金融企业订制专属的线上签署系统</view>
+        <view class="product-banner-desc">本地化部署，为金融企业打造专属的线上签署系统</view>
       </view>
       <view class="product-banner-icon">🖊️</view>
     </view>
@@ -132,7 +127,7 @@
     >
       <view class="product-banner-content">
         <view class="product-banner-title">赊楼宝</view>
-        <view class="product-banner-desc">赊楼系统，全流程ERP管控</view>
+        <view class="product-banner-desc">赊楼系统，实现全流程ERP管控</view>
       </view>
       <view class="product-banner-icon">🎁</view>
       <view class="product-banner-badge">激励计划</view>
@@ -145,10 +140,10 @@
     >
       <view class="product-banner-content">
         <view class="product-banner-title">抵押宝</view>
-        <view class="product-banner-desc">抵押贷产品解决方案 · 核心流程在线化</view>
+        <view class="product-banner-desc">抵押贷产品解决方案 · 核心流程全面在线化</view>
       </view>
       <view class="product-banner-icon">🏦</view>
     </view>
-  </view> -->
+  </view>
 </view>
 

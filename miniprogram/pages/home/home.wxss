@@ -213,6 +213,15 @@
   font-weight: 500;
 }
 
+/* 禁用的功能项 */
+.function-item-disabled {
+  pointer-events: none;
+}
+
+.function-item-disabled:active {
+  transform: none;
+}
+
 /* 产品服务 */
 .product-section {
   margin: 24rpx;

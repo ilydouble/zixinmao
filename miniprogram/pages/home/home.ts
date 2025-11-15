@@ -144,18 +144,6 @@ Page({
     const { link } = e.currentTarget.dataset
 
     if (link) {
-      // 检查是否是待开发功能（流水宝、专信宝）
-      if (link.includes('liushui') || link.includes('zhuanxin')) {
-        wx.showModal({
-          title: '功能开发中',
-          content: '该功能正在开发中，敬请期待！\n\n我们正在努力为您打造更好的体验。',
-          showCancel: false,
-          confirmText: '我知道了',
-          confirmColor: '#007AFF'
-        })
-        return
-      }
-
       // ✅ 修复审核问题：先检查登录状态
       if (!isAuthenticated()) {
         wx.showModal({
@@ -204,18 +192,6 @@ Page({
     // 如果无法获取 url，记录错误并返回
     if (!url) {
       console.error('无法获取 url 属性', e)
-      return
-    }
-
-    // 检查是否是待开发功能（流水宝、专信宝）
-    if (url.includes('liushui') || url.includes('zhuanxin')) {
-      wx.showModal({
-        title: '功能开发中',
-        content: '该功能正在开发中，敬请期待！\n\n我们正在努力为您打造更好的体验。',
-        showCancel: false,
-        confirmText: '我知道了',
-        confirmColor: '#007AFF'
-      })
       return
     }
 
