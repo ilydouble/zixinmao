@@ -48,33 +48,18 @@
     <!-- 协议勾选 -->
     <view class="agreement-section">
       <view class="agreement-item">
-        <checkbox-group bind:change="onAgreementChange" data-agreement="userAgreement">
-          <checkbox value="agree" checked="{{agreements.userAgreement}}" />
+        <checkbox-group bind:change="onAgreementChange">
+          <label class="agreement-label">
+            <checkbox value="agree" checked="{{agreements.allAgreed}}" color="#ffffffff" />
+            <view class="checkbox-spacer"></view>
+            <text>我已阅读并同意</text>
+            <text class="agreement-link" data-type="user" catchtap="onViewAgreement">《用户协议》</text>
+            <text>、</text>
+            <text class="agreement-link" data-type="privacy" catchtap="onViewAgreement">《隐私政策》</text>
+            <text>和</text>
+            <text class="agreement-link" data-type="disclaimer" catchtap="onViewAgreement">《免责声明》</text>
+          </label>
         </checkbox-group>
-        <text class="agreement-text">
-          我已阅读并同意
-          <text class="agreement-link" data-type="user" bind:tap="onViewAgreement">《用户协议》</text>
-        </text>
-      </view>
-
-      <view class="agreement-item">
-        <checkbox-group bind:change="onAgreementChange" data-agreement="privacyPolicy">
-          <checkbox value="agree" checked="{{agreements.privacyPolicy}}" />
-        </checkbox-group>
-        <text class="agreement-text">
-          我已阅读并同意
-          <text class="agreement-link" data-type="privacy" bind:tap="onViewAgreement">《隐私政策》</text>
-        </text>
-      </view>
-
-      <view class="agreement-item">
-        <checkbox-group bind:change="onAgreementChange" data-agreement="disclaimer">
-          <checkbox value="agree" checked="{{agreements.disclaimer}}" />
-        </checkbox-group>
-        <text class="agreement-text">
-          我已阅读并同意
-          <text class="agreement-link" data-type="disclaimer" bind:tap="onViewAgreement">《免责声明》</text>
-        </text>
       </view>
     </view>
 

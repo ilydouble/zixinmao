@@ -207,7 +207,7 @@ Page({
         const file = res.tempFiles[0]
 
         // 使用统一的文件验证
-        const validation = validateFile(`征信报告截图.${file.tempFilePath.split('.').pop()}`, file.size, 'simple')
+        const validation = validateFile(`财务报告截图.${file.tempFilePath.split('.').pop()}`, file.size, 'simple')
         if (!validation.valid) {
           showError(validation.message!)
           return
@@ -215,7 +215,7 @@ Page({
 
         this.setData({
           selectedFile: {
-            name: `征信报告截图.${file.tempFilePath.split('.').pop()}`,
+            name: `财务报告截图.${file.tempFilePath.split('.').pop()}`,
             size: file.size,
             path: file.tempFilePath,
             type: 'image'
@@ -579,7 +579,7 @@ Page({
     if (!selectedFile) {
       wx.showModal({
         title: '提示',
-        content: '请先选择信用报告文件',
+        content: '请先选择财务报告文件',
         showCancel: false,
         confirmText: '我知道了',
         confirmColor: '#007AFF'
@@ -752,7 +752,7 @@ Page({
             currentReportId: '',
             pollStartTime: 0
           })
-          showSuccess('简版征信报告生成完成！')
+          showSuccess('财务分析报告生成完成！')
           this.loadReportList()
 
         } else if (response.needResubmit) {
@@ -836,7 +836,7 @@ Page({
           this.loadReportList()
 
           // 显示完成提示
-          showSuccess('简版征信报告生成完成！')
+          showSuccess('财务分析报告生成完成！')
 
         } else if (statusData.status === 'failed') {
           // 报告失败，清除状态
@@ -893,7 +893,7 @@ Page({
         currentReportId: '',
         pollStartTime: 0
       })
-      showError('简版征信报告生成超时，请重试')
+      showError('财务分析报告生成超时，请重试')
       return
     }
 
@@ -1049,7 +1049,7 @@ Page({
         // 转换数据格式以适配现有UI
         const reports = response.data.reports.map((report: any) => ({
           id: report.reportId,
-          title: `简版征信分析报告 - ${report.fileName}`,
+          title: `财务分析报告 - ${report.fileName}`,
           date: new Date(report.createdAt).toLocaleDateString(),
           status: report.status,
           progress: report.progress,
@@ -1416,7 +1416,7 @@ Page({
     if (this.data.generating) {
       wx.showModal({
         title: '提示',
-        content: '简版征信报告正在生成中，离开页面不会中断处理，您可以稍后回来查看结果',
+        content: '财务分析报告正在生成中，离开页面不会中断处理，您可以稍后回来查看结果',
         confirmText: '继续离开',
         cancelText: '留在此页',
         success: (res) => {

@@ -12,9 +12,7 @@ Page({
       phone: ''
     },
     agreements: {
-      userAgreement: false,
-      privacyPolicy: false,
-      disclaimer: false
+      allAgreed: false
     }
   },
 
@@ -54,10 +52,9 @@ Page({
    * 协议勾选
    */
   onAgreementChange(e: any) {
-    const { agreement } = e.currentTarget.dataset
     const { value } = e.detail
     this.setData({
-      [`agreements.${agreement}`]: value.length > 0
+      'agreements.allAgreed': value.length > 0
     })
   },
 
@@ -96,7 +93,7 @@ Page({
       return false
     }
     
-    if (!agreements.userAgreement || !agreements.privacyPolicy || !agreements.disclaimer) {
+    if (!agreements.allAgreed) {
       showError('请同意用户协议、隐私政策和免责声明')
       return false
     }

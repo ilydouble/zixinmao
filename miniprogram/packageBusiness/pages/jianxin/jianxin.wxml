@@ -6,7 +6,7 @@
       <view class="notice-icon">🔐</view>
       <view class="notice-text">
         <view class="notice-title">需要实名认证</view>
-        <view class="notice-desc">使用信用报告分析功能需要先完成实名认证</view>
+        <view class="notice-desc">使用财务分析功能需要先完成实名认证</view>
       </view>
       <t-button theme="primary" size="small" bind:tap="goToAuth">
         去认证
@@ -30,12 +30,12 @@
 
   <!-- 功能介绍 -->
   <view class="feature-intro">
-    <view class="intro-title">📄 简信宝 · 信用报告解读</view>
-    <view class="intro-desc">快速解读个人信用报告核心信息，提供基础信用评估</view>
+    <view class="intro-title">📄 简信宝 · 财务数据分析</view>
+    <view class="intro-desc">快速分析个人财务数据，提供基础财务评估</view>
     <view class="intro-features">
       <view class="feature-tag">快速分析</view>
-      <view class="feature-tag">核心信息</view>
-      <view class="feature-tag">信用评估</view>
+      <view class="feature-tag">数据洞察</view>
+      <view class="feature-tag">财务评估</view>
     </view>
   </view>
 
@@ -193,19 +193,19 @@
       </view>
     </view>
 
-    <!-- 第二部分：上传信用报告框 -->
+    <!-- 第二部分：上传财务报告框 -->
     <view class="info-card">
       <view class="card-header">
         <view class="card-title-icon">📄</view>
         <view class="card-title-text">
-          <view class="card-title">上传信用报告</view>
+          <view class="card-title">上传财务报告</view>
         </view>
       </view>
 
       <view wx:if="{{!selectedFile}}" class="upload-area compact">
         <view class="upload-content" bind:tap="onChooseFile">
           <view class="upload-icon">☁️</view>
-          <view class="upload-text">点击选择信用报告文件</view>
+          <view class="upload-text">点击选择财务报告文件</view>
           <view class="upload-desc">支持 PDF 文档或图片截图，最大 10MB</view>
         </view>
       </view>
@@ -252,7 +252,7 @@
             {{selectedFile ? '✓' : '○'}}
           </view>
           <view class="status-text compact">
-            <view class="status-label">信用报告文件</view>
+            <view class="status-label">财务报告文件</view>
           </view>
         </view>
       </view>
@@ -330,13 +330,13 @@
               <view class="report-title">{{item.title}}</view>
               <view class="report-date">{{item.date}}</view>
               <view wx:if="{{item.status === 'processing'}}" class="report-status processing">
-                AI正在分析信用数据... {{item.progress}}%
+                AI正在分析财务数据... {{item.progress}}%
               </view>
               <view wx:elif="{{item.status === 'failed'}}" class="report-status failed">
                 文件损坏或分析出错 - 点击重新生成
               </view>
               <view wx:elif="{{item.status === 'completed'}}" class="report-status completed">
-                信用分析完成 - 点击查看详情
+                财务分析完成 - 点击查看详情
               </view>
             </view>
             <view class="report-actions">

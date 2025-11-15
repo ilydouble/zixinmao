@@ -6,7 +6,7 @@
       <view class="notice-icon">🔐</view>
       <view class="notice-text">
         <view class="notice-title">需要实名认证</view>
-        <view class="notice-desc">使用深度信用分析功能需要先完成实名认证</view>
+        <view class="notice-desc">使用深度财务分析功能需要先完成实名认证</view>
       </view>
       <t-button theme="primary" size="small" bind:tap="goToAuth">
         去认证
@@ -16,8 +16,8 @@
 
   <!-- 功能介绍 -->
   <view class="feature-intro">
-    <view class="intro-title">📘 专信宝 · 深度信用分析</view>
-    <view class="intro-desc">深度解析个人信用报告，提供专业级风险评估和建议</view>
+    <view class="intro-title">📘 专信宝 · 深度财务分析</view>
+    <view class="intro-desc">深度分析个人财务数据，提供专业级财务评估和建议</view>
     <view class="intro-features">
       <view class="feature-tag">深度分析</view>
       <view class="feature-tag">风险评估</view>
@@ -30,7 +30,7 @@
     <view wx:if="{{!selectedFile}}" class="upload-area">
       <view class="upload-content" bind:tap="onChooseFile">
         <view class="upload-icon">☁️</view>
-        <view class="upload-text">点击选择详版信用报告文件</view>
+        <view class="upload-text">点击选择详版财务报告文件</view>
         <view class="upload-desc">支持 PDF 文档或图片截图，最大 10MB</view>
       </view>
       <t-button theme="primary" size="medium" style="margin-top: 20rpx;" bind:tap="onChooseFile">
@@ -133,13 +133,13 @@
               <view class="report-title">{{item.title}}</view>
               <view class="report-date">{{item.date}}</view>
               <view wx:if="{{item.status === 'processing'}}" class="report-status processing">
-                AI正在进行深度信用分析... {{item.progress}}%
+                AI正在进行深度财务分析... {{item.progress}}%
               </view>
               <view wx:elif="{{item.status === 'failed'}}" class="report-status failed">
                 文件损坏或分析出错 - 点击重新生成专业报告
               </view>
               <view wx:elif="{{item.status === 'completed'}}" class="report-status completed">
-                深度信用分析完成 - 点击查看详细报告
+                深度财务分析完成 - 点击查看详细报告
               </view>
             </view>
             <view class="report-tag">详版</view>

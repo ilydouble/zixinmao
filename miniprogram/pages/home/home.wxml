@@ -94,7 +94,7 @@
       >
         <view class="function-icon">📋</view>
         <view class="function-name">简信宝</view>
-        <view class="function-desc">信用报告解读</view>
+        <view class="function-desc">财务数据分析</view>
       </view>
 
       <view
@@ -104,7 +104,7 @@
       >
         <view class="function-icon">📘</view>
         <view class="function-name">专信宝</view>
-        <view class="function-desc">深度信用分析</view>
+        <view class="function-desc">深度财务分析</view>
       </view>
     </view>
   </view>

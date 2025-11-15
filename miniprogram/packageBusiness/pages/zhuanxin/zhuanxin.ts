@@ -104,7 +104,7 @@ Page({
         const file = res.tempFiles[0]
 
         // 使用统一的文件验证
-        const validation = validateFile(`详版信用报告截图.${file.tempFilePath.split('.').pop()}`, file.size, 'detail')
+        const validation = validateFile(`详版财务报告截图.${file.tempFilePath.split('.').pop()}`, file.size, 'detail')
         if (!validation.valid) {
           showError(validation.message!)
           return
@@ -112,7 +112,7 @@ Page({
 
         this.setData({
           selectedFile: {
-            name: `详版信用报告截图.${file.tempFilePath.split('.').pop()}`,
+            name: `详版财务报告截图.${file.tempFilePath.split('.').pop()}`,
             size: file.size,
             path: file.tempFilePath,
             type: 'image'
@@ -328,7 +328,7 @@ Page({
             currentReportId: '',
             pollStartTime: 0
           })
-          showSuccess('专业征信报告生成完成！')
+          showSuccess('专业财务分析报告生成完成！')
           this.loadReportList()
 
         } else if (response.needResubmit) {
@@ -414,7 +414,7 @@ Page({
           this.loadReportList()
 
           // 显示完成提示
-          showSuccess('专业征信报告生成完成！')
+          showSuccess('专业财务分析报告生成完成！')
 
         } else if (statusData.status === 'failed') {
           // 报告失败，清除状态
@@ -478,7 +478,7 @@ Page({
         currentReportId: '',
         pollStartTime: 0
       })
-      showError('专业征信报告生成超时，请重试')
+      showError('专业财务分析报告生成超时，请重试')
       return
     }
 
@@ -674,7 +674,7 @@ Page({
         // 转换数据格式以适配现有UI
         const reports = (result.result as any).data.reports.map((report: any) => ({
           id: report.reportId,
-          title: `深度信用分析报告 - ${report.fileName}`,
+          title: `深度财务分析报告 - ${report.fileName}`,
           date: new Date(report.createdAt).toLocaleDateString(),
           status: report.status,
           progress: report.progress,
@@ -1009,7 +1009,7 @@ Page({
     if (this.data.generating) {
       wx.showModal({
         title: '提示',
-        content: '专业版征信报告正在生成中，离开页面不会中断处理，您可以稍后回来查看结果',
+        content: '专业版财务分析报告正在生成中，离开页面不会中断处理，您可以稍后回来查看结果',
         confirmText: '继续离开',
         cancelText: '留在此页',
         success: (res) => {
