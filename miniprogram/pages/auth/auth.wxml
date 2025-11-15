@@ -54,10 +54,8 @@
             <view class="checkbox-spacer"></view>
             <text>我已阅读并同意</text>
             <text class="agreement-link" data-type="user" catchtap="onViewAgreement">《用户协议》</text>
-            <text>、</text>
-            <text class="agreement-link" data-type="privacy" catchtap="onViewAgreement">《隐私政策》</text>
             <text>和</text>
-            <text class="agreement-link" data-type="disclaimer" catchtap="onViewAgreement">《免责声明》</text>
+            <text class="agreement-link" data-type="privacy" catchtap="onViewAgreement">《隐私政策》</text>
           </label>
         </checkbox-group>
       </view>

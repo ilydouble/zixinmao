@@ -94,7 +94,7 @@ Page({
     }
     
     if (!agreements.allAgreed) {
-      showError('请同意用户协议、隐私政策和免责声明')
+      showError('请同意用户协议和隐私政策')
       return false
     }
     
@@ -175,8 +175,6 @@ Page({
       url = '/packageUser/pages/userAgreement/userAgreement'
     } else if (type === 'privacy') {
       url = '/packageUser/pages/privacyPolicy/privacyPolicy'
-    } else if (type === 'disclaimer') {
-      url = '/packageUser/pages/disclaimer/disclaimer'
     }
 
     if (url) {
