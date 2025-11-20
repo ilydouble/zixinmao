@@ -771,6 +771,30 @@
   font-size: 24rpx;
 }
 
+
+/* 省市组合选择器：一行显示两个选择器 */
+.picker-group {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  flex: 1;
+}
+
+/* 覆盖 picker 在组合中的宽度，确保两列同一行显示 */
+.picker-group .picker-wrapper {
+  width: auto;
+  flex: 1;
+  min-width: 0; /* 允许在一行内收缩 */
+}
+.picker-group picker {
+  width: auto;
+  display: block;
+}
+.picker-group .picker-input.compact {
+  width: 100%;
+}
+
+
 /* Picker包装器 - 占满宽度 */
 .picker-wrapper {
   flex: 1;

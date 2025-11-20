@@ -58,6 +58,70 @@
         </view>
       </view>
 
+      <!-- 基本信息输入 -->
+      <view class="form-section basic-info-section compact">
+        <!-- 姓名 -->
+        <view class="form-row compact">
+          <view class="form-label compact">姓名 <text class="required">*</text></view>
+          <view class="input-wrapper compact">
+            <input
+              type="text"
+              placeholder="请输入姓名"
+              value="{{customerInfo.name}}"
+              bindinput="onNameInput"
+              class="form-input"
+            />
+          </view>
+        </view>
+
+        <!-- 身份证号 -->
+        <view class="form-row compact">
+          <view class="form-label compact">身份证号 <text class="required">*</text></view>
+          <view class="input-wrapper compact">
+            <input
+              type="idcard"
+              placeholder="请输入身份证号"
+              value="{{customerInfo.idCard}}"
+              bindinput="onIdCardInput"
+              class="form-input"
+            />
+          </view>
+        </view>
+
+        <!-- 手机号 -->
+        <view class="form-row compact">
+          <view class="form-label compact">手机号 <text class="required">*</text></view>
+          <view class="input-wrapper compact">
+            <input
+              type="number"
+              placeholder="请输入手机号"
+              value="{{customerInfo.mobileNo}}"
+              bindinput="onMobileNoInput"
+              class="form-input"
+            />
+          </view>
+        </view>
+
+        <!-- 所在地区 -->
+        <view class="form-row compact">
+          <view class="form-label compact">所在地区 <text class="required">*</text></view>
+          <view class="picker-group">
+            <!-- 省份选择 -->
+            <picker mode="selector" range="{{provinceOptions}}" range-key="name" bindchange="onProvinceChange" class="picker-wrapper">
+              <view class="picker-input compact {{customerInfo.province ? '' : 'placeholder'}}">
+                {{customerInfo.province || '请选择省份'}}
+              </view>
+            </picker>
+            <!-- 城市选择 -->
+            <picker mode="selector" range="{{cityOptions}}" range-key="name" bindchange="onCityChange" class="picker-wrapper" disabled="{{!customerInfo.province}}">
+              <view class="picker-input compact {{customerInfo.city ? '' : 'placeholder'}}">
+                {{customerInfo.city || '请选择城市'}}
+              </view>
+            </picker>
+          </view>
+        </view>
+      </view>
+
       <!-- 客户类型选择 - 勾选框式 -->
       <view class="customer-type-checkbox-group">
         <view class="checkbox-label">

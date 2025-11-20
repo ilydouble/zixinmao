@@ -11,6 +11,8 @@ class ReportType(str, Enum):
 
 class CustomerInfo(BaseModel):
     """客户群体信息"""
+    province: Optional[str] = Field(None, description="省份")
+    city: Optional[str] = Field(None, description="城市")
     customerType: Optional[str] = Field(None, description="客户群体类型：授薪类客群/自雇类客群")
     includeProductMatch: Optional[bool] = Field(None, description="是否包含产品匹配")
 
@@ -37,6 +39,7 @@ class AnalysisRequest(BaseModel):
     name: Optional[str] = Field(None, description="姓名")
     id_card: Optional[str] = Field(None, description="身份证号")
     mobile_no: Optional[str] = Field(None, description="手机号码")
+    auth_file: Optional[str] = Field(None, description="授权文件")
     customer_info: Optional[CustomerInfo] = Field(None, description="客户群体信息")
 
     class Config:

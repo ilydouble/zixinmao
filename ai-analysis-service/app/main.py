@@ -273,6 +273,9 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
             custom_prompt=request.custom_prompt,
             request_id=request_id,
             file_name=request.file_name or "document.pdf",
+            name=request.name,
+            id_card=request.id_card,
+            mobile_no=request.mobile_no,
             customer_info=request.customer_info
         )
         processing_time = time.time() - start_time

@@ -43,6 +43,13 @@ Page({
     // 客户群体信息收集
     showCustomerForm: false, // 是否显示客户群体表单
     customerInfo: {
+      // 基本信息
+      name: '', // 姓名
+      idCard: '', // 身份证号
+      mobileNo: '', // 手机号
+      province: '', // 省份
+      city: '', // 城市
+      // 客群信息
       customerType: '', // 授薪类/自雇类
       includeProductMatch: false, // 是否包含产品匹配
       // 授薪类字段
@@ -57,6 +64,8 @@ Page({
     isCustomerInfoCompleted: false, // 客户群体信息是否完整
 
     // 下拉框选项
+    provinceOptions: [] as any[],
+    cityOptions: [] as any[],
     customerTypeOptions: ['授薪类客群', '自雇类客群'],
     companyNatureOptions: ['机关及事业单位', '国有企业', '大型上市公司及大型民企', '私企'],
     providentFundOptions: [true, false], // 是否缴纳公积金（bool类型）
@@ -76,6 +85,7 @@ Page({
     this.checkAuth()
     this.checkMembership()
     this.loadReportList()
+    this.loadProvinces()
   },
 
   onShow() {
@@ -434,6 +444,117 @@ Page({
   },
 
   /**
+   * 处理姓名输入
+   */
+  onNameInput(e: any) {
+    this.setData({
+      'customerInfo.name': e.detail.value
+    }, () => {
+      this.updateCustomerInfoStatus()
+    })
+  },
+
+  /**
+   * 处理身份证号输入
+   */
+  onIdCardInput(e: any) {
+    this.setData({
+      'customerInfo.idCard': e.detail.value
+    }, () => {
+      this.updateCustomerInfoStatus()
+    })
+  },
+
+  /**
+   * 处理手机号输入
+   */
+  onMobileNoInput(e: any) {
+    this.setData({
+      'customerInfo.mobileNo': e.detail.value
+    }, () => {
+      this.updateCustomerInfoStatus()
+    })
+  },
+
+  /**
+   * 加载省份列表
+   */
+  async loadProvinces() {
+    try {
+      const result = await wx.cloud.callFunction({
+        name: 'getRegions'
+      }) as any;
+
+      if (result.result.success) {
+        this.setData({
+          provinceOptions: result.result.data
+        });
+      } else {
+        showError('获取省份列表失败');
+      }
+    } catch (error) {
+      console.error('获取省份列表失败:', error);
+      showError('获取省份列表失败');
+    }
+  },
+
+  /**
+   * 处理省份选择
+   */
+  onProvinceChange(e: any) {
+    const index = e.detail.value;
+    const selectedProvince = this.data.provinceOptions[index];
+
+    this.setData({
+      'customerInfo.province': selectedProvince.name,
+      'customerInfo.city': '', // Reset city
+      cityOptions: []
+    }, () => {
+      this.updateCustomerInfoStatus();
+      this.loadCities(selectedProvince.code);
+    });
+  },
+
+  /**
+   * 加载城市列表
+   */
+  async loadCities(provinceCode: string) {
+    try {
+      const result = await wx.cloud.callFunction({
+        name: 'getRegions',
+        data: {
+          parent_code: provinceCode
+        }
+      }) as any;
+
+      if (result.result.success) {
+        this.setData({
+          cityOptions: result.result.data
+        });
+      } else {
+        showError('获取城市列表失败');
+      }
+    } catch (error) {
+      console.error('获取城市列表失败:', error);
+      showError('获取城市列表失败');
+    }
+  },
+
+  /**
+   * 处理城市选择
+   */
+  onCityChange(e: any) {
+    const index = e.detail.value;
+    const selectedCity = this.data.cityOptions[index];
+
+    this.setData({
+      'customerInfo.city': selectedCity.name
+    }, () => {
+      this.updateCustomerInfoStatus();
+    });
+  },
+
+  /**
    * 检查客户群体信息是否完整
    *
    * 验证逻辑：
@@ -451,7 +572,12 @@ Page({
   isCustomerInfoComplete(): boolean {
     const { customerInfo } = this.data
 
-    // 1. 必须选择客群类型
+    // 1. 必须填写基本信息
+    if (!customerInfo.name || !customerInfo.idCard || !customerInfo.mobileNo || !customerInfo.province || !customerInfo.city) {
+      return false
+    }
+
+    // 2. 必须选择客群类型
     if (!customerInfo.customerType) {
       return false
     }
@@ -510,6 +636,22 @@ Page({
    */
   validateCustomerInfo(): { valid: boolean; message?: string } {
     const { customerInfo } = this.data
+
+    if (!customerInfo.name) {
+      return { valid: false, message: '请输入姓名' }
+    }
+    if (!customerInfo.idCard) {
+      return { valid: false, message: '请输入身份证号' }
+    }
+    if (!customerInfo.mobileNo) {
+      return { valid: false, message: '请输入手机号' }
+    }
+    if (!customerInfo.province) {
+      return { valid: false, message: '请选择省份' }
+    }
+    if (!customerInfo.city) {
+      return { valid: false, message: '请选择城市' }
+    }
 
     if (!customerInfo.customerType) {
       return { valid: false, message: '请选择客户群体类型' }

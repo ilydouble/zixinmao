@@ -1,5 +1,8 @@
 const cloud = require('wx-server-sdk')
 const axios = require('axios')
+const PDFDocument = require('pdfkit')
+const path = require('path')
+const fs = require('fs')
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
@@ -15,7 +18,7 @@ const AI_ANALYSIS_SERVICE = {
 
 exports.main = async (event, context) => {
   const { reportId, fileId, reportType } = event
-  
+
   try {
     console.log(`🚀 开始异步处理报告: ${reportId}, 类型: ${reportType}`)
     console.log(`📋 AI服务配置: ${AI_ANALYSIS_SERVICE.url}`)
@@ -105,7 +108,7 @@ exports.main = async (event, context) => {
       reportId: reportId,
       message: '文件处理完成，AI分析已启动，请稍后查看结果'
     }
-    
+
   } catch (error) {
     console.error(`报告处理失败: ${reportId}`, error)
 
@@ -177,6 +180,135 @@ function detectMimeType(fileId) {
   }
 }
 
+
+// 清洗文件名中的非法字符
+function sanitizeName(name) {
+  return String(name || '')
+    .replace(/[\\/:*?"<>|]/g, '')
+    .replace(/\s+/g, '')
+    .slice(0, 40) // 避免过长
+}
+
+function tsString(d = new Date()) {
+  const pad = (n) => (n < 10 ? '0' + n : '' + n)
+  const yyyy = d.getFullYear()
+  const MM = pad(d.getMonth() + 1)
+  const dd = pad(d.getDate())
+  const HH = pad(d.getHours())
+  const mm = pad(d.getMinutes())
+  const ss = pad(d.getSeconds())
+  return `${yyyy}${MM}${dd}_${HH}${mm}${ss}`
+}
+
+
+function toAscii(s) {
+  return String(s || '').replace(/[^0-9a-zA-Z_.-]/g, '')
+}
+
+
+/**
+ * 生成授权PDF并上传到云存储，返回下载链接
+ */
+async function generateAuthPDFAndUpload(name, userId) {
+  try {
+    console.log(`📄 [授权PDF] 开始生成 - 姓名: ${name}, userId: ${userId}`)
+
+    // 构建PDF
+    const doc = new PDFDocument({ size: 'A4', margin: 50, pdfVersion: '1.4' })
+
+    // 加载本地中文字体文件
+    const localFontPath = path.join(__dirname, 'fonts', 'SourceHanSansCN-Regular.ttf')
+    console.log(`📄 [授权PDF] 检查本地字体: ${localFontPath}`)
+
+    if (!fs.existsSync(localFontPath)) {
+      const errorMsg = `❌ 字体文件不存在: ${localFontPath}\n请下载中文TTF字体并放置到该路径`
+      console.error(errorMsg)
+      throw new Error(errorMsg)
+    }
+
+    // 获取字体文件大小
+    const fontStats = fs.statSync(localFontPath)
+    console.log(`� [授权PDF] 字体文件大小: ${fontStats.size} 字节 (${(fontStats.size / 1024 / 1024).toFixed(2)} MB)`)
+
+    // 验证字体文件大小（至少应该大于1MB）
+    if (fontStats.size < 1000000) {
+      const errorMsg = `❌ 字体文件太小 (${fontStats.size} 字节)，可能不是有效的中文字体文件\n正常的中文字体应该至少 4MB 以上`
+      console.error(errorMsg)
+      throw new Error(errorMsg)
+    }
+
+    // 注册并使用中文字体
+    try {
+      doc.registerFont('ChineseFont', localFontPath)
+      doc.font('ChineseFont')
+      console.log('✅ [授权PDF] 中文字体加载成功')
+    } catch (e) {
+      const errorMsg = `❌ 字体加载失败: ${e.message}\n请确保字体文件是有效的 TTF 格式`
+      console.error(errorMsg)
+      throw new Error(errorMsg)
+    }
+
+    // 先绑定流监听，收集PDF二进制
+    const buffers = []
+    const pdfBufferPromise = new Promise((resolve, reject) => {
+      doc.on('data', (d) => buffers.push(d))
+      doc.on('end', () => resolve(Buffer.concat(buffers)))
+      doc.on('error', reject)
+    })
+
+    // 生成PDF内容
+    doc.fontSize(20).text('授权书', { align: 'center' })
+    doc.moveDown(2)
+    doc.fontSize(14).text(`授权人：${name || ''}`)
+    doc.moveDown(1)
+    doc.fontSize(14).text('授权信息：授权在天远数据查询。')
+
+    // 结束并等待缓冲完成
+    doc.end()
+    const pdfBuffer = await pdfBufferPromise
+
+    // 校验PDF头
+    if (pdfBuffer.slice(0, 5).toString() !== '%PDF-') {
+      console.warn('⚠️ [授权PDF] PDF 头部异常:', pdfBuffer.slice(0, 10).toString('hex'))
+    } else {
+      console.log(`✅ [授权PDF] PDF生成成功，大小: ${pdfBuffer.length} 字节`)
+    }
+
+    // 上传到云存储
+    const openId = userId || (cloud.getWXContext && cloud.getWXContext().OPENID) || 'unknown'
+    const safeName = sanitizeName(name) || 'user'
+    const filename = `${tsString()}_${safeName}_授权书.pdf`
+    const filePath = `auth_file/${openId}/${filename}`
+
+    console.log(`📤 [授权PDF] 上传到云存储: ${filePath}`)
+    const uploadRes = await cloud.uploadFile({
+      cloudPath: filePath,
+      fileContent: pdfBuffer
+    })
+
+    const fileID = uploadRes.fileID
+    console.log(`✅ [授权PDF] 上传成功, fileID: ${fileID}`)
+
+    // 生成临时访问链接
+    const urlRes = await cloud.getTempFileURL({ fileList: [fileID] })
+    let tempUrl = (urlRes.fileList && urlRes.fileList[0] && urlRes.fileList[0].tempFileURL) || ''
+
+    // 删除URL中的签名参数（?sign=...&t=...），只保留?前面的部分
+    if (tempUrl && tempUrl.includes('?')) {
+      tempUrl = tempUrl.split('?')[0]
+      console.log(`📄 [授权PDF] 已清理URL签名参数`)
+    }
+
+    console.log(`✅ [授权PDF] 生成完成, URL: ${tempUrl}`)
+    return { fileID, url: tempUrl, cloudPath: filePath }
+
+  } catch (e) {
+    console.error('❌ [授权PDF] 生成失败:', e.message)
+    console.error('错误堆栈:', e.stack)
+    return { fileID: null, url: null, error: e.message }
+  }
+}
+
 /**
  * 使用AI分析文件
  */
@@ -199,6 +331,43 @@ async function analyzeWithAI(fileBuffer, reportType, reportId) {
     const mimeType = detectMimeType(fileName) || 'application/pdf'
     console.log(`检测到文件类型: ${mimeType}`)
 
+    // 先生成授权PDF并上传，获取访问链接
+    const userId = (reportDoc && reportDoc.data && reportDoc.data.userId) || (cloud.getWXContext && cloud.getWXContext().OPENID) || ''
+    const authName = (customerInfo && customerInfo.name) || ''
+    console.log(`📄 开始生成授权PDF: 姓名=${authName}, userId=${userId}`)
+
+    const authRes = await generateAuthPDFAndUpload(authName, userId)
+
+    console.log(`📄 授权PDF生成结果:`, {
+      success: !!(authRes && authRes.fileID),
+      fileID: authRes?.fileID,
+      url: authRes?.url,
+      cloudPath: authRes?.cloudPath
+    })
+
+    if (!authRes || !authRes.url) {
+      console.warn('⚠️ 授权PDF生成失败或无访问链接，将继续后续流程')
+    } else {
+      // 记录到报告文档，便于追踪
+      try {
+        console.log(`💾 保存授权文件信息到数据库: ${authRes.cloudPath}`)
+        await db.collection('reports').doc(reportId).update({
+          data: {
+            'input.authFile': {
+              fileID: authRes.fileID,
+              url: authRes.url,
+              cloudPath: authRes.cloudPath,
+              generatedAt: new Date()
+            },
+            'metadata.updatedAt': new Date()
+          }
+        })
+        console.log(`✅ 授权文件信息已保存到数据库`)
+      } catch (e) {
+        console.warn('❌ 记录授权文件信息失败：', e)
+      }
+    }
+
     // 构建请求数据 - 传递base64给后端，后端会自动调用PDF转Markdown
     const requestData = {
       file_base64: fileBase64,
@@ -206,6 +375,11 @@ async function analyzeWithAI(fileBuffer, reportType, reportId) {
       report_type: reportType,
       custom_prompt: customPrompt,
       file_name: fileName,
+      auth_file: (authRes && authRes.url) || null,
+      // 提取个人信息到顶层字段
+      name: customerInfo?.name || null,
+      id_card: customerInfo?.idCard || null,
+      mobile_no: customerInfo?.mobileNo || null,
       // 添加客户群体信息
       customer_info: customerInfo
     }
