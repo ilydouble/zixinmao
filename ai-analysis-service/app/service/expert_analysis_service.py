@@ -26,7 +26,7 @@ from app.config.settings import settings
 logger = logging.getLogger(__name__)
 
 
-class AIAnalysisService:
+class ExpertAnalysisService:
     """AI专家分析服务"""
 
     def __init__(self):

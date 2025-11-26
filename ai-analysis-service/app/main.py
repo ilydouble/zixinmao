@@ -11,17 +11,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from loguru import logger
 import sys
+import base64
 
 from config.settings import settings
 from models.report_model import *
-from service.ai_service import AIAnalysisService
 from utils.queue_manager import request_queue, TaskStatus
 from utils.log_manager import algorithm_logger
 from utils.prompts import PROMPT_TEMPLATES
-from models.basemodel import *
-from service.report_service import *
 from models.visualization_model import VisualizationReportRequest
-from service.html_report_service import HTMLReportService
+from service.brief_report_service import BriefReportService
 
 # 配置日志
 logger.remove()
@@ -48,12 +46,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# 创建AI分析服务实例
-ai_service = AIAnalysisService()
-
-# 创建HTML报告服务实例
-html_report_service = HTMLReportService()
 
 
 @app.on_event("startup")
@@ -110,36 +102,6 @@ async def root():
         version="1.0.0",
         timestamp=datetime.now().isoformat()
     )
-
-
-@app.get("/health", response_model=dict)
-async def health_check():
-    """详细健康检查"""
-    ai_health = await ai_service.health_check()
-    queue_stats = request_queue.get_queue_stats()
-
-    return {
-        "status": "healthy",
-        "version": "1.0.0",
-        "timestamp": datetime.now().isoformat(),
-        "services": {
-            "ai_api": ai_health,
-            "request_queue": {
-                "status": "running" if queue_stats["is_running"] else "stopped",
-                "current_queue_size": queue_stats["current_queue_size"],
-                "current_processing": queue_stats["current_processing"],
-                "total_processed": queue_stats["completed_requests"] + queue_stats["failed_requests"]
-            }
-        },
-        "config": {
-            "ai_api_url": settings.ai.api_url,
-            "max_file_size": settings.file.max_file_size,
-            "allowed_mime_types": settings.file.allowed_mime_types,
-            "max_concurrent_tasks": settings.queue.max_concurrent_tasks,
-            "max_queue_size": settings.queue.max_queue_size,
-            "algorithm_enable": settings.log.algorithm_enable
-        }
-    }
 
 
 @app.post("/analyze", response_model=TaskSubmitResponse)
@@ -265,63 +227,44 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
 
         # AI分析
         start_time = time.time()
-        result = await ai_service.analyze_document(
-            file_base64=request.file_base64,
-            markdown_content=request.markdown_content,
-            mime_type=request.mime_type,
-            report_type=request.report_type.value,
-            custom_prompt=request.custom_prompt,
-            request_id=request_id,
-            file_name=request.file_name or "document.pdf",
-            name=request.name,
-            id_card=request.id_card,
-            mobile_no=request.mobile_no,
-            customer_info=request.customer_info
+        briefReportService = BriefReportService()
+        visualization_report, html_file, pdf_file = await briefReportService.generate_report(
+            analysisRequest=request,
+            request_id=request_id
         )
         processing_time = time.time() - start_time
 
-        # 记录完成日志
-        if settings.log.algorithm_enable:
-            await algorithm_logger.log_request_complete(request_id, result, processing_time)
-
-        # 生成HTML报告
-        html_report = None
-        pdf_report = None
-        if result['success']:
-            try:
-                html_report = await html_report_service.generate_html_report(
-                    analysis_result=result['analysis_result'],
-                    report_type=request.report_type.value
-                )
-                logger.info(f"✅ HTML报告生成成功 | 长度: {len(html_report):,} | ID: {request_id}")
-            except Exception as e:
-                logger.error(f"❌ HTML报告生成失败: {str(e)} | ID: {request_id}")
-
-            # 生成PDF报告
-            if html_report:
-                try:
-                    from service.pdf_report_service import pdf_report_service
-                    import base64
-
-                    pdf_bytes = await pdf_report_service.convert_html_to_pdf(
-                        html_content=html_report,
-                        pdf_filename=request.file_name or "report.pdf"
-                    )
-                    # 将PDF转换为base64编码
-                    pdf_report = base64.b64encode(pdf_bytes).decode('utf-8')
-                    logger.info(f"✅ PDF报告生成成功 | 大小: {len(pdf_bytes):,} 字节 | ID: {request_id}")
-                except Exception as e:
-                    logger.error(f"❌ PDF报告生成失败: {str(e)} | ID: {request_id}")
-
         # 返回响应
+        # 将visualization_report转换为字典
+        analysis_result_dict = None
+        if visualization_report:
+            if hasattr(visualization_report, 'model_dump'):
+                analysis_result_dict = visualization_report.model_dump()
+            elif hasattr(visualization_report, 'dict'):
+                analysis_result_dict = visualization_report.dict()
+            else:
+                analysis_result_dict = visualization_report
+
+        # 将PDF二进制转换为base64字符串
+        pdf_report_b64 = None
+        if pdf_file is not None:
+            try:
+                if isinstance(pdf_file, (bytes, bytearray)):
+                    pdf_report_b64 = base64.b64encode(pdf_file).decode('utf-8')
+                elif isinstance(pdf_file, str):
+                    # 如果已经是字符串（例如已经是base64），直接使用
+                    pdf_report_b64 = pdf_file
+            except Exception:
+                pdf_report_b64 = None
+
         return AnalysisResponse(
-            success=result['success'],
+            success=True,
             request_id=request_id,
-            analysis_result=result.get('analysis_result'),
-            error_message=result.get('error_message'),
+            analysis_result=analysis_result_dict,
+            error_message=None,
             processing_time=processing_time,
-            html_report=html_report,
-            pdf_report=pdf_report
+            html_report=html_file,
+            pdf_report=pdf_report_b64
         )
 
     except HTTPException:
@@ -545,38 +488,6 @@ async def generate_report(request: AnalysisRequest, http_request: Request):
             status_code=500,
             detail=f"服务器内部错误: {str(e)}"
         )
-
-@app.post("/analysis/report")
-async def generate_analysis_report(request: AnalysisRequest):
-    """
-    生成个人征信报告接口
-
-    接收文件的base64编码和相关参数，直接生成分析报告
-    """
-    try:
-        from service.report_service import ReportService
-        report_service = ReportService()
-        
-        # 生成唯一请求ID
-        request_id = str(uuid.uuid4())
-        
-        # 调用异步方法时添加await
-        result = await report_service.generate_report(
-            file_base64=request.file_base64,
-            mime_type=request.mime_type,
-            report_type=request.report_type,
-            custom_prompt=request.custom_prompt,
-            request_id=request_id,
-            name=request.name,
-            id_card=request.id_card,
-            mobile_no=request.mobile_no,
-            customer_info=request.customer_info,
-        )
-        
-        # 将Pydantic模型转换为字典以便FastAPI序列化
-        return result.model_dump()
-    except Exception as e:
-        return None
 
 
 @app.post("/income")

@@ -22,97 +22,15 @@ class AIAnalysisService:
     """AI分析服务"""
 
     def __init__(self):
-        self.api_url = settings.ai.api_url
-        self.api_key = settings.ai.api_key
-        self.timeout = settings.ai.api_timeout
-
-        # PDF转Markdown服务配置
-        self.pdf_to_markdown_url = settings.pdf.to_markdown_url
-        self.pdf_to_markdown_timeout = settings.pdf.to_markdown_timeout
+        self.ai_api_url = settings.ai.api_url
+        self.ai_api_key = settings.ai.api_key
+        self.ai_api_timeout = settings.ai.api_timeout
 
         # Dify工作流服务配置
         self.dify_workflow_url = settings.dify.workflow_url
         self.dify_api_key = settings.dify.workflow_api_key
         self.dify_timeout = settings.dify.api_timeout
 
-    async def convert_pdf_to_markdown(
-        self,
-        file_base64: str,
-        file_name: str,
-        request_id: str = None
-    ) -> str:
-        """
-        将PDF转换为Markdown
-
-        Args:
-            file_base64: PDF文件的base64编码
-            file_name: 文件名
-            request_id: 请求ID
-
-        Returns:
-            Markdown格式的文档内容
-        """
-        try:
-            logger.info(f"📄 [PDF转Markdown] 开始转换, request_id: {request_id}, 文件: {file_name}")
-            logger.info(f"📊 [PDF转Markdown] Base64长度: {len(file_base64):,} 字符")
-
-            # 构建请求数据
-            request_data = {
-                "filename": file_name,
-                "file_data": file_base64
-            }
-
-            # 调用PDF转Markdown服务
-            start_time = time.time()
-            async with httpx.AsyncClient(timeout=self.pdf_to_markdown_timeout) as client:
-                response = await client.post(
-                    self.pdf_to_markdown_url,
-                    json=request_data,
-                    headers={
-                        'Content-Type': 'application/json'
-                    }
-                )
-
-            processing_time = time.time() - start_time
-
-            if response.status_code == 200:
-                result = response.json()
-
-                # 尝试从响应中提取markdown内容
-                # 支持多种可能的字段名
-                markdown_content = None
-                if isinstance(result, dict):
-                    for key in ['markdown', 'content', 'text', 'data', 'result']:
-                        if key in result:
-                            markdown_content = result[key]
-                            logger.info(f"📝 [PDF转Markdown] 找到Markdown字段: {key}")
-                            break
-
-                    if not markdown_content:
-                        # 如果没有找到标准字段，使用整个响应
-                        markdown_content = json.dumps(result, ensure_ascii=False, indent=2)
-                        logger.warning(f"⚠️ [PDF转Markdown] 未找到标准字段，使用完整响应")
-                else:
-                    markdown_content = str(result)
-
-                logger.info(f"✅ [PDF转Markdown] 转换成功, request_id: {request_id}, "
-                          f"Markdown长度: {len(markdown_content):,}, "
-                          f"处理时间: {processing_time:.2f}s")
-
-                return markdown_content
-            else:
-                error_msg = f"PDF转Markdown服务返回错误: {response.status_code}"
-                logger.error(f"❌ [PDF转Markdown] {error_msg}, 响应: {response.text[:500]}")
-                raise Exception(error_msg)
-
-        except httpx.TimeoutException:
-            error_msg = f"PDF转Markdown服务超时 (>{self.pdf_to_markdown_timeout}s)"
-            logger.error(f"❌ [PDF转Markdown] {error_msg}, request_id: {request_id}")
-            raise Exception(error_msg)
-        except Exception as e:
-            error_msg = f"PDF转Markdown失败: {str(e)}"
-            logger.error(f"❌ [PDF转Markdown] {error_msg}, request_id: {request_id}")
-            raise Exception(error_msg)
     
     async def analyze_document(
         self,
@@ -152,10 +70,11 @@ class AIAnalysisService:
             # 🆕 如果提供了file_base64，先转换为Markdown
             if file_base64 and not markdown_content:
                 logger.info(f"🔄 [AI分析] 步骤1: 将PDF转换为Markdown, request_id: {request_id}")
-                markdown_content = await self.convert_pdf_to_markdown(
-                    file_base64=file_base64,
+                from .document_service import DocumentService
+                documentService = DocumentService()
+                markdown_content = await documentService.process_document_by_ocr(
                     file_name=file_name,
-                    request_id=request_id
+                    file_base64=file_base64,
                 )
                 logger.info(f"✅ [AI分析] PDF转Markdown完成, Markdown长度: {len(markdown_content):,}")
 
@@ -388,29 +307,6 @@ class AIAnalysisService:
         logger.info(f"✅ [Dify解析] 转换为可视化格式成功")
 
         return visualization_data
-
-    def _extract_json_from_text(self, text: str) -> Optional[Dict[str, Any]]:
-        """
-        从文本中提取JSON
-        
-        Args:
-            text: 包含JSON的文本
-        
-        Returns:
-            提取的JSON对象或None
-        """
-        try:
-            # 尝试找到JSON部分
-            start_idx = text.find('{')
-            end_idx = text.rfind('}')
-            
-            if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
-                json_text = text[start_idx:end_idx + 1]
-                return json.loads(json_text)
-        except Exception as e:
-            logger.warning(f"无法从文本中提取JSON: {e}")
-        
-        return None
     
     async def health_check(self) -> Dict[str, Any]:
         """
@@ -423,18 +319,18 @@ class AIAnalysisService:
             # 简单的API连通性检查
             async with httpx.AsyncClient(timeout=10) as client:
                 response = await client.get(
-                    str(self.api_url).replace('/generateContent', ''),
-                    params={'key': self.api_key}
+                    str(self.ai_api_url).replace('/generateContent', ''),
+                    params={'key': self.ai_api_key}
                 )
             
             return {
                 'ai_api_status': 'healthy' if response.status_code in [200, 404] else 'unhealthy',
-                'api_url': self.api_url,
+                'api_url': self.ai_api_url,
                 'response_code': response.status_code
             }
         except Exception as e:
             return {
                 'ai_api_status': 'unhealthy',
-                'api_url': self.api_url,
+                'api_url': self.ai_api_url,
                 'error': str(e)
             }

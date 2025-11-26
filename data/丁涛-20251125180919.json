@@ -1,0 +1,169 @@
+{
+  "reportSummary": {
+    "ruleValidation": {
+      "code": "STR0042314/贷前-经营性租赁全量策略",
+      "result": "低风险"
+    },
+    "antiFraudScore": {
+      "level": "低风险"
+    },
+    "antiFraudRule": {
+      "level": "高风险",
+      "code": "STR0042314/贷前-经营性租赁全量策略"
+    },
+    "abnormalRulesHit": {
+      "count": 3,
+      "alert": "高风险提示"
+    }
+  },
+  "basicInfo": {
+    "name": "丁*",
+    "phone": "183****6453",
+    "idCard": "6105**199206***471",
+    "reportId": "20251125DD0F75B6",
+    "verifications": [
+      {
+        "item": "要素核查",
+        "description": "使用姓名、手机号、身份证信息进行三要素核验",
+        "result": "正常"
+      },
+      {
+        "item": "运营商检验",
+        "description": "检查手机号在运营商处的状态及在线时长",
+        "result": "正常"
+      },
+      {
+        "item": "法院信息",
+        "description": "检测被查询人的借贷风险情况，及在司法体系中是否存在行为风险",
+        "result": "未命中"
+      },
+      {
+        "item": "借贷评估",
+        "description": "综合近12个月借贷申请情况评估风险",
+        "result": "正常"
+      },
+      {
+        "item": "其他",
+        "description": "其它规则风险",
+        "result": "涉赌涉诈风险"
+      }
+    ]
+  },
+  "riskIdentification": {
+    "title": "风险识别产品",
+    "caseAnnouncements": {
+      "title": "涉案公告列表",
+      "records": []
+    },
+    "enforcementAnnouncements": {
+      "title": "执行公告列表",
+      "records": []
+    },
+    "dishonestAnnouncements": {
+      "title": "失信公告列表",
+      "records": []
+    },
+    "highConsumptionRestrictionAnnouncements": {
+      "title": "限高公告列表",
+      "records": []
+    }
+  },
+  "creditAssessment": {
+    "title": "信贷评估产品",
+    "loanIntentionByCustomerType": {
+      "title": "本人在各类机构的借贷意向表现",
+      "records": [
+        {
+          "customerType": "持牌网络小贷",
+          "applicationCount": 5,
+          "riskLevel": "低风险"
+        },
+        {
+          "customerType": "持牌消费金融",
+          "applicationCount": 11,
+          "riskLevel": "中风险"
+        },
+        {
+          "customerType": "持牌融资租赁机构",
+          "applicationCount": 0,
+          "riskLevel": "无风险"
+        },
+        {
+          "customerType": "持牌汽车金融",
+          "applicationCount": 0,
+          "riskLevel": "无风险"
+        },
+        {
+          "customerType": "其他非银机构",
+          "applicationCount": 23,
+          "riskLevel": "高风险"
+        }
+      ]
+    },
+    "loanIntentionAbnormalTimes": {
+      "title": "异常时间段借贷申请情况",
+      "records": [
+        {
+          "timePeriod": "夜间(22:00-06:00)",
+          "mainInstitutionType": "银行类机构",
+          "riskLevel": "中风险"
+        },
+        {
+          "timePeriod": "周末",
+          "mainInstitutionType": "银行类机构、非银金融机构",
+          "riskLevel": "中风险"
+        },
+        {
+          "timePeriod": "工作日工作时间",
+          "mainInstitutionType": "银行类机构、非银金融机构",
+          "riskLevel": "高风险"
+        }
+      ]
+    }
+  },
+  "leasingRiskAssessment": {
+    "title": "租赁风险评估产品",
+    "multiLenderRisk3C": {
+      "title": "3C机构多头借贷风险",
+      "records": [
+        {
+          "institutionType": "消费金融",
+          "appliedCount": 7,
+          "inUseCount": 0,
+          "totalCreditLimit": 0,
+          "totalDebtBalance": 0,
+          "riskLevel": "中风险"
+        },
+        {
+          "institutionType": "小贷公司",
+          "appliedCount": 1,
+          "inUseCount": 0,
+          "totalCreditLimit": 0,
+          "totalDebtBalance": 0,
+          "riskLevel": "低风险"
+        },
+        {
+          "institutionType": "其他非银机构",
+          "appliedCount": 19,
+          "inUseCount": 1,
+          "totalCreditLimit": 30000,
+          "totalDebtBalance": 6495,
+          "riskLevel": "高风险"
+        }
+      ]
+    }
+  },
+  "comprehensiveAnalysis": [
+    "规则验证判定为低风险、反欺诈得分判定为低风险、反欺诈规则判定为高风险。",
+    "系统共识别3项规则命中（高风险提示）。",
+    "借贷评估显示持牌消费金融近12个月申请机构数11家，风险等级为中风险、其他非银机构近12个月申请机构数23家，风险等级为高风险。",
+    "其他风险因素包括：涉赌涉诈风险。",
+    "多头借贷风险在夜间(22:00-06:00)阶段主要由银行类机构发起，风险等级为中风险、周末阶段主要由银行类机构、非银金融机构发起，风险等级为中风险、工作日工作时间阶段主要由银行类机构、非银金融机构发起，风险等级为高风险。",
+    "风险提示：系统识别出该用户存在多项高风险因素，建议谨慎评估信用状况并加强风险管控措施。"
+  ],
+  "reportFooter": {
+    "dataSource": "天远数据报告",
+    "generationTime": "2025-11-25",
+    "disclaimer": "本报告基于2025-11-25数据生成，仅供参考，具体审批以最终审核为准。"
+  }
+}

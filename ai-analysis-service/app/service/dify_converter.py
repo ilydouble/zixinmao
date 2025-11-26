@@ -30,8 +30,8 @@ from app.models.visualization_model import (
     LoanSummary,
     LoanChart
 )
-from app.service.product_recommendation_service import ProductRecommendationService
-from app.service.ai_analysis_service import AIAnalysisService
+from app.service.product_recommend_service import ProductRecommendService
+from app.service.expert_analysis_service import ExpertAnalysisService
 from app.models.report_model import CustomerInfo
 
 logger = logging.getLogger(__name__)
@@ -754,7 +754,7 @@ class DifyToVisualizationConverter:
         """
         try:
             # 创建产品推荐服务实例
-            recommendation_service = ProductRecommendationService()
+            recommendation_service = ProductRecommendService()
 
             # 调用服务生成推荐
             recommendations = recommendation_service.generate_recommendations(
@@ -798,8 +798,8 @@ class DifyToVisualizationConverter:
         """
         try:
             # 使用AI分析服务
-            analysis_service = AIAnalysisService()
-            return analysis_service.generate_analysis(
+            expert_analysis_service = ExpertAnalysisService()
+            return expert_analysis_service.generate_analysis(
                 personal_info=personal_info,
                 stats=stats,
                 debt_composition=debt_composition,
@@ -815,8 +815,8 @@ class DifyToVisualizationConverter:
         except Exception as e:
             logger.error(f"AI分析生成失败，使用默认分析: {str(e)}")
             # 如果AI服务失败，使用默认分析
-            analysis_service = AIAnalysisService()
-            return analysis_service._get_default_analysis(stats, credit_usage, overdue_analysis)
+            expert_analysis_service = ExpertAnalysisService()
+            return expert_analysis_service._get_default_analysis(stats, credit_usage, overdue_analysis)
 
     @staticmethod
     def _generate_loan_chart_data(

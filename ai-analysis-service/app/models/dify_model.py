@@ -68,23 +68,23 @@ class DifyWorkflowOutput(BaseModel):
     query_records: Optional[List[DifyQueryRecord]] = Field(default_factory=list, description="查询记录列表")
 
 
-class DifyWorkflowData(BaseModel):
-    """Dify工作流数据（data字段）"""
-    id: Optional[str] = Field(None, description="工作流运行ID")
-    workflow_id: Optional[str] = Field(None, description="工作流ID")
-    status: Optional[str] = Field(None, description="状态")
-    outputs: Optional[Dict[str, Any]] = Field(None, description="输出数据")
-    error: Optional[str] = Field(None, description="错误信息")
-    elapsed_time: Optional[float] = Field(None, description="执行时间(秒)")
-    total_tokens: Optional[int] = Field(None, description="总token数")
-    total_steps: Optional[int] = Field(None, description="总步骤数")
-    created_at: Optional[int] = Field(None, description="创建时间戳")
-    finished_at: Optional[int] = Field(None, description="完成时间戳")
+# class DifyWorkflowData(BaseModel):
+#     """Dify工作流数据（data字段）"""
+#     id: Optional[str] = Field(None, description="工作流运行ID")
+#     workflow_id: Optional[str] = Field(None, description="工作流ID")
+#     status: Optional[str] = Field(None, description="状态")
+#     outputs: Optional[Dict[str, Any]] = Field(None, description="输出数据")
+#     error: Optional[str] = Field(None, description="错误信息")
+#     elapsed_time: Optional[float] = Field(None, description="执行时间(秒)")
+#     total_tokens: Optional[int] = Field(None, description="总token数")
+#     total_steps: Optional[int] = Field(None, description="总步骤数")
+#     created_at: Optional[int] = Field(None, description="创建时间戳")
+#     finished_at: Optional[int] = Field(None, description="完成时间戳")
 
 
-class DifyWorkflowResponse(BaseModel):
-    """Dify工作流完整响应"""
-    task_id: Optional[str] = Field(None, description="任务ID")
-    workflow_run_id: Optional[str] = Field(None, description="工作流运行ID")
-    data: Optional[DifyWorkflowData] = Field(None, description="工作流数据")
+# class DifyWorkflowResponse(BaseModel):
+#     """Dify工作流完整响应"""
+#     task_id: Optional[str] = Field(None, description="任务ID")
+#     workflow_run_id: Optional[str] = Field(None, description="工作流运行ID")
+#     data: Optional[DifyWorkflowData] = Field(None, description="工作流数据")
 

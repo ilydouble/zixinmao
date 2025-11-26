@@ -26,7 +26,7 @@ from app.models.report_model import CustomerInfo
 logger = logging.getLogger(__name__)
 
 
-class ProductRecommendationService:
+class ProductRecommendService:
     """产品推荐服务"""
 
     def __init__(self):

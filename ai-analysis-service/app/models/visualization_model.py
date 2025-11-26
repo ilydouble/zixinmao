@@ -178,10 +178,6 @@ class VisualizationReportData(BaseModel):
     query_charts: Optional[List[QueryRecord]] = Field(default_factory=list, description="查询记录图表")
 
     
-    # query_chart_labels: List[str] = Field(..., description="查询图表标签")
-    # query_chart_loan_data: List[int] = Field(..., description="查询图表贷款审批数据")
-    # query_chart_card_data: List[int] = Field(..., description="查询图表信用卡审批数据")
-    # query_chart_guarantee_data: List[int] = Field(..., description="查询图表担保审查数据")
 
 
 class VisualizationReportRequest(BaseModel):

@@ -3,6 +3,7 @@
 """
 大数据分析数据库服务
 负责big_data表的数据存储和查询操作
+不再使用
 """
 import sys
 from pathlib import Path
@@ -12,8 +13,8 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import json
 import pymysql
 from loguru import logger
-from typing import Optional, Tuple
-from .parser_service import parse_api_responses
+from typing import Optional
+from models.bigdata_model import BigDataResponse
 from config.settings import settings
 
 
@@ -88,37 +89,37 @@ class DatabaseService:
         except Exception as e:
             logger.error("数据库初始化失败", exception=e)
     
-    def query_data_from_db(self, name: str, mobile_no: str, id_card: str) -> Optional[Tuple]:
+    def query_data_from_db(self, name: str, mobile_no: str, id_card: str) -> Optional[BigDataResponse]:
         """
         从big_data表查询数据
-        
+
         Args:
             name: 姓名
             mobile_no: 手机号
             id_card: 身份证号
-            
+
         Returns:
-            解析后的API响应元组，如果没有数据则返回None
+            BigDataResponse对象，如果没有数据则返回None
         """
         try:
             connection = get_database_connection()
             cursor = connection.cursor()
-            
+
             query_sql = """
-            SELECT api_data FROM big_data 
-            WHERE name = %s AND mobile_no = %s AND id_card = %s 
+            SELECT api_data FROM big_data
+            WHERE name = %s AND mobile_no = %s AND id_card = %s
             ORDER BY create_time DESC LIMIT 1
             """
             cursor.execute(query_sql, (name, mobile_no, id_card))
             result = cursor.fetchone()
-            
+
             cursor.close()
             connection.close()
-            
+
             if result:
                 logger.info(f"big_data表中缓存数据命中: {name}, {mobile_no}, {id_card}")
                 api_data = json.loads(result[0])
-                return parse_api_responses(api_data)
+                return api_data
             else:
                 logger.info(f"big_data表中缓存数据未命中: {name}, {mobile_no}, {id_card}")
                 return None

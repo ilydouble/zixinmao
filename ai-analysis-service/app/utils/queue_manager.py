@@ -5,6 +5,7 @@
 import asyncio
 import time
 import uuid
+import base64
 from typing import Dict, Any, Optional, Callable
 from enum import Enum
 from dataclasses import dataclass, field
@@ -200,50 +201,78 @@ class RequestQueue:
             logger.info(f"开始处理任务: {task_id}, 工作协程: {worker_name}")
             
             # 创建处理协程
-            # from service.ai_service import AIAnalysisService
-            # ai_service = AIAnalysisService()
-            
-            # processing_coro = ai_service.analyze_document(
-            #     file_base64=task.request_data["file_base64"],
-            #     mime_type=task.request_data["mime_type"],
-            #     report_type=task.request_data["report_type"],
-            #     custom_prompt=task.request_data.get("custom_prompt"),
-            #     request_id=task_id
-            # )
+            from service.brief_report_service import BriefReportService
+            from models.report_model import AnalysisRequest
 
-            from service.report_service import ReportService
-            report_service = ReportService()
-            processing_coro = report_service.generate_report(
-                file_base64=task.request_data["file_base64"],
-                mime_type=task.request_data["mime_type"],
+            brief_report_service = BriefReportService()
+
+            # 构建AnalysisRequest对象
+            analysis_request = AnalysisRequest(
+                file_base64=task.request_data.get("file_base64"),
+                markdown_content=task.request_data.get("markdown_content"),
+                mime_type=task.request_data.get("mime_type"),
                 report_type=task.request_data["report_type"],
                 custom_prompt=task.request_data.get("custom_prompt"),
-                request_id=task_id,
-                name=task.request_data["name"],
-                id_card=task.request_data["id_card"],
-                mobile_no=task.request_data["mobile_no"],
+                file_name=task.request_data.get("file_name"),
+                name=task.request_data.get("name"),
+                id_card=task.request_data.get("id_card"),
+                mobile_no=task.request_data.get("mobile_no"),
+                auth_file=task.request_data.get("auth_file"),
+                customer_info=task.request_data.get("customer_info")
+            )
+
+            processing_coro = brief_report_service.generate_report(
+                analysisRequest=analysis_request,
+                request_id=task_id
             )
 
             processing_task = asyncio.create_task(processing_coro)
             self.processing_tasks[task_id] = processing_task
-            
-            # 等待处理完成
-            result = await processing_task
-            
+
+            # 等待处理完成 - generate_report返回三个值: (visualization_report, html_file, pdf_file)
+            visualization_report, html_file, pdf_file = await processing_task
+
             # 更新任务结果
             task.completed_at = time.time()
-            task.result = result
-            
-            if result.success:
+
+            # 检查是否成功
+            if visualization_report is not None:
                 task.status = TaskStatus.COMPLETED
                 self._stats["completed_requests"] += 1
                 logger.info(f"任务处理成功: {task_id}, 耗时: {task.processing_time:.2f}s")
-                task.result = result.model_dump()  # 将Pydantic模型转换为字典
+
+                # 将PDF二进制转换为base64字符串
+                pdf_file_b64 = None
+                if pdf_file is not None:
+                    try:
+                        if isinstance(pdf_file, (bytes, bytearray)):
+                            pdf_file_b64 = base64.b64encode(pdf_file).decode('utf-8')
+                        elif isinstance(pdf_file, str):
+                            # 如果已经是字符串（例如已经是base64），直接使用
+                            pdf_file_b64 = pdf_file
+                    except Exception as e:
+                        logger.warning(f"PDF转base64失败: {e}")
+                        pdf_file_b64 = None
+
+                # 构建结果字典
+                task.result = {
+                    "success": True,
+                    "visualization_report": visualization_report.model_dump() if hasattr(visualization_report, 'model_dump') else visualization_report,
+                    "html_file": html_file,
+                    "pdf_file": pdf_file_b64,
+                    "request_id": task_id,
+                    "processing_time": task.processing_time
+                }
             else:
                 task.status = TaskStatus.FAILED
-                task.error_message = result.message  # 直接访问message属性
+                task.error_message = "报告生成失败"
                 self._stats["failed_requests"] += 1
                 logger.error(f"任务处理失败: {task_id}, 错误: {task.error_message}")
+                task.result = {
+                    "success": False,
+                    "error_message": task.error_message,
+                    "request_id": task_id
+                }
         
         except asyncio.CancelledError:
             task.status = TaskStatus.CANCELLED
