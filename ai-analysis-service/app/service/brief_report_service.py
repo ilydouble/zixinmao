@@ -11,6 +11,7 @@ import os
 import time
 import tempfile
 from typing import Dict, Any, Optional
+from datetime import datetime
 import httpx
 from pathlib import Path
 from loguru import logger
@@ -23,9 +24,9 @@ from config.settings import settings
 from app.models.visualization_model import VisualizationReportData
 from app.models.report_model import *
 from app.models.dify_model import DifyWorkflowOutput
-from app.models.report_model import CustomerInfo
 from app.service.dify_converter import DifyToVisualizationConverter
-
+from app.service.bigdata_analysis_service import *
+from app.models.bigdata_model_example import *
 
 
 class BriefReportService:
@@ -100,21 +101,38 @@ class BriefReportService:
             # 步骤2: 调用Dify工作流进行AI分析
             dify_output = await self._call_dify_workflow(markdown_content, request_id)
 
-            # 步骤3: 解析并转换结果
+            # 步骤3：调用大数据分析服务
+            bigdata_service = BigdataAnalysisService()
+            combhzy2Request = COMBHZY2Request(
+                mobile_no=analysisRequest.mobile_no,
+                id_card=analysisRequest.id_card,
+                name=analysisRequest.name,
+                authorization_url=analysisRequest.auth_file
+            )
+            # bigdata_report = bigdata_service.call_api(combhzy2Request)
+            bigdata_report = example_create_report()
+
+            # 如果大数据API调用失败，使用默认值
+            if bigdata_report is None:
+                logger.warning(f"⚠️ [步骤3] 大数据API调用失败，使用默认值, request_id: {request_id}")
+                bigdata_report = self._get_default_bigdata_report(analysisRequest)
+
+            # 步骤4: 解析并转换结果
             processing_time = time.time() - start_time
             # 使用转换器将Dify数据转换为可视化格式
             visualization_report = DifyToVisualizationConverter.convert(
-                dify_output, request_id, customer_info
+                bigdata_report, dify_output, request_id, customer_info
             )
 
-            logger.info(f"✅ [步骤3] Dify数据转换为可视化格式成功, 耗时: {processing_time:.2f}s, request_id: {request_id}")
+            logger.info(f"✅ [步骤4] Dify数据转换为可视化格式成功, 耗时: {processing_time:.2f}s, request_id: {request_id}")
 
-            # 步骤4: 生成html报告
+            # 步骤5: 生成html报告
             html_file = await self.generate_html_file(
                 visualization_report=visualization_report,
                 report_type="simple"
             )
 
+            # 步骤6: 生成pdf报告
             pdf_file = await self.generate_pdf_file(
                                     html_content=html_file,
                                     pdf_filename=analysisRequest.file_name or "report.pdf"
@@ -123,9 +141,10 @@ class BriefReportService:
             return visualization_report, html_file, pdf_file
 
         except Exception as e:
-            error_msg = f'Dify API调用超时，处理时间: {processing_time:.2f}s'
+            processing_time = time.time() - start_time
+            error_msg = f'分析处理失败: {str(e)}, 处理时间: {processing_time:.2f}s'
             logger.error(f"❌ {error_msg}, request_id: {request_id}")
-            return None, None, None
+            raise
 
     # ==================== 核心处理方法 ====================
 
@@ -216,8 +235,111 @@ class BriefReportService:
             outputs = response_data['data']['outputs']
             if 'output' in outputs:
                 return DifyWorkflowOutput(**outputs['output'])
-            
+
         return None
+
+    def _get_default_bigdata_report(self, analysisRequest: AnalysisRequest) -> 'BigDataResponse':
+        """
+        获取默认的大数据报告（当API调用失败时使用）
+
+        Args:
+            analysisRequest: 分析请求对象
+
+        Returns:
+            默认的BigDataResponse对象
+        """
+        from app.models.bigdata_model import (
+            BigDataResponse, ReportSummary, BasicInfo, RiskIdentification,
+            CreditAssessment, LeasingRiskAssessment, ReportFooter,
+            RuleValidation, AntiFraudScore, AntiFraudRule, AbnormalRulesHit,
+            Verification, CaseAnnouncements, EnforcementAnnouncements,
+            DishonestAnnouncements, HighConsumptionRestrictionAnnouncements,
+            LoanIntentionByCustomerType, LoanIntentionAbnormalTimes,
+            MultiLenderRisk3C
+        )
+
+        # 生成报告ID和时间
+        now = datetime.now()
+        report_id = now.strftime("%Y%m%d%H%M%S")
+        generation_time = now.strftime("%Y-%m-%d")
+
+        # 构建默认报告
+        return BigDataResponse(
+            reportSummary=ReportSummary(
+                ruleValidation=RuleValidation(
+                    code="DEFAULT/无数据",
+                    result="无法验证"
+                ),
+                antiFraudScore=AntiFraudScore(
+                    level="未知"
+                ),
+                antiFraudRule=AntiFraudRule(
+                    code="DEFAULT/无数据",
+                    level="未知"
+                ),
+                abnormalRulesHit=AbnormalRulesHit(
+                    count=0,
+                    alert="暂无数据"
+                )
+            ),
+            basicInfo=BasicInfo(
+                name=analysisRequest.name or "未知",
+                phone=analysisRequest.mobile_no or "未知",
+                idCard=analysisRequest.id_card or "未知",
+                reportId=report_id,
+                verifications=[
+                    Verification(
+                        item="数据获取",
+                        description="大数据API调用失败",
+                        result="未验证",
+                        details="无法获取第三方数据，请稍后重试"
+                    )
+                ]
+            ),
+            riskIdentification=RiskIdentification(
+                caseAnnouncements=CaseAnnouncements(
+                    title="涉案公告列表",
+                    records=[]
+                ),
+                enforcementAnnouncements=EnforcementAnnouncements(
+                    title="执行公告列表",
+                    records=[]
+                ),
+                dishonestAnnouncements=DishonestAnnouncements(
+                    title="失信公告列表",
+                    records=[]
+                ),
+                highConsumptionRestrictionAnnouncements=HighConsumptionRestrictionAnnouncements(
+                    title="限高公告列表",
+                    records=[]
+                )
+            ),
+            creditAssessment=CreditAssessment(
+                loanIntentionByCustomerType=LoanIntentionByCustomerType(
+                    title="本人在各类机构的借贷意向表现",
+                    records=[]
+                ),
+                loanIntentionAbnormalTimes=LoanIntentionAbnormalTimes(
+                    title="异常时间段借贷申请情况",
+                    records=[]
+                )
+            ),
+            leasingRiskAssessment=LeasingRiskAssessment(
+                multiLenderRisk3C=MultiLenderRisk3C(
+                    title="3C机构多头借贷风险",
+                    records=[]
+                )
+            ),
+            comprehensiveAnalysis=[
+                "注意：由于大数据API调用失败，本报告仅包含征信报告分析结果。",
+                "建议：请检查网络连接或稍后重试以获取完整的风险评估数据。"
+            ],
+            reportFooter=ReportFooter(
+                dataSource="天远数据报告（数据获取失败）",
+                generationTime=generation_time,
+                disclaimer="本报告因数据源暂时不可用，仅供参考，最终审核以完整数据为准。"
+            )
+        )
 
     async def generate_html_file(
         self,
@@ -247,10 +369,11 @@ class BriefReportService:
             # ---------------------------------------------------------------------
             try:
                 # 如果是Pydantic模型，先转换为字典
+                # 🔑 关键：使用 by_alias=True 确保大数据报告字段使用驼峰命名（camelCase）
                 if hasattr(visualization_report, 'model_dump'):
-                    data_dict = visualization_report.model_dump()
+                    data_dict = visualization_report.model_dump(by_alias=True)
                 elif hasattr(visualization_report, 'dict'):
-                    data_dict = visualization_report.dict()
+                    data_dict = visualization_report.dict(by_alias=True)
                 else:
                     data_dict = visualization_report
 

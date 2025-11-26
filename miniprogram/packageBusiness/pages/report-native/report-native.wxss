@@ -953,3 +953,397 @@ page {
   color: #d84315;
 }
 
+/* ==================== 报告摘要样式 ==================== */
+.summary-card {
+  background-color: white;
+  border-radius: 12rpx;
+  padding: 25rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.summary-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.summary-label {
+  font-size: 28rpx;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.summary-value {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #4b6cb7;
+}
+
+.summary-detail {
+  font-size: 24rpx;
+  color: #7f8c8d;
+  line-height: 1.6;
+  margin-top: 8rpx;
+}
+
+/* ==================== 基本信息样式 ==================== */
+.info-card {
+  background-color: white;
+  border-radius: 12rpx;
+  padding: 25rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #ecf0f1;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: 26rpx;
+  color: #7f8c8d;
+}
+
+.info-value {
+  font-size: 26rpx;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.verification-list {
+  margin-top: 20rpx;
+}
+
+.list-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 15rpx;
+}
+
+.verification-item {
+  background-color: white;
+  border-radius: 12rpx;
+  padding: 25rpx;
+  margin-bottom: 15rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.verification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.verification-item-name {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.verification-result {
+  font-size: 26rpx;
+  color: #27ae60;
+  font-weight: 500;
+}
+
+.verification-description {
+  display: block;
+  font-size: 24rpx;
+  color: #7f8c8d;
+  line-height: 1.6;
+  margin-bottom: 8rpx;
+}
+
+.verification-details {
+  display: block;
+  font-size: 24rpx;
+  color: #e74c3c;
+  line-height: 1.6;
+}
+
+/* ==================== 风险识别样式 ==================== */
+.risk-subsection {
+  margin-bottom: 30rpx;
+}
+
+.risk-subsection-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15rpx;
+}
+
+.risk-icon {
+  font-size: 32rpx;
+  margin-right: 10rpx;
+}
+
+.risk-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.risk-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15rpx;
+}
+
+.risk-item {
+  background-color: white;
+  border-radius: 12rpx;
+  padding: 25rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+  border-left: 4rpx solid #e74c3c;
+}
+
+.risk-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+  padding-bottom: 12rpx;
+  border-bottom: 1rpx solid #ecf0f1;
+}
+
+.risk-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10rpx 0;
+}
+
+.risk-item-label {
+  font-size: 24rpx;
+  color: #7f8c8d;
+}
+
+.risk-item-value {
+  font-size: 24rpx;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+/* ==================== 信贷评估样式 ==================== */
+.assessment-subsection {
+  margin-bottom: 30rpx;
+}
+
+.assessment-header {
+  margin-bottom: 15rpx;
+}
+
+.assessment-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.assessment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15rpx;
+}
+
+.assessment-item {
+  background-color: white;
+  border-radius: 12rpx;
+  padding: 25rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.assessment-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.assessment-label {
+  font-size: 26rpx;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.assessment-value {
+  font-size: 26rpx;
+  color: #4b6cb7;
+  font-weight: bold;
+}
+
+.assessment-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8rpx 0;
+}
+
+.assessment-detail-label {
+  font-size: 24rpx;
+  color: #7f8c8d;
+}
+
+.assessment-detail-value {
+  font-size: 24rpx;
+  color: #2c3e50;
+}
+
+.assessment-risk {
+  margin-top: 12rpx;
+  padding-top: 12rpx;
+  border-top: 1rpx solid #ecf0f1;
+}
+
+.risk-level {
+  display: inline-block;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+/* ==================== 租赁风险评估样式 ==================== */
+.leasing-subsection {
+  margin-bottom: 30rpx;
+}
+
+.leasing-header {
+  margin-bottom: 15rpx;
+}
+
+.leasing-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.leasing-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15rpx;
+}
+
+.leasing-item {
+  background-color: white;
+  border-radius: 12rpx;
+  padding: 25rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.leasing-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15rpx;
+  padding-bottom: 15rpx;
+  border-bottom: 1rpx solid #ecf0f1;
+}
+
+.leasing-label {
+  font-size: 28rpx;
+  color: #2c3e50;
+  font-weight: bold;
+}
+
+.leasing-risk {
+  font-size: 24rpx;
+  color: #e74c3c;
+  font-weight: 500;
+}
+
+.leasing-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15rpx;
+}
+
+.leasing-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.leasing-stat .stat-label {
+  font-size: 22rpx;
+  color: #7f8c8d;
+}
+
+.leasing-stat .stat-value {
+  font-size: 26rpx;
+  color: #2c3e50;
+  font-weight: bold;
+}
+
+/* ==================== 综合分析样式 ==================== */
+.analysis-content {
+  background-color: white;
+  border-radius: 12rpx;
+  padding: 25rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.analysis-paragraph {
+  font-size: 26rpx;
+  line-height: 1.8;
+  color: #2c3e50;
+  margin-bottom: 20rpx;
+  text-align: justify;
+}
+
+.analysis-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+/* ==================== 报告页脚样式 ==================== */
+.report-footer-section {
+  margin-top: 40rpx;
+  margin-bottom: 20rpx;
+}
+
+.footer-content {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8eaf0 100%);
+  border-radius: 12rpx;
+  padding: 30rpx;
+  text-align: center;
+  border-top: 4rpx solid #4b6cb7;
+}
+
+.footer-source {
+  display: block;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 12rpx;
+}
+
+.footer-time {
+  display: block;
+  font-size: 24rpx;
+  color: #7f8c8d;
+  margin-bottom: 15rpx;
+}
+
+.footer-disclaimer {
+  display: block;
+  font-size: 22rpx;
+  color: #95a5a6;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+

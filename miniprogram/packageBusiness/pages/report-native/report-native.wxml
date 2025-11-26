@@ -401,6 +401,310 @@
       </view>
     </view>
 
+    <!-- 报告摘要 -->
+    <view class="section" wx:if="{{reportSummary}}">
+      <view class="section-title">
+        <text class="title-icon">📋</text>
+        <text class="title-text">报告摘要</text>
+      </view>
+
+      <!-- 规则验证 -->
+      <view class="summary-card" wx:if="{{reportSummary.rule_validation}}">
+        <view class="summary-item-header">
+          <text class="summary-label">规则验证</text>
+          <text class="summary-value">{{reportSummary.rule_validation.result}}</text>
+        </view>
+        <text class="summary-detail">策略: {{reportSummary.rule_validation.code}}</text>
+      </view>
+
+      <!-- 反欺诈评分 -->
+      <view class="summary-card" wx:if="{{reportSummary.anti_fraud_score}}">
+        <view class="summary-item-header">
+          <text class="summary-label">反欺诈评分</text>
+          <text class="summary-value">{{reportSummary.anti_fraud_score.level}}</text>
+        </view>
+      </view>
+
+      <!-- 反欺诈规则 -->
+      <view class="summary-card" wx:if="{{reportSummary.anti_fraud_rule}}">
+        <view class="summary-item-header">
+          <text class="summary-label">反欺诈规则</text>
+          <text class="summary-value">{{reportSummary.anti_fraud_rule.level}}</text>
+        </view>
+        <text class="summary-detail">策略: {{reportSummary.anti_fraud_rule.code}}</text>
+      </view>
+
+      <!-- 异常规则命中 -->
+      <view class="summary-card" wx:if="{{reportSummary.abnormal_rules_hit}}">
+        <view class="summary-item-header">
+          <text class="summary-label">异常规则命中</text>
+          <text class="summary-value">{{reportSummary.abnormal_rules_hit.count}}项</text>
+        </view>
+        <text class="summary-detail">⚠️ {{reportSummary.abnormal_rules_hit.alert}}</text>
+      </view>
+    </view>
+
+    <!-- 基本信息 -->
+    <view class="section" wx:if="{{basicInfo}}">
+      <view class="section-title">
+        <text class="title-icon">👤</text>
+        <text class="title-text">基本信息</text>
+      </view>
+
+      <!-- 个人信息卡片 -->
+      <view class="info-card">
+        <view class="info-row">
+          <text class="info-label">姓名</text>
+          <text class="info-value">{{basicInfo.name}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">手机号</text>
+          <text class="info-value">{{basicInfo.phone}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">身份证号</text>
+          <text class="info-value">{{basicInfo.id_card}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">报告编号</text>
+          <text class="info-value">{{basicInfo.report_id}}</text>
+        </view>
+      </view>
+
+      <!-- 核验项列表 -->
+      <view wx:if="{{basicInfo.verifications && basicInfo.verifications.length > 0}}" class="verification-list">
+        <text class="list-title">核验项结果</text>
+        <view wx:for="{{basicInfo.verifications}}" wx:key="item" class="verification-item">
+          <view class="verification-header">
+            <text class="verification-item-name">{{item.item}}</text>
+            <text class="verification-result">{{item.result}}</text>
+          </view>
+          <text class="verification-description">{{item.description}}</text>
+          <text class="verification-details" wx:if="{{item.details}}">{{item.details}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 风险识别 -->
+    <view class="section" wx:if="{{riskIdentification}}">
+      <view class="section-title">
+        <text class="title-icon">⚠️</text>
+        <text class="title-text">风险识别</text>
+      </view>
+
+      <!-- 涉案公告 -->
+      <view wx:if="{{riskIdentification.case_announcements && riskIdentification.case_announcements.records.length > 0}}" class="risk-subsection">
+        <view class="risk-subsection-header">
+          <text class="risk-icon">📋</text>
+          <text class="risk-title">{{riskIdentification.case_announcements.title}}</text>
+        </view>
+        <view class="risk-list">
+          <view wx:for="{{riskIdentification.case_announcements.records}}" wx:key="case_number" class="risk-item">
+            <view class="risk-item-header">
+              <text class="risk-item-label">法院</text>
+              <text class="risk-item-value">{{item.authority}}</text>
+            </view>
+            <view class="risk-item-row">
+              <text class="risk-item-label">案号</text>
+              <text class="risk-item-value">{{item.case_number}}</text>
+            </view>
+            <view class="risk-item-row">
+              <text class="risk-item-label">案件类型</text>
+              <text class="risk-item-value">{{item.case_type}}</text>
+            </view>
+            <view class="risk-item-row">
+              <text class="risk-item-label">立案日期</text>
+              <text class="risk-item-value">{{item.filing_date}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 执行公告 -->
+      <view wx:if="{{riskIdentification.enforcement_announcements && riskIdentification.enforcement_announcements.records.length > 0}}" class="risk-subsection">
+        <view class="risk-subsection-header">
+          <text class="risk-icon">⚖️</text>
+          <text class="risk-title">{{riskIdentification.enforcement_announcements.title}}</text>
+        </view>
+        <view class="risk-list">
+          <view wx:for="{{riskIdentification.enforcement_announcements.records}}" wx:key="case_number" class="risk-item">
+            <view class="risk-item-header">
+              <text class="risk-item-label">法院</text>
+              <text class="risk-item-value">{{item.court}}</text>
+            </view>
+            <view class="risk-item-row">
+              <text class="risk-item-label">案号</text>
+              <text class="risk-item-value">{{item.case_number}}</text>
+            </view>
+            <view class="risk-item-row">
+              <text class="risk-item-label">状态</text>
+              <text class="risk-item-value">{{item.status}}</text>
+            </view>
+            <view class="risk-item-row">
+              <text class="risk-item-label">执行标的</text>
+              <text class="risk-item-value">{{item.target_amount}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 失信公告 -->
+      <view wx:if="{{riskIdentification.dishonest_announcements && riskIdentification.dishonest_announcements.records.length > 0}}" class="risk-subsection">
+        <view class="risk-subsection-header">
+          <text class="risk-icon">❌</text>
+          <text class="risk-title">{{riskIdentification.dishonest_announcements.title}}</text>
+        </view>
+        <view class="risk-list">
+          <view wx:for="{{riskIdentification.dishonest_announcements.records}}" wx:key="id_card" class="risk-item">
+            <view class="risk-item-header">
+              <text class="risk-item-label">法院</text>
+              <text class="risk-item-value">{{item.court}}</text>
+            </view>
+            <view class="risk-item-row">
+              <text class="risk-item-label">被执行人</text>
+              <text class="risk-item-value">{{item.dishonest_person}}</text>
+            </view>
+            <view class="risk-item-row">
+              <text class="risk-item-label">履行情况</text>
+              <text class="risk-item-value">{{item.performance_status}}</text>
+            </view>
+            <view class="risk-item-row">
+              <text class="risk-item-label">公告日期</text>
+              <text class="risk-item-value">{{item.filing_date}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 限高公告 -->
+      <view wx:if="{{riskIdentification.high_consumption_restriction_announcements && riskIdentification.high_consumption_restriction_announcements.records.length > 0}}" class="risk-subsection">
+        <view class="risk-subsection-header">
+          <text class="risk-icon">🚫</text>
+          <text class="risk-title">{{riskIdentification.high_consumption_restriction_announcements.title}}</text>
+        </view>
+        <view class="risk-list">
+          <view wx:for="{{riskIdentification.high_consumption_restriction_announcements.records}}" wx:key="id_card" class="risk-item">
+            <view class="risk-item-header">
+              <text class="risk-item-label">法院</text>
+              <text class="risk-item-value">{{item.court}}</text>
+            </view>
+            <view class="risk-item-row">
+              <text class="risk-item-label">被限制人员</text>
+              <text class="risk-item-value">{{item.restricted_person}}</text>
+            </view>
+            <view class="risk-item-row">
+              <text class="risk-item-label">限制措施</text>
+              <text class="risk-item-value">{{item.measure}}</text>
+            </view>
+            <view class="risk-item-row">
+              <text class="risk-item-label">生效日期</text>
+              <text class="risk-item-value">{{item.start_date}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 信贷评估 -->
+    <view class="section" wx:if="{{creditAssessment}}">
+      <view class="section-title">
+        <text class="title-icon">💳</text>
+        <text class="title-text">信贷评估</text>
+      </view>
+
+      <!-- 借贷意向表现 -->
+      <view wx:if="{{creditAssessment.loan_intention_by_customer_type}}" class="assessment-subsection">
+        <view class="assessment-header">
+          <text class="assessment-title">{{creditAssessment.loan_intention_by_customer_type.title}}</text>
+        </view>
+        <view class="assessment-list">
+          <view wx:for="{{creditAssessment.loan_intention_by_customer_type.records}}" wx:key="customer_type" class="assessment-item">
+            <view class="assessment-item-header">
+              <text class="assessment-label">{{item.customer_type}}</text>
+              <text class="assessment-value">{{item.application_count}}次申请</text>
+            </view>
+            <view class="assessment-risk">
+              <text class="risk-level">{{item.risk_level}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 异常时间段借贷申请 -->
+      <view wx:if="{{creditAssessment.loan_intention_abnormal_times}}" class="assessment-subsection">
+        <view class="assessment-header">
+          <text class="assessment-title">{{creditAssessment.loan_intention_abnormal_times.title}}</text>
+        </view>
+        <view class="assessment-list">
+          <view wx:for="{{creditAssessment.loan_intention_abnormal_times.records}}" wx:key="time_period" class="assessment-item">
+            <view class="assessment-item-header">
+              <text class="assessment-label">{{item.time_period}}</text>
+            </view>
+            <view class="assessment-item-row">
+              <text class="assessment-detail-label">主导机构</text>
+              <text class="assessment-detail-value">{{item.main_institution_type}}</text>
+            </view>
+            <view class="assessment-risk">
+              <text class="risk-level">{{item.risk_level}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 租赁风险评估 -->
+    <view class="section" wx:if="{{leasingRiskAssessment}}">
+      <view class="section-title">
+        <text class="title-icon">🚗</text>
+        <text class="title-text">租赁风险评估</text>
+      </view>
+
+      <view wx:if="{{leasingRiskAssessment.multi_lender_risk_3c}}" class="leasing-subsection">
+        <view class="leasing-header">
+          <text class="leasing-title">{{leasingRiskAssessment.multi_lender_risk_3c.title}}</text>
+        </view>
+        <view class="leasing-list">
+          <view wx:for="{{leasingRiskAssessment.multi_lender_risk_3c.records}}" wx:key="institution_type" class="leasing-item">
+            <view class="leasing-item-header">
+              <text class="leasing-label">{{item.institution_type}}</text>
+              <text class="leasing-risk">{{item.risk_level}}</text>
+            </view>
+            <view class="leasing-stats">
+              <view class="leasing-stat">
+                <text class="stat-label">申请机构数</text>
+                <text class="stat-value">{{item.applied_count}}</text>
+              </view>
+              <view class="leasing-stat">
+                <text class="stat-label">在用机构数</text>
+                <text class="stat-value">{{item.in_use_count}}</text>
+              </view>
+              <view class="leasing-stat">
+                <text class="stat-label">授信总额</text>
+                <text class="stat-value">¥{{item.total_credit_limit}}</text>
+              </view>
+              <view class="leasing-stat">
+                <text class="stat-label">负债总额</text>
+                <text class="stat-value">¥{{item.total_debt_balance}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 综合分析 -->
+    <view class="section" wx:if="{{comprehensiveAnalysis && comprehensiveAnalysis.length > 0}}">
+      <view class="section-title">
+        <text class="title-icon">📊</text>
+        <text class="title-text">综合分析</text>
+      </view>
+      <view class="analysis-content">
+        <view wx:for="{{comprehensiveAnalysis}}" wx:key="index" class="analysis-paragraph">
+          <text>{{item}}</text>
+        </view>
+      </view>
+    </view>
+
     <!-- 产品推荐 -->
     <view class="section" wx:if="{{productRecommendations.length > 0}}">
       <view class="section-title">
@@ -492,6 +796,15 @@
           <text class="ai-risk-title">风险提示</text>
         </view>
         <text class="ai-risk-text">{{aiExpertAnalysis.risk_warning}}</text>
+      </view>
+    </view>
+
+    <!-- 报告页脚 -->
+    <view class="section report-footer-section" wx:if="{{reportFooter}}">
+      <view class="footer-content">
+        <text class="footer-source">{{reportFooter.data_source}}</text>
+        <text class="footer-time">生成时间: {{reportFooter.generation_time}}</text>
+        <text class="footer-disclaimer">{{reportFooter.disclaimer}}</text>
       </view>
     </view>
 

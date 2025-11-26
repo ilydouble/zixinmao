@@ -61,6 +61,15 @@ Page({
     // 产品推荐
     productRecommendations: [] as any[],
 
+    // 大数据报告字段
+    reportSummary: null as any,
+    basicInfo: null as any,
+    riskIdentification: null as any,
+    creditAssessment: null as any,
+    leasingRiskAssessment: null as any,
+    comprehensiveAnalysis: [] as string[],
+    reportFooter: null as any,
+
     // AI专家分析
     aiExpertAnalysis: null as any
   },
@@ -141,6 +150,14 @@ Page({
           overdueAnalysis: analysisResult.overdue_analysis,
           queryRecords: analysisResult.query_records || [],
           productRecommendations: analysisResult.product_recommendations || [],
+          // 大数据报告字段（使用camelCase）
+          reportSummary: analysisResult.reportSummary || null,
+          basicInfo: analysisResult.basicInfo || null,
+          riskIdentification: analysisResult.riskIdentification || null,
+          creditAssessment: analysisResult.creditAssessment || null,
+          leasingRiskAssessment: analysisResult.leasingRiskAssessment || null,
+          comprehensiveAnalysis: analysisResult.comprehensiveAnalysis || [],
+          reportFooter: analysisResult.reportFooter || null,
           aiExpertAnalysis: analysisResult.ai_expert_analysis || null
         })
       } else {

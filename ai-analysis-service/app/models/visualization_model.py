@@ -3,8 +3,9 @@
 定义征信报告可视化所需的数据结构
 """
 from typing import List, Optional, Dict, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
+from .bigdata_model import *
 
 # 个人信息概览
 class PersonalInfo(BaseModel):
@@ -139,45 +140,65 @@ class AIExpertAnalysis(BaseModel):
 
 
 class VisualizationReportData(BaseModel):
-    """可视化报告完整数据"""
-    # 报告基本信息
+    """可视化报告完整数据
+
+    🔑 命名规范说明：
+    - Python字段名：使用蛇形命名（snake_case），符合Python规范
+    - JSON序列化：使用驼峰命名（camelCase），符合前端JavaScript规范
+    - 通过 alias 实现两种命名风格的转换
+    - 序列化时必须使用 model_dump(by_alias=True) 才能输出驼峰命名
+    """
+
+    # 配置模型支持通过字段名和别名进行赋值
+    model_config = ConfigDict(populate_by_name=True)
+
+    # 报告基本信息（保持蛇形，前端使用 snake_case）
     report_number: Optional[str] = Field(default="", description="报告编号（格式：YYYYMMDDHHmmss）")
     report_date: Optional[str] = Field(default="", description="报告时间（格式：YYYY-MM-DD）")
 
-    # 个人信息
+    # 个人信息（保持蛇形）
     personal_info: Optional[PersonalInfo] = Field(default_factory=PersonalInfo, description="个人信息")
 
-    # 统计卡片
+    # 统计卡片（保持蛇形）
     stats: Optional[StatCard] = Field(default_factory=StatCard, description="统计数据")
 
-    # 负债构成
+    # 负债构成（保持蛇形）
     debt_composition: Optional[List[DebtItem]] = Field(default_factory=list, description="负债构成列表")
 
-    # 贷款详情
+    # 贷款详情（保持蛇形）
     loan_charts: Optional[List[LoanChart]] = Field(default_factory=list, description="贷款图表标签")
     loan_summary: Optional[LoanSummary] = Field(default_factory=LoanSummary, description="贷款汇总信息")
     bank_loans: Optional[List[LoanDetail]] = Field(default_factory=list, description="银行贷款列表")
     non_bank_loans: Optional[List[LoanDetail]] = Field(default_factory=list, description="非银机构贷款列表")
 
-    # 信用卡详情
+    # 信用卡详情（保持蛇形）
     credit_usage: Optional[CreditUsageAnalysis] = Field(default_factory=CreditUsageAnalysis, description="信用卡使用率分析")
     credit_cards: Optional[List[CreditCardDetail]] = Field(default_factory=list, description="信用卡列表")
 
-    # 逾期分析
+    # 逾期分析（保持蛇形）
     overdue_analysis: Optional[OverdueAnalysis] = Field(default_factory=OverdueAnalysis, description="逾期分析")
 
-    # 查询记录
+    # 查询记录（保持蛇形）
     query_records: Optional[List[QueryRecord]] = Field(default_factory=list, description="查询记录列表")
 
-    # 产品推荐
+    # 产品推荐（保持蛇形）
     product_recommendations: Optional[List[ProductRecommendation]] = Field(default_factory=list, description="产品推荐列表")
 
-    # AI专家分析
+    # AI专家分析（保持蛇形）
     ai_expert_analysis: Optional[AIExpertAnalysis] = Field(default_factory=AIExpertAnalysis, description="AI专家综合分析")
 
+    # 图表（保持蛇形）
     query_charts: Optional[List[QueryRecord]] = Field(default_factory=list, description="查询记录图表")
 
-    
+    # 大数据报告字段（可选，API失败时使用默认值）
+    report_summary: Optional[ReportSummary] = Field(default_factory=ReportSummary, alias="reportSummary", description="报告摘要")
+    basic_info: Optional[BasicInfo] = Field(default_factory=BasicInfo, alias="basicInfo", description="基本信息")
+    risk_identification: Optional[RiskIdentification] = Field(default_factory=RiskIdentification, alias="riskIdentification", description="风险识别产品")
+    credit_assessment: Optional[CreditAssessment] = Field(default_factory=CreditAssessment, alias="creditAssessment", description="信贷评估产品")
+    leasing_risk_assessment: Optional[LeasingRiskAssessment] = Field(default_factory=LeasingRiskAssessment, alias="leasingRiskAssessment", description="租赁风险评估产品")
+    comprehensive_analysis: Optional[List[str]] = Field(default_factory=list, alias="comprehensiveAnalysis", description="综合分析文字列表")
+    report_footer: Optional[ReportFooter] = Field(default_factory=ReportFooter, alias="reportFooter", description="报告页脚")
+
 
 
 class VisualizationReportRequest(BaseModel):

@@ -236,14 +236,19 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
 
         # 返回响应
         # 将visualization_report转换为字典
+        # 🔑 关键：使用 by_alias=True 确保大数据报告字段使用驼峰命名（camelCase）
         analysis_result_dict = None
         if visualization_report:
             if hasattr(visualization_report, 'model_dump'):
-                analysis_result_dict = visualization_report.model_dump()
+                analysis_result_dict = visualization_report.model_dump(by_alias=True)
             elif hasattr(visualization_report, 'dict'):
-                analysis_result_dict = visualization_report.dict()
+                analysis_result_dict = visualization_report.dict(by_alias=True)
             else:
                 analysis_result_dict = visualization_report
+
+            # 🔍 调试日志：检查report_number和report_date是否存在
+            logger.info(f"📊 [数据检查] report_number: {analysis_result_dict.get('report_number', 'NOT FOUND')}")
+            logger.info(f"📊 [数据检查] report_date: {analysis_result_dict.get('report_date', 'NOT FOUND')}")
 
         # 将PDF二进制转换为base64字符串
         pdf_report_b64 = None

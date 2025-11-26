@@ -3,7 +3,7 @@
 演示如何创建、验证和使用 BigDataResponse 模型
 """
 import json
-from bigdata_model import BigDataResponse
+from .bigdata_model import *
 
 
 def example_create_report():

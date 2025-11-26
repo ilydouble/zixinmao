@@ -6,30 +6,9 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 import logging
 
-from app.models.dify_model import (
-    DifyWorkflowOutput,
-    DifyBasicInfo,
-    DifyLoanDetail,
-    DifyCreditCardDetail,
-    DifyQueryRecord
-)
-from app.models.visualization_model import (
-    VisualizationReportData,
-    PersonalInfo,
-    StatCard,
-    DebtItem,
-    LoanDetail,
-    CreditCardDetail,
-    OverdueInstitution,
-    QueryRecord,
-    ProductRecommendation,
-    AIAnalysisPoint,
-    AIExpertAnalysis,
-    CreditUsageAnalysis,
-    OverdueAnalysis,
-    LoanSummary,
-    LoanChart
-)
+from app.models.dify_model import *
+from app.models.visualization_model import *
+from app.models.bigdata_model import *
 from app.service.product_recommend_service import ProductRecommendService
 from app.service.expert_analysis_service import ExpertAnalysisService
 from app.models.report_model import CustomerInfo
@@ -71,7 +50,7 @@ class DifyToVisualizationConverter:
     """Dify数据到可视化数据的转换器"""
 
     @staticmethod
-    def convert(dify_output: DifyWorkflowOutput, request_id: str = None, customer_info: CustomerInfo = None) -> VisualizationReportData:
+    def convert(bigdata_report: BigDataResponse, dify_output: DifyWorkflowOutput, request_id: str = None, customer_info: CustomerInfo = None) -> VisualizationReportData:
         """
         将Dify工作流输出转换为可视化报告数据
 
@@ -181,7 +160,14 @@ class DifyToVisualizationConverter:
                 product_recommendations=product_recommendations,
                 ai_expert_analysis=ai_expert_analysis,
                 loan_charts=loan_charts,
-                query_charts=query_records
+                query_charts=query_records,                
+                report_summary=bigdata_report.report_summary,
+                basic_info=bigdata_report.basic_info,
+                risk_identification=bigdata_report.risk_identification,
+                credit_assessment=bigdata_report.credit_assessment,
+                leasing_risk_assessment=bigdata_report.leasing_risk_assessment,
+                comprehensive_analysis=bigdata_report.comprehensive_analysis,
+                report_footer=bigdata_report.report_footer
             )
 
             logger.info(f"✅ [Dify转换] 转换完成, request_id: {request_id}")

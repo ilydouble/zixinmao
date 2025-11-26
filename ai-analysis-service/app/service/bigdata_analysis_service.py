@@ -112,10 +112,12 @@ class BigdataAnalysisService:
             if code == 0 and response_data.get("data"):
                 decrypted_data_str = self.decrypt_data(response_data["data"])
                 decrypted_data = json.loads(decrypted_data_str)
-                return BigDataResponse(**decrypted_data)
+                bigDataResponse=BigDataResponse(**decrypted_data)
+                logger.info(f"✅天远大数据API调用成功 - code: {code}, result: {bigDataResponse}")
+                return bigDataResponse
 
             # 业务失败或无数据
-            logger.warning(f"API调用失败 - code: {code}, message: {response_data.get('message')}")
+            logger.info(f"❌天远大数据API调用失败 - code: {code}, message: {response_data.get('message')}")
             return None
 
         except Exception as e:

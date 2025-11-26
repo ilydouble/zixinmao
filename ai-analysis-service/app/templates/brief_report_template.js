@@ -41,6 +41,12 @@ function generateVisualizationReport(data) {
         ${generateCreditCardAnalysis(data)}
         ${generateOverdueAnalysis(data.overdue_analysis)}
         ${generateQueryRecords(data.query_records, data.query_charts)}
+        ${generateReportSummary(data.report_summary)}
+        ${generateBasicInfo(data.basic_info)}
+        ${generateRiskIdentification(data.risk_identification)}
+        ${generateCreditAssessment(data.credit_assessment)}
+        ${generateLeasingRiskAssessment(data.leasing_risk_assessment)}
+        ${generateComprehensiveAnalysis(data.comprehensive_analysis)}
         ${generateProductRecommendations(data.product_recommendations)}
         ${generateAIAnalysis(data)}
         ${generateFooter(reportDate)}
@@ -147,6 +153,27 @@ function generateStyles() {
             grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
+
+            /* 报告摘要四项横向布局 */
+            .summary-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 12px;
+                margin-top: 8px;
+            }
+
+            @media (max-width: 768px) {
+                .summary-grid {
+                    grid-template-columns: 1fr 1fr;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .summary-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
 
         .info-item {
             margin-bottom: 12px;
@@ -1957,6 +1984,396 @@ function generateAIAnalysis(data) {
         </div>
     </div>`;
 }
+
+/**
+ * 生成报告摘要部分
+ */
+function generateReportSummary(summary) {
+    if (!summary) return '';
+
+    return `<h2 class="section-title">报告摘要</h2>
+    <div class="charts-container">
+        <div class="chart-card">
+            <div class="chart-title">
+                <span>📋</span>
+                风险评估概览
+            </div>
+
+            <div class="summary-grid">
+                ${summary.rule_validation ? `
+                <div class="info-item">
+                    <div class="info-label">规则验证</div>
+                    <div class="info-value highlight">${summary.rule_validation.result}</div>
+                </div>
+                ` : ''}
+
+                ${summary.anti_fraud_score ? `
+                <div class="info-item">
+                    <div class="info-label">反欺诈评分</div>
+                    <div class="info-value highlight">${summary.anti_fraud_score.level}</div>
+                </div>
+                ` : ''}
+
+                ${summary.anti_fraud_rule ? `
+                <div class="info-item">
+                    <div class="info-label">反欺诈规则</div>
+                    <div class="info-value highlight">${summary.anti_fraud_rule.level}</div>
+                </div>
+                ` : ''}
+
+                ${summary.abnormal_rules_hit ? `
+                <div class="info-item">
+                    <div class="info-label">异常规则命中</div>
+                    <div class="info-value highlight">${summary.abnormal_rules_hit.count}项</div>
+                    <div class="info-value" style="color: #e65100;">${summary.abnormal_rules_hit.alert}</div>
+                </div>
+                ` : ''}
+            </div>
+        </div>
+    </div>`;
+}
+
+/**
+ * 生成基本信息部分
+ */
+function generateBasicInfo(basicInfo) {
+    if (!basicInfo) return '';
+
+    const verificationsHtml = basicInfo.verifications && basicInfo.verifications.length > 0
+        ? basicInfo.verifications.map(v => `
+            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid ${v.result === '命中' ? '#27ae60' : '#e74c3c'};">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <strong style="font-size: 16px;">${v.item}</strong>
+                    <span style="color: ${v.result === '命中' ? '#27ae60' : '#e74c3c'}; font-weight: bold;">${v.result}</span>
+                </div>
+                <div style="color: #7f8c8d; font-size: 13px; margin-bottom: 6px;">${v.description}</div>
+                ${v.details ? `<div style="color: #e74c3c; font-size: 13px;">${v.details}</div>` : ''}
+            </div>
+        `).join('')
+        : '';
+
+    return `<h2 class="section-title">基本信息</h2>
+    <div class="charts-container">
+        <div class="chart-card">
+            ${verificationsHtml ? `
+            <div style="margin-top: 20px;">
+                <h3 style="font-size: 18px; margin-bottom: 15px; color: #2c3e50;">核验项结果</h3>
+                ${verificationsHtml}
+            </div>
+            ` : ''}
+        </div>
+    </div>`;
+}
+
+/**
+ * 生成风险识别部分
+ */
+function generateRiskIdentification(riskId) {
+    if (!riskId) return '';
+
+    let html = `<h2 class="section-title">风险识别产品</h2>
+    <div class="charts-container">`;
+
+    // 涉案公告
+    if (riskId.case_announcements && riskId.case_announcements.records && riskId.case_announcements.records.length > 0) {
+        const caseRows = riskId.case_announcements.records.map(record => `
+            <tr>                
+                <td>${record.case_number}</td>
+                <td>${record.case_type}</td>
+                <td>${record.filing_date}</td>
+                <td>${record.authority}</td>
+            </tr>
+        `).join('');
+
+        html += `
+        <div class="chart-card">
+            <div class="chart-title">
+                <span>📋</span>
+                ${riskId.case_announcements.title}
+            </div>
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>案件编号</th>                                                        
+                            <th>案件类型</th>
+                            <th>立案时间</th>
+                            <th>处理机关</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${caseRows}
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
+    }
+
+    // 执行公告
+    if (riskId.enforcement_announcements && riskId.enforcement_announcements.records && riskId.enforcement_announcements.records.length > 0) {
+        const enforcementRows = riskId.enforcement_announcements.records.map(record => `
+            <tr>                
+                <td>${record.case_number}</td>                
+                <td>${record.target_amount}</td>
+                <td>${record.filing_date}</td>
+                <td>${record.court}</td>
+                <td>${record.status}</td>
+            </tr>
+        `).join('');
+
+        html += `
+        <div class="chart-card">
+            <div class="chart-title">
+                <span>⚖️</span>
+                ${riskId.enforcement_announcements.title}
+            </div>
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>                            
+                            <th>执行案号</th>                            
+                            <th>执行标的</th>
+                            <th>立案时间</th>
+                            <th>执行法院</th>
+                            <th>执行状态</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${enforcementRows}
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
+    }
+
+    // 失信公告
+    if (riskId.dishonest_announcements && riskId.dishonest_announcements.records && riskId.dishonest_announcements.records.length > 0) {
+        const dishonestRows = riskId.dishonest_announcements.records.map(record => `
+            <tr>
+                <td>${record.dishonest_person}</td>
+                <td>${record.id_card}</td>
+                <td>${record.court}</td>                
+                <td>${record.filing_date}</td>
+                <td>${record.performance_status}</td>               
+            </tr>
+        `).join('');
+
+        html += `
+        <div class="chart-card">
+            <div class="chart-title">
+                <span>❌</span>
+                ${riskId.dishonest_announcements.title}
+            </div>
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>失信被执行人</th>
+                            <th>身份证号</th>
+                            <th>执行法院</th>
+                            <th>立案时间</th>
+                            <th>履行情况</th>                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${dishonestRows}
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
+    }
+
+    // 限高公告
+    if (riskId.high_consumption_restriction_announcements && riskId.high_consumption_restriction_announcements.records && riskId.high_consumption_restriction_announcements.records.length > 0) {
+        const restrictionRows = riskId.high_consumption_restriction_announcements.records.map(record => `
+            <tr>                
+                <td>${record.restricted_person}</td>
+                <td>${record.id_card}</td>
+                <td>${record.court}</td>
+                <td>${record.start_date}</td>
+                <td>${record.measure}</td>                
+            </tr>
+        `).join('');
+
+        html += `
+        <div class="chart-card">
+            <div class="chart-title">
+                <span>🚫</span>
+                ${riskId.high_consumption_restriction_announcements.title}
+            </div>
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>                            
+                            <th>限高人员</th>
+                            <th>身份证号</th>
+                            <th>限制法院</th>
+                            <th>限制开始时间</th>
+                            <th>限制措施</th>                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${restrictionRows}
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
+    }
+
+    html += `</div>`;
+    return html;
+}
+
+/**
+ * 生成信贷评估部分
+ */
+function generateCreditAssessment(assessment) {
+    if (!assessment) return '';
+
+    let html = `<h2 class="section-title">信贷评估产品</h2>
+    <div class="charts-container">`;
+
+    // 借贷意向表现
+    if (assessment.loan_intention_by_customer_type && assessment.loan_intention_by_customer_type.records && assessment.loan_intention_by_customer_type.records.length > 0) {
+        const intentionRows = assessment.loan_intention_by_customer_type.records.map(record => `
+            <tr>
+                <td>${record.customer_type}</td>
+                <td class="highlight">${record.application_count}次</td>
+                <td><span style="color: ${record.risk_level.includes('高') ? '#e74c3c' : (record.risk_level.includes('中') ? '#f39c12' : '#27ae60')}; font-weight: bold;">${record.risk_level}</span></td>
+            </tr>
+        `).join('');
+
+        html += `
+        <div class="chart-card">
+            <div class="chart-title">
+                <span>💳</span>
+                ${assessment.loan_intention_by_customer_type.title}
+            </div>
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>客户类型</th>
+                            <th>申请次数</th>
+                            <th>风险等级</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${intentionRows}
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
+    }
+
+    // 异常时间段借贷申请
+    if (assessment.loan_intention_abnormal_times && assessment.loan_intention_abnormal_times.records && assessment.loan_intention_abnormal_times.records.length > 0) {
+        const abnormalRows = assessment.loan_intention_abnormal_times.records.map(record => `
+            <tr>
+                <td>${record.time_period}</td>
+                <td>${record.main_institution_type}</td>
+                <td><span style="color: ${record.risk_level.includes('高') ? '#e74c3c' : (record.risk_level.includes('中') ? '#f39c12' : '#27ae60')}; font-weight: bold;">${record.risk_level}</span></td>
+            </tr>
+        `).join('');
+
+        html += `
+        <div class="chart-card">
+            <div class="chart-title">
+                <span>🕐</span>
+                ${assessment.loan_intention_abnormal_times.title}
+            </div>
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>时间段</th>
+                            <th>主要机构类型</th>
+                            <th>风险等级</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${abnormalRows}
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
+    }
+
+    html += `</div>`;
+    return html;
+}
+
+/**
+ * 生成租赁风险评估部分
+ */
+function generateLeasingRiskAssessment(leasing) {
+    if (!leasing || !leasing.multi_lender_risk_3c || !leasing.multi_lender_risk_3c.records || leasing.multi_lender_risk_3c.records.length === 0) {
+        return '';
+    }
+
+    const leasingRows = leasing.multi_lender_risk_3c.records.map(record => `
+        <tr>
+            <td>${record.institution_type}</td>
+            <td class="highlight">${record.applied_count}</td>
+            <td class="highlight">${record.in_use_count}</td>
+            <td>¥${formatNumber(record.total_credit_limit)}</td>
+            <td>¥${formatNumber(record.total_debt_balance)}</td>
+            <td><span style="color: ${record.risk_level.includes('高') ? '#e74c3c' : (record.risk_level.includes('中') ? '#f39c12' : '#27ae60')}; font-weight: bold;">${record.risk_level}</span></td>
+        </tr>
+    `).join('');
+
+    return `<h2 class="section-title">租赁风险评估</h2>
+    <div class="charts-container">
+        <div class="chart-card">
+            <div class="chart-title">
+                <span>🚗</span>
+                ${leasing.multi_lender_risk_3c.title}
+            </div>
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>机构类型</th>
+                            <th>申请机构数</th>
+                            <th>在用机构数</th>
+                            <th>总授信额度(元)</th>
+                            <th>总负债余额(元)</th>
+                            <th>风险等级</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${leasingRows}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>`;
+}
+
+/**
+ * 生成综合分析部分
+ */
+function generateComprehensiveAnalysis(analysis) {
+    if (!analysis || analysis.length === 0) return '';
+
+    const paragraphs = analysis.map(text => `
+        <p style="margin-bottom: 15px; line-height: 1.8; text-align: justify;">● ${text}</p>
+    `).join('');
+
+    return `<h2 class="section-title">综合解析</h2>
+    <div class="charts-container">
+        <div class="chart-card">
+            <div class="chart-title">
+                <span>📊</span>
+                综合风险分析
+            </div>
+            <div style="padding: 20px; font-size: 15px; color: #2c3e50;">
+                ${paragraphs}
+            </div>
+        </div>
+    </div>`;
+}
+
 
 /**
  * 生成页脚
