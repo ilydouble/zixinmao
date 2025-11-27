@@ -13,6 +13,24 @@ function formatNumber(num) {
 }
 
 /**
+ * 安全获取字段（同时兼容 snake_case 与 camelCase）
+ */
+function pick(obj, ...keys) {
+    for (const k of keys) {
+        if (obj && obj[k] !== undefined && obj[k] !== null) return obj[k];
+    }
+    return undefined;
+}
+
+/**
+ * 确保返回数组
+ */
+function safeArray(v) {
+    return Array.isArray(v) ? v : [];
+}
+
+
+/**
  * 生成完整的HTML报告
  * @param {Object} data - VisualizationReportData对象（必须包含report_date和report_number）
  * @returns {string} 完整的HTML字符串
@@ -41,12 +59,12 @@ function generateVisualizationReport(data) {
         ${generateCreditCardAnalysis(data)}
         ${generateOverdueAnalysis(data.overdue_analysis)}
         ${generateQueryRecords(data.query_records, data.query_charts)}
-        ${generateReportSummary(data.report_summary)}
-        ${generateBasicInfo(data.basic_info)}
-        ${generateRiskIdentification(data.risk_identification)}
-        ${generateCreditAssessment(data.credit_assessment)}
-        ${generateLeasingRiskAssessment(data.leasing_risk_assessment)}
-        ${generateComprehensiveAnalysis(data.comprehensive_analysis)}
+        ${generateReportSummary(data.report_summary || data.reportSummary)}
+        ${generateBasicInfo(data.basic_info || data.basicInfo)}
+        ${generateRiskIdentification(data.risk_identification || data.riskIdentification)}
+        ${generateCreditAssessment(data.credit_assessment || data.creditAssessment)}
+        ${generateLeasingRiskAssessment(data.leasing_risk_assessment || data.leasingRiskAssessment)}
+        ${generateComprehensiveAnalysis(data.comprehensive_analysis || data.comprehensiveAnalysis)}
         ${generateProductRecommendations(data.product_recommendations)}
         ${generateAIAnalysis(data)}
         ${generateFooter(reportDate)}
@@ -2000,32 +2018,32 @@ function generateReportSummary(summary) {
             </div>
 
             <div class="summary-grid">
-                ${summary.rule_validation ? `
+                ${pick(summary, 'ruleValidation', 'rule_validation') ? `
                 <div class="info-item">
                     <div class="info-label">规则验证</div>
-                    <div class="info-value highlight">${summary.rule_validation.result}</div>
+                    <div class="info-value highlight">${pick(summary, 'ruleValidation', 'rule_validation').result}</div>
                 </div>
                 ` : ''}
 
-                ${summary.anti_fraud_score ? `
+                ${pick(summary, 'antiFraudScore', 'anti_fraud_score') ? `
                 <div class="info-item">
                     <div class="info-label">反欺诈评分</div>
-                    <div class="info-value highlight">${summary.anti_fraud_score.level}</div>
+                    <div class="info-value highlight">${pick(summary, 'antiFraudScore', 'anti_fraud_score').level}</div>
                 </div>
                 ` : ''}
 
-                ${summary.anti_fraud_rule ? `
+                ${pick(summary, 'antiFraudRule', 'anti_fraud_rule') ? `
                 <div class="info-item">
                     <div class="info-label">反欺诈规则</div>
-                    <div class="info-value highlight">${summary.anti_fraud_rule.level}</div>
+                    <div class="info-value highlight">${pick(summary, 'antiFraudRule', 'anti_fraud_rule').level}</div>
                 </div>
                 ` : ''}
 
-                ${summary.abnormal_rules_hit ? `
+                ${pick(summary, 'abnormalRulesHit', 'abnormal_rules_hit') ? `
                 <div class="info-item">
                     <div class="info-label">异常规则命中</div>
-                    <div class="info-value highlight">${summary.abnormal_rules_hit.count}项</div>
-                    <div class="info-value" style="color: #e65100;">${summary.abnormal_rules_hit.alert}</div>
+                    <div class="info-value highlight">${pick(summary, 'abnormalRulesHit', 'abnormal_rules_hit').count}项</div>
+                    <div class="info-value" style="color: #e65100;">${pick(summary, 'abnormalRulesHit', 'abnormal_rules_hit').alert}</div>
                 </div>
                 ` : ''}
             </div>
@@ -2075,12 +2093,13 @@ function generateRiskIdentification(riskId) {
     <div class="charts-container">`;
 
     // 涉案公告
-    if (riskId.case_announcements && riskId.case_announcements.records && riskId.case_announcements.records.length > 0) {
-        const caseRows = riskId.case_announcements.records.map(record => `
-            <tr>                
-                <td>${record.case_number}</td>
-                <td>${record.case_type}</td>
-                <td>${record.filing_date}</td>
+    const caseAnnouncements = pick(riskId, 'caseAnnouncements', 'case_announcements');
+    if (caseAnnouncements && caseAnnouncements.records && caseAnnouncements.records.length > 0) {
+        const caseRows = caseAnnouncements.records.map(record => `
+            <tr>
+                <td>${pick(record, 'caseNumber', 'case_number')}</td>
+                <td>${pick(record, 'caseType', 'case_type')}</td>
+                <td>${pick(record, 'filingDate', 'filing_date')}</td>
                 <td>${record.authority}</td>
             </tr>
         `).join('');
@@ -2089,13 +2108,13 @@ function generateRiskIdentification(riskId) {
         <div class="chart-card">
             <div class="chart-title">
                 <span>📋</span>
-                ${riskId.case_announcements.title}
+                ${caseAnnouncements.title}
             </div>
             <div class="data-table">
                 <table>
                     <thead>
                         <tr>
-                            <th>案件编号</th>                                                        
+                            <th>案件编号</th>
                             <th>案件类型</th>
                             <th>立案时间</th>
                             <th>处理机关</th>
@@ -2110,12 +2129,13 @@ function generateRiskIdentification(riskId) {
     }
 
     // 执行公告
-    if (riskId.enforcement_announcements && riskId.enforcement_announcements.records && riskId.enforcement_announcements.records.length > 0) {
-        const enforcementRows = riskId.enforcement_announcements.records.map(record => `
-            <tr>                
-                <td>${record.case_number}</td>                
-                <td>${record.target_amount}</td>
-                <td>${record.filing_date}</td>
+    const enforcementAnnouncements = pick(riskId, 'enforcementAnnouncements', 'enforcement_announcements');
+    if (enforcementAnnouncements && enforcementAnnouncements.records && enforcementAnnouncements.records.length > 0) {
+        const enforcementRows = enforcementAnnouncements.records.map(record => `
+            <tr>
+                <td>${pick(record, 'caseNumber', 'case_number')}</td>
+                <td>${pick(record, 'targetAmount', 'target_amount')}</td>
+                <td>${pick(record, 'filingDate', 'filing_date')}</td>
                 <td>${record.court}</td>
                 <td>${record.status}</td>
             </tr>
@@ -2125,13 +2145,13 @@ function generateRiskIdentification(riskId) {
         <div class="chart-card">
             <div class="chart-title">
                 <span>⚖️</span>
-                ${riskId.enforcement_announcements.title}
+                ${enforcementAnnouncements.title}
             </div>
             <div class="data-table">
                 <table>
                     <thead>
-                        <tr>                            
-                            <th>执行案号</th>                            
+                        <tr>
+                            <th>执行案号</th>
                             <th>执行标的</th>
                             <th>立案时间</th>
                             <th>执行法院</th>
@@ -2147,14 +2167,15 @@ function generateRiskIdentification(riskId) {
     }
 
     // 失信公告
-    if (riskId.dishonest_announcements && riskId.dishonest_announcements.records && riskId.dishonest_announcements.records.length > 0) {
-        const dishonestRows = riskId.dishonest_announcements.records.map(record => `
+    const dishonestAnnouncements = pick(riskId, 'dishonestAnnouncements', 'dishonest_announcements');
+    if (dishonestAnnouncements && dishonestAnnouncements.records && dishonestAnnouncements.records.length > 0) {
+        const dishonestRows = dishonestAnnouncements.records.map(record => `
             <tr>
-                <td>${record.dishonest_person}</td>
-                <td>${record.id_card}</td>
-                <td>${record.court}</td>                
-                <td>${record.filing_date}</td>
-                <td>${record.performance_status}</td>               
+                <td>${pick(record, 'dishonestPerson', 'dishonest_person')}</td>
+                <td>${pick(record, 'idCard', 'id_card')}</td>
+                <td>${record.court}</td>
+                <td>${pick(record, 'filingDate', 'filing_date')}</td>
+                <td>${pick(record, 'performanceStatus', 'performance_status')}</td>
             </tr>
         `).join('');
 
@@ -2162,7 +2183,7 @@ function generateRiskIdentification(riskId) {
         <div class="chart-card">
             <div class="chart-title">
                 <span>❌</span>
-                ${riskId.dishonest_announcements.title}
+                ${dishonestAnnouncements.title}
             </div>
             <div class="data-table">
                 <table>
@@ -2172,7 +2193,7 @@ function generateRiskIdentification(riskId) {
                             <th>身份证号</th>
                             <th>执行法院</th>
                             <th>立案时间</th>
-                            <th>履行情况</th>                            
+                            <th>履行情况</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -2184,14 +2205,15 @@ function generateRiskIdentification(riskId) {
     }
 
     // 限高公告
-    if (riskId.high_consumption_restriction_announcements && riskId.high_consumption_restriction_announcements.records && riskId.high_consumption_restriction_announcements.records.length > 0) {
-        const restrictionRows = riskId.high_consumption_restriction_announcements.records.map(record => `
-            <tr>                
-                <td>${record.restricted_person}</td>
-                <td>${record.id_card}</td>
+    const highConsumptionRestrictionAnnouncements = pick(riskId, 'highConsumptionRestrictionAnnouncements', 'high_consumption_restriction_announcements');
+    if (highConsumptionRestrictionAnnouncements && highConsumptionRestrictionAnnouncements.records && highConsumptionRestrictionAnnouncements.records.length > 0) {
+        const restrictionRows = highConsumptionRestrictionAnnouncements.records.map(record => `
+            <tr>
+                <td>${pick(record, 'restrictedPerson', 'restricted_person')}</td>
+                <td>${pick(record, 'idCard', 'id_card')}</td>
                 <td>${record.court}</td>
-                <td>${record.start_date}</td>
-                <td>${record.measure}</td>                
+                <td>${pick(record, 'startDate', 'start_date')}</td>
+                <td>${record.measure}</td>
             </tr>
         `).join('');
 
@@ -2199,17 +2221,17 @@ function generateRiskIdentification(riskId) {
         <div class="chart-card">
             <div class="chart-title">
                 <span>🚫</span>
-                ${riskId.high_consumption_restriction_announcements.title}
+                ${highConsumptionRestrictionAnnouncements.title}
             </div>
             <div class="data-table">
                 <table>
                     <thead>
-                        <tr>                            
+                        <tr>
                             <th>限高人员</th>
                             <th>身份证号</th>
                             <th>限制法院</th>
                             <th>限制开始时间</th>
-                            <th>限制措施</th>                            
+                            <th>限制措施</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -2234,12 +2256,13 @@ function generateCreditAssessment(assessment) {
     <div class="charts-container">`;
 
     // 借贷意向表现
-    if (assessment.loan_intention_by_customer_type && assessment.loan_intention_by_customer_type.records && assessment.loan_intention_by_customer_type.records.length > 0) {
-        const intentionRows = assessment.loan_intention_by_customer_type.records.map(record => `
+    const loanIntentionByCustomerType = pick(assessment, 'loanIntentionByCustomerType', 'loan_intention_by_customer_type');
+    if (loanIntentionByCustomerType && loanIntentionByCustomerType.records && loanIntentionByCustomerType.records.length > 0) {
+        const intentionRows = loanIntentionByCustomerType.records.map(record => `
             <tr>
-                <td>${record.customer_type}</td>
-                <td class="highlight">${record.application_count}次</td>
-                <td><span style="color: ${record.risk_level.includes('高') ? '#e74c3c' : (record.risk_level.includes('中') ? '#f39c12' : '#27ae60')}; font-weight: bold;">${record.risk_level}</span></td>
+                <td>${pick(record, 'customerType', 'customer_type')}</td>
+                <td class="highlight">${pick(record, 'applicationCount', 'application_count')}次</td>
+                <td><span style="color: ${pick(record, 'riskLevel', 'risk_level').includes('高') ? '#e74c3c' : (pick(record, 'riskLevel', 'risk_level').includes('中') ? '#f39c12' : '#27ae60')}; font-weight: bold;">${pick(record, 'riskLevel', 'risk_level')}</span></td>
             </tr>
         `).join('');
 
@@ -2247,7 +2270,7 @@ function generateCreditAssessment(assessment) {
         <div class="chart-card">
             <div class="chart-title">
                 <span>💳</span>
-                ${assessment.loan_intention_by_customer_type.title}
+                ${loanIntentionByCustomerType.title}
             </div>
             <div class="data-table">
                 <table>
@@ -2267,12 +2290,13 @@ function generateCreditAssessment(assessment) {
     }
 
     // 异常时间段借贷申请
-    if (assessment.loan_intention_abnormal_times && assessment.loan_intention_abnormal_times.records && assessment.loan_intention_abnormal_times.records.length > 0) {
-        const abnormalRows = assessment.loan_intention_abnormal_times.records.map(record => `
+    const loanIntentionAbnormalTimes = pick(assessment, 'loanIntentionAbnormalTimes', 'loan_intention_abnormal_times');
+    if (loanIntentionAbnormalTimes && loanIntentionAbnormalTimes.records && loanIntentionAbnormalTimes.records.length > 0) {
+        const abnormalRows = loanIntentionAbnormalTimes.records.map(record => `
             <tr>
-                <td>${record.time_period}</td>
-                <td>${record.main_institution_type}</td>
-                <td><span style="color: ${record.risk_level.includes('高') ? '#e74c3c' : (record.risk_level.includes('中') ? '#f39c12' : '#27ae60')}; font-weight: bold;">${record.risk_level}</span></td>
+                <td>${pick(record, 'timePeriod', 'time_period')}</td>
+                <td>${pick(record, 'mainInstitutionType', 'main_institution_type')}</td>
+                <td><span style="color: ${pick(record, 'riskLevel', 'risk_level').includes('高') ? '#e74c3c' : (pick(record, 'riskLevel', 'risk_level').includes('中') ? '#f39c12' : '#27ae60')}; font-weight: bold;">${pick(record, 'riskLevel', 'risk_level')}</span></td>
             </tr>
         `).join('');
 
@@ -2280,7 +2304,7 @@ function generateCreditAssessment(assessment) {
         <div class="chart-card">
             <div class="chart-title">
                 <span>🕐</span>
-                ${assessment.loan_intention_abnormal_times.title}
+                ${loanIntentionAbnormalTimes.title}
             </div>
             <div class="data-table">
                 <table>
@@ -2307,18 +2331,21 @@ function generateCreditAssessment(assessment) {
  * 生成租赁风险评估部分
  */
 function generateLeasingRiskAssessment(leasing) {
-    if (!leasing || !leasing.multi_lender_risk_3c || !leasing.multi_lender_risk_3c.records || leasing.multi_lender_risk_3c.records.length === 0) {
+    if (!leasing) return '';
+
+    const multiLenderRisk3C = pick(leasing, 'multiLenderRisk3C', 'multi_lender_risk_3c');
+    if (!multiLenderRisk3C || !multiLenderRisk3C.records || multiLenderRisk3C.records.length === 0) {
         return '';
     }
 
-    const leasingRows = leasing.multi_lender_risk_3c.records.map(record => `
+    const leasingRows = multiLenderRisk3C.records.map(record => `
         <tr>
-            <td>${record.institution_type}</td>
-            <td class="highlight">${record.applied_count}</td>
-            <td class="highlight">${record.in_use_count}</td>
-            <td>¥${formatNumber(record.total_credit_limit)}</td>
-            <td>¥${formatNumber(record.total_debt_balance)}</td>
-            <td><span style="color: ${record.risk_level.includes('高') ? '#e74c3c' : (record.risk_level.includes('中') ? '#f39c12' : '#27ae60')}; font-weight: bold;">${record.risk_level}</span></td>
+            <td>${pick(record, 'institutionType', 'institution_type')}</td>
+            <td class="highlight">${pick(record, 'appliedCount', 'applied_count')}</td>
+            <td class="highlight">${pick(record, 'inUseCount', 'in_use_count')}</td>
+            <td>¥${formatNumber(pick(record, 'totalCreditLimit', 'total_credit_limit'))}</td>
+            <td>¥${formatNumber(pick(record, 'totalDebtBalance', 'total_debt_balance'))}</td>
+            <td><span style="color: ${pick(record, 'riskLevel', 'risk_level').includes('高') ? '#e74c3c' : (pick(record, 'riskLevel', 'risk_level').includes('中') ? '#f39c12' : '#27ae60')}; font-weight: bold;">${pick(record, 'riskLevel', 'risk_level')}</span></td>
         </tr>
     `).join('');
 
@@ -2327,7 +2354,7 @@ function generateLeasingRiskAssessment(leasing) {
         <div class="chart-card">
             <div class="chart-title">
                 <span>🚗</span>
-                ${leasing.multi_lender_risk_3c.title}
+                ${multiLenderRisk3C.title}
             </div>
             <div class="data-table">
                 <table>

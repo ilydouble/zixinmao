@@ -160,14 +160,14 @@ class DifyToVisualizationConverter:
                 product_recommendations=product_recommendations,
                 ai_expert_analysis=ai_expert_analysis,
                 loan_charts=loan_charts,
-                query_charts=query_records,                
-                report_summary=bigdata_report.report_summary,
-                basic_info=bigdata_report.basic_info,
-                risk_identification=bigdata_report.risk_identification,
-                credit_assessment=bigdata_report.credit_assessment,
-                leasing_risk_assessment=bigdata_report.leasing_risk_assessment,
+                query_charts=query_records,
+                report_summary=bigdata_report.report_summary.model_dump() if bigdata_report.report_summary else None,
+                basic_info=bigdata_report.basic_info.model_dump() if bigdata_report.basic_info else None,
+                risk_identification=bigdata_report.risk_identification.model_dump() if bigdata_report.risk_identification else None,
+                credit_assessment=bigdata_report.credit_assessment.model_dump() if bigdata_report.credit_assessment else None,
+                leasing_risk_assessment=bigdata_report.leasing_risk_assessment.model_dump() if bigdata_report.leasing_risk_assessment else None,
                 comprehensive_analysis=bigdata_report.comprehensive_analysis,
-                report_footer=bigdata_report.report_footer
+                report_footer=bigdata_report.report_footer.model_dump() if bigdata_report.report_footer else None
             )
 
             logger.info(f"✅ [Dify转换] 转换完成, request_id: {request_id}")

@@ -10,10 +10,12 @@ class COMBHZY2Request(BaseModel):
     """
     COMBHZY2接口请求参数实体类。
     """
-    mobile_no: Optional[str] = Field(None, description="手机号码")
-    id_card: Optional[str] = Field(None, description="身份证号")
+    model_config = ConfigDict(populate_by_name=True)
+
+    mobile_no: Optional[str] = Field(None, alias="mobileNo", description="手机号码")
+    id_card: Optional[str] = Field(None, alias="idCard", description="身份证号")
     name: Optional[str] = Field(None, description="姓名")
-    authorization_url: Optional[str] = Field(None, description="授权书地址")
+    authorization_url: Optional[str] = Field(None, alias="authorizationUrl", description="授权书地址")
 
 
 # ==================== 枚举类型 ====================
@@ -136,6 +138,7 @@ class ReportSummary(BaseModel):
 class Verification(BaseModel):
     """核验项"""
     model_config = ConfigDict(
+        populate_by_name=True,
         json_schema_extra={
             "example": {
                 "item": "要素核查",

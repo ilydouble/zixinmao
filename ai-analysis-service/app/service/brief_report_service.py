@@ -109,8 +109,8 @@ class BriefReportService:
                 name=analysisRequest.name,
                 authorization_url=analysisRequest.auth_file
             )
-            # bigdata_report = bigdata_service.call_api(combhzy2Request)
-            bigdata_report = example_create_report()
+            bigdata_report = bigdata_service.call_api(combhzy2Request)
+            # bigdata_report = example_create_report()
 
             # 如果大数据API调用失败，使用默认值
             if bigdata_report is None:
