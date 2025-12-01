@@ -253,13 +253,34 @@ Page({
         }
       })
 
+      console.log('云函数返回结果:', result)
+
       if (result.result && (result.result as any).success) {
         const downloadData = (result.result as any).data
         const downloadUrl = downloadData.downloadUrl
         const fileName = downloadData.fileName || `报告_${this.data.reportId}.pdf`
+        const fileSize = downloadData.fileSize || 0
 
         console.log('PDF报告下载链接:', downloadUrl)
         console.log('文件名:', fileName)
+        console.log('文件大小:', fileSize, 'bytes')
+
+        // 检查文件大小（超过10MB可能分享失败）
+        if (fileSize > 10 * 1024 * 1024) {
+          wx.hideLoading()
+          wx.showModal({
+            title: '文件较大',
+            content: `PDF文件大小为 ${(fileSize / 1024 / 1024).toFixed(2)}MB，建议直接打开查看。`,
+            confirmText: '打开文档',
+            cancelText: '取消',
+            success: (modalRes) => {
+              if (modalRes.confirm) {
+                this.openPDFDocument(downloadUrl, fileName)
+              }
+            }
+          })
+          return
+        }
 
         // 下载PDF文件
         wx.downloadFile({
@@ -294,11 +315,31 @@ Page({
                           })
                         },
                         fail: (err) => {
-                          console.error('分享失败:', err)
-                          wx.showToast({
-                            title: '分享失败，请重试',
-                            icon: 'none',
-                            duration: 2000
+                          console.error('❌ iOS分享失败:', err)
+                          // 分享失败，提供备用方案
+                          wx.showModal({
+                            title: '分享失败',
+                            content: '文件分享失败，可能是文件格式或大小限制。\n\n是否尝试直接打开文档？',
+                            confirmText: '打开文档',
+                            cancelText: '取消',
+                            success: (retryRes) => {
+                              if (retryRes.confirm) {
+                                wx.openDocument({
+                                  filePath: res.tempFilePath,
+                                  fileType: 'pdf',
+                                  success: () => {
+                                    console.log('✅ 文档打开成功')
+                                  },
+                                  fail: (openErr) => {
+                                    console.error('❌ 打开文档失败:', openErr)
+                                    wx.showToast({
+                                      title: '打开失败',
+                                      icon: 'none'
+                                    })
+                                  }
+                                })
+                              }
+                            }
                           })
                         }
                       })
@@ -326,10 +367,31 @@ Page({
                           })
                         },
                         fail: (err) => {
-                          console.error('分享失败:', err)
-                          wx.showToast({
-                            title: '分享失败，请重试',
-                            icon: 'none'
+                          console.error('❌ Android分享失败:', err)
+                          // 分享失败，提供备用方案
+                          wx.showModal({
+                            title: '分享失败',
+                            content: '文件分享失败，可能是文件格式或大小限制。\n\n是否尝试直接打开文档？',
+                            confirmText: '打开文档',
+                            cancelText: '取消',
+                            success: (retryRes) => {
+                              if (retryRes.confirm) {
+                                wx.openDocument({
+                                  filePath: res.tempFilePath,
+                                  fileType: 'pdf',
+                                  success: () => {
+                                    console.log('✅ 文档打开成功')
+                                  },
+                                  fail: (openErr) => {
+                                    console.error('❌ 打开文档失败:', openErr)
+                                    wx.showToast({
+                                      title: '打开失败',
+                                      icon: 'none'
+                                    })
+                                  }
+                                })
+                              }
+                            }
                           })
                         }
                       })

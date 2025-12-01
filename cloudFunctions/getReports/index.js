@@ -257,35 +257,47 @@ function buildStatusResponse(report) {
  */
 async function downloadReport(reportId, userId, fileType = 'json') {
   try {
+    console.log(`📥 下载报告请求: reportId=${reportId}, fileType=${fileType}`)
+
     const reportDoc = await db.collection('reports')
       .doc(reportId)
       .get()
-    
+
     if (!reportDoc.data) {
+      console.error(`❌ 报告不存在: ${reportId}`)
       throw new Error('报告不存在')
     }
-    
+
     const report = reportDoc.data
-    
+
     // 验证用户权限
     if (report.userId !== userId) {
+      console.error(`❌ 用户无权访问报告`)
       throw new Error('无权访问此报告')
     }
-    
+
     // 检查报告是否完成
     if (report.processing.status !== 'completed') {
+      console.warn(`⚠️ 报告未完成: status=${report.processing.status}`)
       throw new Error('报告尚未完成')
     }
-    
+
     // 检查报告是否过期
     if (report.metadata.expiresAt && new Date() > new Date(report.metadata.expiresAt)) {
+      console.warn(`⚠️ 报告已过期`)
       throw new Error('报告已过期')
     }
-    
+
     // 获取对应的文件URL
     const reportFiles = report.output.reportFiles
+    console.log(`📄 报告文件信息:`, {
+      hasJsonUrl: !!reportFiles.jsonUrl,
+      hasPdfUrl: !!reportFiles.pdfUrl,
+      hasHtmlUrl: !!reportFiles.htmlUrl
+    })
+
     let fileUrl = null
-    
+
     switch (fileType) {
       case 'json':
         fileUrl = reportFiles.jsonUrl
@@ -299,9 +311,12 @@ async function downloadReport(reportId, userId, fileType = 'json') {
       default:
         throw new Error('不支持的文件类型')
     }
-    
+
+    console.log(`📎 文件URL (${fileType}):`, fileUrl ? '✅ 存在' : '❌ 不存在')
+
     if (!fileUrl) {
-      throw new Error('报告文件不存在')
+      console.error(`❌ ${fileType}文件URL不存在`)
+      throw new Error(`${fileType.toUpperCase()}报告文件不存在，可能生成失败`)
     }
     
     // 更新下载统计
@@ -314,10 +329,19 @@ async function downloadReport(reportId, userId, fileType = 'json') {
     })
     
     // 生成临时下载链接
+    console.log(`🔗 生成临时下载链接...`)
     const downloadUrl = await cloud.getTempFileURL({
       fileList: [fileUrl]
     })
-    
+
+    if (!downloadUrl.fileList || downloadUrl.fileList.length === 0) {
+      console.error(`❌ 临时链接生成失败`)
+      throw new Error('生成下载链接失败')
+    }
+
+    const tempFileURL = downloadUrl.fileList[0].tempFileURL
+    console.log(`✅ 临时链接生成成功`)
+
     // 生成更友好的文件名
     let baseFileName = report.input.originalFileName || '报告'
     // 移除原文件的扩展名（如 .pdf）
@@ -333,15 +357,23 @@ async function downloadReport(reportId, userId, fileType = 'json') {
       finalFileName = `${baseFileName}_分析数据.${fileType}`
     }
 
+    console.log(`✅ 下载报告成功: ${finalFileName}`)
+
     return {
       success: true,
       data: {
-        downloadUrl: downloadUrl.fileList[0].tempFileURL,
+        downloadUrl: tempFileURL,
         fileName: finalFileName,
         fileSize: report.output.fileInfo[`${fileType}FileSize`] || 0
       }
     }
   } catch (error) {
+    console.error(`❌ 下载报告失败:`, {
+      reportId,
+      fileType,
+      error: error.message
+    })
+
     // 检查是否是文档不存在的错误
     const errorMessage = error.message || error.toString()
     if (errorMessage.includes('document.get:fail') ||

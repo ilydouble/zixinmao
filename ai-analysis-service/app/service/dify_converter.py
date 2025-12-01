@@ -11,46 +11,17 @@ from app.models.visualization_model import *
 from app.models.bigdata_model import *
 from app.service.product_recommend_service import ProductRecommendService
 from app.service.expert_analysis_service import ExpertAnalysisService
-from app.models.report_model import CustomerInfo
+from app.models.report_model import *
+from app.utils.time_handle import *
 
 logger = logging.getLogger(__name__)
-
-
-def parse_report_date(date_str: str):
-    """
-    灵活解析报告日期，支持多种格式
-
-    Args:
-        date_str: 日期字符串
-
-    Returns:
-        datetime对象
-    """
-    from datetime import datetime
-
-    # 尝试多种日期格式
-    formats = [
-        "%Y-%m-%d %H:%M:%S",  # 2024-10-15 12:00:00
-        "%Y-%m-%d",           # 2024-10-15
-        "%Y/%m/%d %H:%M:%S",  # 2024/10/15 12:00:00
-        "%Y/%m/%d",           # 2024/10/15
-    ]
-
-    for fmt in formats:
-        try:
-            return datetime.strptime(date_str, fmt)
-        except ValueError:
-            continue
-
-    # 如果所有格式都失败，抛出异常
-    raise ValueError(f"无法解析日期格式: {date_str}")
 
 
 class DifyToVisualizationConverter:
     """Dify数据到可视化数据的转换器"""
 
     @staticmethod
-    def convert(bigdata_report: BigDataResponse, dify_output: DifyWorkflowOutput, request_id: str = None, customer_info: CustomerInfo = None) -> VisualizationReportData:
+    def convert(bigdata_report: BigDataResponse, dify_output: DifyWorkflowOutput, request_id: str = None,  analysisRequest: AnalysisRequest = None) -> VisualizationReportData:
         """
         将Dify工作流输出转换为可视化报告数据
 
@@ -118,11 +89,11 @@ class DifyToVisualizationConverter:
             )
 
             # 10. 生成产品推荐（基于分析结果）
-            if customer_info is not None and customer_info.includeProductMatch:
+            if analysisRequest.customer_info is not None and analysisRequest.customer_info.includeProductMatch:
                 product_recommendations = DifyToVisualizationConverter._generate_product_recommendations(
                     personal_info, stats, debt_composition, bank_loans, non_bank_loans,
                     loan_summary, credit_cards, credit_usage, overdue_analysis, query_records,
-                    customer_info
+                    analysisRequest,dify_output
                 )
             else:
                 product_recommendations = None
@@ -732,7 +703,8 @@ class DifyToVisualizationConverter:
         credit_usage: CreditUsageAnalysis,
         overdue_analysis: OverdueAnalysis,
         query_records: List[QueryRecord],
-        customer_info: CustomerInfo = None
+        analysisRequest: AnalysisRequest,
+        dify_output: DifyWorkflowOutput
     ) -> List[ProductRecommendation]:
         """
         生成产品推荐
@@ -754,7 +726,8 @@ class DifyToVisualizationConverter:
                 credit_usage=credit_usage,
                 overdue_analysis=overdue_analysis,
                 query_records=query_records,
-                customer_info=customer_info,
+                analysisRequest=analysisRequest,
+                dify_output=dify_output
             )
 
             return recommendations

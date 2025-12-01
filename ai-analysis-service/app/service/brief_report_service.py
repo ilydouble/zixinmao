@@ -121,7 +121,7 @@ class BriefReportService:
             processing_time = time.time() - start_time
             # 使用转换器将Dify数据转换为可视化格式
             visualization_report = DifyToVisualizationConverter.convert(
-                bigdata_report, dify_output, request_id, customer_info
+                bigdata_report, dify_output, request_id, analysisRequest
             )
 
             logger.info(f"✅ [步骤4] Dify数据转换为可视化格式成功, 耗时: {processing_time:.2f}s, request_id: {request_id}")
