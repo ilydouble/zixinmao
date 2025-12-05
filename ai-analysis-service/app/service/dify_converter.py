@@ -245,8 +245,8 @@ class DifyToVisualizationConverter:
             debt_items.append(
                 DebtItem(
                 type = "信用卡",
-                institutions = basic_info.credit_accounts_uncleared,
-                accounts = len(credit_card_details),
+                institutions = len(card_institutions),
+                accounts = basic_info.credit_accounts_uncleared,
                 credit_limit = card_credit,
                 balance = card_balance,
                 usage_rate = card_usage_rate
@@ -255,7 +255,7 @@ class DifyToVisualizationConverter:
 
         # 统计贷款
         if loan_details:
-            loan_institutions = set(loan.institution for loan in loan_details if loan.institution)
+            loan_institutions = set(loan.institution for loan in loan_details if loan.institution and not loan.is_closed_account)
             loan_credit = sum(loan.credit_limit or 0 for loan in loan_details)
             loan_balance = sum(loan.balance or 0 for loan in loan_details)
             loan_usage_rate = "-"

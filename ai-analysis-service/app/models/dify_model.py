@@ -34,6 +34,7 @@ class DifyLoanDetail(BaseModel):
     over_90_days: Optional[bool] = Field(None, description="是否有90天以上逾期")
     is_consumer_loan: Optional[bool] = Field(None, description="是否为消费贷款")
     is_revolving_loan: Optional[bool] = Field(None, description="是否为循环贷款")
+    is_closed_account: Optional[bool] = Field(None, description="是否为结清账户")
 
 
 class DifyCreditCardDetail(BaseModel):
