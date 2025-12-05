@@ -51,6 +51,7 @@ class DifyToVisualizationConverter:
 
             # 3. 转换负债构成
             debt_composition = DifyToVisualizationConverter._convert_debt_composition(
+                dify_output.basic_info,
                 dify_output.loan_details,
                 dify_output.credit_card_details
             )
@@ -227,6 +228,7 @@ class DifyToVisualizationConverter:
 
     @staticmethod
     def _convert_debt_composition(
+        basic_info: DifyBasicInfo,
         loan_details: List[DifyLoanDetail],
         credit_card_details: List[DifyCreditCardDetail]
     ) -> List[DebtItem]:
@@ -243,7 +245,7 @@ class DifyToVisualizationConverter:
             debt_items.append(
                 DebtItem(
                 type = "信用卡",
-                institutions = len(card_institutions),
+                institutions = basic_info.credit_accounts_uncleared,
                 accounts = len(credit_card_details),
                 credit_limit = card_credit,
                 balance = card_balance,
@@ -262,7 +264,7 @@ class DifyToVisualizationConverter:
                 DebtItem(
                 type = "贷款",
                 institutions = len(loan_institutions),
-                accounts = len(loan_details),
+                accounts = basic_info.loan_accounts_uncleared,
                 credit_limit = loan_credit,
                 balance = loan_balance,
                 usage_rate = loan_usage_rate

@@ -180,7 +180,7 @@ class BriefReportService:
         logger.info(f"🔄 [步骤1] 将PDF转换为Markdown, 文件: {file_name}, request_id: {request_id}")
         from app.service.document_service import DocumentService
         doc_service = DocumentService()
-        markdown_content = await doc_service.process_document_by_ocr(
+        markdown_content = await doc_service.process_document(
             file_name=file_name,
             file_base64=file_base64,
         )

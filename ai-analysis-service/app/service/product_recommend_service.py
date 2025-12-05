@@ -144,10 +144,10 @@ class ProductRecommendService:
                         logger.debug(f"产品 {product_name} 信用卡使用率要求不符合")
                         continue
                 
-                # 检查信用卡张数要求
+                # 检查信用卡张数要求 按照人民币账户数计算
                 credit_card_count = product.credit_card_count
                 if credit_card_count is not None:
-                    if len(list(set([card.institution for card in credit_cards]))) > credit_card_count:
+                    if len(list([card.institution for card in credit_cards])) > credit_card_count:
                         logger.debug(f"产品 {product_name} 信用卡张数要求不符合")
                         continue
                 
@@ -167,6 +167,13 @@ class ProductRecommendService:
                 
                 # 其他筛选条件可在此添加
                 # 例如：公积金连续缴存月数等
+
+                # 按照银行筛选，过滤掉银行明细中的管理机构
+                bank_name = product.bank_name
+                if bank_name is not None:
+                    if bank_name in "-".join([loan.institution for loan in bank_loans]):
+                        logger.debug(f"产品 {product_name} 属于银行 {bank_name}，需要过滤掉银行明细中的管理机构")
+                        continue
 
                 result.append(product)
 
