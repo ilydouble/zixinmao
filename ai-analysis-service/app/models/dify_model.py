@@ -50,6 +50,7 @@ class DifyCreditCardDetail(BaseModel):
     overdue_history: Optional[bool] = Field(None, description="是否有逾期历史")
     total_overdue_months: Optional[int] = Field(None, description="总逾期月数")
     over_90_days: Optional[bool] = Field(None, description="是否有90天以上逾期")
+    is_closed_account: Optional[bool] = Field(None, description="是否销户")
 
 
 class DifyQueryRecord(BaseModel):

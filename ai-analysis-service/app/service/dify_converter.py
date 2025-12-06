@@ -5,6 +5,7 @@ Dify数据转换服务
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 import logging
+from dateutil.relativedelta import relativedelta
 
 from app.models.dify_model import *
 from app.models.visualization_model import *
@@ -188,14 +189,14 @@ class DifyToVisualizationConverter:
         # 计算总机构数（去重）
         institutions = set()
         for loan in loan_details:
-            if loan.institution:
+            if loan.institution and not loan.is_closed_account:
                 institutions.add(loan.institution)
         for card in credit_card_details:
-            if card.institution:
+            if card.institution and not card.is_closed_account:
                 institutions.add(card.institution)
 
         # 计算贷款机构数
-        loan_institutions = set(loan.institution for loan in loan_details if loan.institution)
+        loan_institutions = set(loan.institution for loan in loan_details if loan.institution and not loan.is_closed_account)
 
         # 计算历史逾期月份
         overdue_months = sum(loan.total_overdue_months or 0 for loan in loan_details)
@@ -205,12 +206,12 @@ class DifyToVisualizationConverter:
         from datetime import datetime, timedelta
         # 使用报告日期作为基准日期
         report_datetime = parse_report_date(basic_info.report_date)
-        three_months_ago = report_datetime - timedelta(days=90)
+        three_months_ago = report_datetime - relativedelta(months=3)
         query_count_3m = 0
         for record in query_records:
             try:
                 # query_date现在是date类型，需要转换为datetime进行比较
-                if record.query_date:
+                if record.query_date and  "贷后管理" not in record.reason:
                     query_datetime = datetime.combine(record.query_date, datetime.min.time())
                     if query_datetime >= three_months_ago:
                         query_count_3m += 1
@@ -237,7 +238,7 @@ class DifyToVisualizationConverter:
 
         # 统计信用卡
         if credit_card_details:
-            card_institutions = set(card.institution for card in credit_card_details if card.institution)
+            card_institutions = set(card.institution for card in credit_card_details if card.institution and not card.is_closed_account)
             card_credit = sum(card.credit_limit or 0 for card in credit_card_details)
             card_balance = sum(card.used_limit or 0 for card in credit_card_details)
             card_usage_rate = f"{(card_balance / card_credit * 100):.1f}%" if card_credit > 0 else "0%"
@@ -663,14 +664,24 @@ class DifyToVisualizationConverter:
         report_datetime = parse_report_date(basic_info.report_date)
 
         # 定义时间段（使用OrderedDict保持顺序）
+        # periods = OrderedDict([
+        #     ("近7天", report_datetime - timedelta(days=7)),
+        #     ("近1月", report_datetime - timedelta(days=30)),
+        #     ("近2月", report_datetime - timedelta(days=60)),
+        #     ("近3月", report_datetime - timedelta(days=90)),
+        #     ("近6月", report_datetime - timedelta(days=180)),
+        #     ("近1年", report_datetime - timedelta(days=365)),
+        #     ("近2年", report_datetime - timedelta(days=730))
+        # ])
+
         periods = OrderedDict([
             ("近7天", report_datetime - timedelta(days=7)),
-            ("近1月", report_datetime - timedelta(days=30)),
-            ("近2月", report_datetime - timedelta(days=60)),
-            ("近3月", report_datetime - timedelta(days=90)),
-            ("近6月", report_datetime - timedelta(days=180)),
-            ("近1年", report_datetime - timedelta(days=365)),
-            ("近2年", report_datetime - timedelta(days=730))
+            ("近1月", report_datetime - relativedelta(months=1)),
+            ("近2月", report_datetime - relativedelta(months=2)),
+            ("近3月", report_datetime - relativedelta(months=3)),
+            ("近6月", report_datetime - relativedelta(months=6)),
+            ("近1年", report_datetime - relativedelta(years=1)),
+            ("近2年", report_datetime - relativedelta(years=2)),
         ])
 
         result = []
