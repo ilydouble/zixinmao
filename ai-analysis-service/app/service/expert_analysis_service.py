@@ -200,6 +200,7 @@ class ExpertAnalysisService:
                     "担保资格审查": q.guarantee_review,
                     "保前审查": q.insurance_review,
                     "资信审查": q.credit_review,
+                    "融资审批": q.financing_approval,
                     "非贷后管理查询": q.non_post_loan,
                     "本人查询": q.self_query
                 }

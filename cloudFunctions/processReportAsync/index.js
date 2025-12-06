@@ -39,8 +39,11 @@ exports.main = async (event, context) => {
     // 异步启动AI分析，不等待结果
     console.log(`🚀 异步启动AI分析任务: ${reportId}`)
 
-    // 使用 setTimeout 而不是 setImmediate，确保异步任务能正确执行
-    setTimeout(async () => {
+    // 🔧 修复：使用 setImmediate 替代 setTimeout，并增强错误处理
+    setImmediate(async () => {
+      let analysisStartTime = Date.now()
+      let timeoutId = null
+      
       try {
         console.log(`🤖 [异步任务] 开始AI分析: ${reportId}`)
 
@@ -48,11 +51,34 @@ exports.main = async (event, context) => {
         await updateReportStatus(reportId, 'processing', 'AI_ANALYZING', 60)
         console.log(`📊 [异步任务] 状态已更新为AI分析中: ${reportId}`)
 
-        const analysisStartTime = Date.now()
-        const aiResult = await analyzeWithAI(fileBuffer, reportType, reportId)
-        const analysisEndTime = Date.now()
+        // 🔧 增加超时保护机制 - 8分钟超时
+        const AI_ANALYSIS_TIMEOUT = 8 * 60 * 1000
+        const timeoutPromise = new Promise((_, reject) => {
+          timeoutId = setTimeout(() => {
+            reject(new Error(`AI分析超时 (${AI_ANALYSIS_TIMEOUT / 1000}秒)`))
+          }, AI_ANALYSIS_TIMEOUT)
+        })
 
+        // 🔧 使用 Promise.race 实现超时控制
+        analysisStartTime = Date.now()
+        const aiResult = await Promise.race([
+          analyzeWithAI(fileBuffer, reportType, reportId),
+          timeoutPromise
+        ])
+        
+        // 清除超时定时器
+        if (timeoutId) {
+          clearTimeout(timeoutId)
+          timeoutId = null
+        }
+        
+        const analysisEndTime = Date.now()
         console.log(`🤖 [异步任务] AI分析完成: ${reportId}, 耗时: ${analysisEndTime - analysisStartTime}ms`)
+
+        // 🔧 增强结果验证
+        if (!aiResult) {
+          throw new Error('AI分析返回空结果')
+        }
 
         // 🔧 提取分析结果、HTML报告和PDF报告
         const analysisResult = aiResult.analysisResult || aiResult  // 兼容旧格式
@@ -63,6 +89,11 @@ exports.main = async (event, context) => {
         console.log(`  - JSON数据: ${analysisResult ? '✅' : '❌'}`)
         console.log(`  - HTML报告: ${htmlReport ? `✅ (${htmlReport.length}字符)` : '❌'}`)
         console.log(`  - PDF报告: ${pdfReport ? `✅ (${pdfReport.length}字符)` : '❌'}`)
+
+        // 🔧 验证关键数据
+        if (!analysisResult) {
+          throw new Error('AI分析结果为空，无法生成报告')
+        }
 
         // 4. 生成报告文件（JSON + HTML + PDF）
         console.log(`📄 [异步任务] 开始生成报告文件: ${reportId}`)
@@ -77,14 +108,65 @@ exports.main = async (event, context) => {
         console.log(`🎉 [异步任务] 报告处理完成: ${reportId}`)
 
       } catch (error) {
+        // 清除超时定时器
+        if (timeoutId) {
+          clearTimeout(timeoutId)
+        }
+        
+        const processingTime = Date.now() - analysisStartTime
         console.error(`❌ [异步任务] AI分析失败: ${reportId}`, {
           message: error.message,
-          stack: error.stack
+          stack: error.stack,
+          processingTime: `${processingTime}ms`
         })
 
-        // 🔧 修复：不再删除报告记录，而是标记为失败状态
-        // 这样小程序端可以检测到失败状态并显示友好的错误信息
-        await updateReportStatus(reportId, 'failed', 'FAILED', 0, null, null, null, error.message)
+        // 🔧 增强错误处理：重试机制
+        try {
+          // 检查是否是超时错误或网络错误，可以重试
+          const isRetryableError = error.message.includes('超时') ||
+                                 error.message.includes('timeout') ||
+                                 error.message.includes('ECONNRESET') ||
+                                 error.message.includes('ENOTFOUND') ||
+                                 error.code === 'ECONNRESET'
+
+          if (isRetryableError) {
+            // 获取当前重试次数
+            const reportDoc = await db.collection('reports').doc(reportId).get()
+            const currentRetryCount = reportDoc.data?.algorithm?.retryCount || 0
+            const maxRetries = 2
+
+            if (currentRetryCount < maxRetries) {
+              console.log(`🔄 [异步任务] 检测到可重试错误，准备重试: ${reportId} (${currentRetryCount + 1}/${maxRetries})`)
+              
+              // 更新重试次数和状态
+              await db.collection('reports').doc(reportId).update({
+                data: {
+                  'algorithm.retryCount': db.command.inc(1),
+                  'algorithm.lastError': error.message,
+                  'processing.currentStage': 'RETRYING',
+                  'processing.progress': 30,
+                  'metadata.updatedAt': new Date()
+                }
+              })
+
+              // 延迟后重试
+              setTimeout(async () => {
+                console.log(`🔄 [异步任务] 开始重试: ${reportId}`)
+                // 递归调用自身进行重试
+                setImmediate(arguments.callee)
+              }, 10000) // 10秒后重试
+              
+              return // 不标记为失败，等待重试
+            }
+          }
+
+          // 🔧 修复：标记为失败状态，保留错误信息
+          await updateReportStatus(reportId, 'failed', 'FAILED', 0, null, null, null, error.message)
+          console.log(`❌ [异步任务] 报告已标记为失败: ${reportId}`)
+
+        } catch (updateError) {
+          console.error(`❌ [异步任务] 更新失败状态时出错: ${reportId}`, updateError)
+        }
 
         // 可选：删除上传的原始文件以节省存储空间
         if (fileId) {
@@ -92,13 +174,13 @@ exports.main = async (event, context) => {
             await cloud.deleteFile({
               fileList: [fileId]
             })
-            console.log(`已删除失败报告的原始文件: ${fileId}`)
+            console.log(`🗑️ 已删除失败报告的原始文件: ${fileId}`)
           } catch (deleteError) {
-            console.warn(`删除原始文件失败: ${fileId}`, deleteError)
+            console.warn(`⚠️ 删除原始文件失败: ${fileId}`, deleteError)
           }
         }
       }
-    }, 100) // 100ms 延迟启动
+    })
 
     // 立即返回，不等待AI分析完成
     console.log(`✅ 任务已提交，异步处理中: ${reportId}`)
@@ -396,15 +478,22 @@ async function analyzeWithAI(fileBuffer, reportType, reportId) {
     console.log(`开始调用AI分析服务: ${reportId}, 类型: ${reportType}`)
     console.log(`文件: ${fileName}, MIME: ${mimeType}`)
 
-    // 调用AI分析服务同步接口（后端会自动处理PDF转Markdown）
+    // 🔧 修复：增强AI分析服务调用的稳定性
     const response = await axios.post(
       `${AI_ANALYSIS_SERVICE.url}/analyze/sync`,
       requestData,
       {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'User-Agent': 'WeChat-CloudFunction/1.0'
         },
-        timeout: 300000 // 5分钟超时，足够AI处理
+        timeout: 480000, // 🔧 增加到8分钟超时，给AI更多处理时间
+        maxContentLength: 50 * 1024 * 1024, // 50MB 响应大小限制
+        maxBodyLength: 50 * 1024 * 1024,    // 50MB 请求大小限制
+        // 🔧 增加重试配置
+        validateStatus: function (status) {
+          return status >= 200 && status < 300; // 只接受2xx状态码
+        }
       }
     )
 
@@ -448,58 +537,55 @@ async function analyzeWithAI(fileBuffer, reportType, reportId) {
 
 
   } catch (error) {
-    console.error(`AI分析失败: ${reportId}`, {
+    // 🔧 增强错误日志记录
+    const errorDetails = {
       message: error.message,
       code: error.code,
       status: error.response?.status,
       statusText: error.response?.statusText,
-      responseData: error.response?.data,
+      responseData: error.response?.data ?
+        (typeof error.response.data === 'string' ? error.response.data.substring(0, 500) : error.response.data) : null,
       config: {
         url: error.config?.url,
         method: error.config?.method,
         timeout: error.config?.timeout
-      }
-    })
-
-    // 检查重试次数，如果超过最大重试次数则删除记录
-    try {
-      const reportDoc = await db.collection('reports').doc(reportId).get()
-
-      if (!reportDoc.exists) {
-        console.log(`报告记录不存在，可能已被删除: ${reportId}`)
-        throw new Error(`报告记录不存在: ${error.message}`)
-      }
-
-      const currentRetryCount = reportDoc.data?.algorithm?.retryCount || 0
-      const maxRetries = 2 // 最大重试2次
-
-      if (currentRetryCount >= maxRetries) {
-        console.log(`AI分析重试次数已达上限，删除报告记录: ${reportId}`)
-        // 不再重试，直接抛出错误让上层处理删除
-        throw new Error(`AI分析失败且重试次数已达上限: ${error.message}`)
-      } else {
-        // 更新重试次数
-        await db.collection('reports').doc(reportId).update({
-          data: {
-            'algorithm.retryCount': db.command.inc(1),
-            'algorithm.lastError': error.message,
-            'algorithm.errorDetails': {
-              code: error.code,
-              status: error.response?.status,
-              url: error.config?.url,
-              timestamp: new Date()
-            },
-            'metadata.updatedAt': new Date()
-          }
-        })
-
-        throw new Error(`AI分析失败: ${error.message}`)
-      }
-    } catch (dbError) {
-      console.error(`访问数据库时发生错误: ${reportId}`, dbError)
-      // 如果数据库访问失败，直接抛出原始错误
-      throw new Error(`AI分析失败: ${error.message}`)
+      },
+      isTimeout: error.code === 'ECONNABORTED' || error.message.includes('timeout'),
+      isNetworkError: error.code === 'ECONNRESET' || error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED'
     }
+
+    console.error(`❌ AI分析失败: ${reportId}`, errorDetails)
+
+    // 🔧 根据错误类型提供更具体的错误信息
+    let errorMessage = error.message
+    if (errorDetails.isTimeout) {
+      errorMessage = `AI分析服务响应超时，请稍后重试`
+    } else if (errorDetails.isNetworkError) {
+      errorMessage = `网络连接失败，请检查AI分析服务状态`
+    } else if (error.response?.status === 500) {
+      errorMessage = `AI分析服务内部错误，请稍后重试`
+    } else if (error.response?.status === 413) {
+      errorMessage = `文件过大，AI分析服务无法处理`
+    } else if (error.response?.status >= 400 && error.response?.status < 500) {
+      errorMessage = `请求参数错误: ${error.response?.data?.detail || error.message}`
+    }
+
+    // 🔧 更新错误信息到数据库，但不在这里处理重试逻辑
+    try {
+      await db.collection('reports').doc(reportId).update({
+        data: {
+          'algorithm.lastError': errorMessage,
+          'algorithm.errorDetails': errorDetails,
+          'algorithm.lastErrorTime': new Date(),
+          'metadata.updatedAt': new Date()
+        }
+      })
+    } catch (dbError) {
+      console.error(`❌ 更新错误信息到数据库失败: ${reportId}`, dbError)
+    }
+
+    // 抛出包含详细信息的错误
+    throw new Error(errorMessage)
   }
 }
 

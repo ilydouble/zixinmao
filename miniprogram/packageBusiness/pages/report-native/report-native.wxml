@@ -388,6 +388,10 @@
               <text class="query-label">资信审查</text>
               <text class="query-value">{{item.credit_review}}次</text>
             </view>
+            <view class="query-detail" wx:if="{{item.financing_approval > 0}}">
+              <text class="query-label">融资审批</text>
+              <text class="query-value">{{item.financing_approval}}次</text>
+            </view>
             <view class="query-detail" wx:if="{{item.non_post_loan > 0}}">
               <text class="query-label">非贷后管理查询</text>
               <text class="query-value">{{item.non_post_loan}}次</text>

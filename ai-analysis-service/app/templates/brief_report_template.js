@@ -1741,6 +1741,7 @@ function generateQueryRecords(queryRecords, queryCharts) {
             <td>${record.guarantee_review}</td>
             <td>${record.insurance_review}</td>
             <td>${record.credit_review}</td>
+            <td>${record.financing_approval}</td>
             <td class="${record.non_post_loan > 5 ? 'warning' : ''}">${record.non_post_loan}</td>
             <td>${record.self_query}</td>
         </tr>
@@ -1753,6 +1754,7 @@ function generateQueryRecords(queryRecords, queryCharts) {
     const queryChartGuaranteeData = (queryCharts || []).map(item => item.guarantee_review);
     const queryChartInsuranceData = (queryCharts || []).map(item => item.insurance_review);
     const queryChartCreditData = (queryCharts || []).map(item => item.credit_review);
+    const queryChartFinancingData = (queryCharts || []).map(item => item.financing_approval);
     const queryChartNonPostLoanData = (queryCharts || []).map(item => item.non_post_loan);
     const queryChartSelfQueryData = (queryCharts || []).map(item => item.self_query);
 
@@ -1777,6 +1779,7 @@ function generateQueryRecords(queryRecords, queryCharts) {
                             <th>担保资格审查</th>
                             <th>保前审查</th>
                             <th>资信审查</th>
+                            <th>融资审批</th>
                             <th>非贷后管理查询</th>
                             <th>本人查询</th>
                         </tr>
@@ -1831,6 +1834,13 @@ function generateQueryRecords(queryRecords, queryCharts) {
                             data: ${JSON.stringify(queryChartCreditData)},
                             borderColor: 'rgba(255, 87, 34, 1)',
                             backgroundColor: 'rgba(255, 87, 34, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }, {
+                            label: '融资审批',
+                            data: ${JSON.stringify(queryChartFinancingData)},
+                            borderColor: 'rgba(255, 152, 0, 1)',
+                            backgroundColor: 'rgba(255, 152, 0, 0.1)',
                             tension: 0.4,
                             fill: true
                         }, {

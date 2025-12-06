@@ -110,6 +110,7 @@ class QueryRecord(BaseModel):
     guarantee_review: Optional[int] = Field(default=0, description="担保资格审查")
     insurance_review: Optional[int] = Field(default=0, description="保前审查")
     credit_review: Optional[int] = Field(default=0, description="资信审查")
+    financing_approval: Optional[int] = Field(default=0, description="融资审批")
     non_post_loan: Optional[int] = Field(default=0, description="非贷后管理查询")
     self_query: Optional[int] = Field(default=0, description="本人查询")
 

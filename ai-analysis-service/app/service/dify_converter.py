@@ -211,7 +211,7 @@ class DifyToVisualizationConverter:
         for record in query_records:
             try:
                 # query_date现在是date类型，需要转换为datetime进行比较
-                if record.query_date and  "贷后管理" not in record.reason:
+                if record.query_date and "本人查询" not in record.reason and "贷后管理" not in record.reason:
                     query_datetime = datetime.combine(record.query_date, datetime.min.time())
                     if query_datetime >= three_months_ago:
                         query_count_3m += 1
@@ -697,6 +697,7 @@ class DifyToVisualizationConverter:
                     guarantee_review=len([q for q in query_records_time if q.reason and "担保资格审查" in q.reason]),
                     insurance_review=len([q for q in query_records_time if q.reason and "保前审查" in q.reason]),
                     credit_review=len([q for q in query_records_time if q.reason and "资信审查" in q.reason]),
+                    financing_approval=len([q for q in query_records_time if q.reason and "融资审批" in q.reason]),
                     non_post_loan=len([q for q in query_records_time if q.reason and "本人查询" not in q.reason and "贷后管理" not in q.reason]),
                     self_query=len([q for q in query_records_time if q.reason and "本人查询" in q.reason]),
                 )
