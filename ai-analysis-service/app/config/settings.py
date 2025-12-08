@@ -14,18 +14,6 @@ class TianYuanConfig(BaseSettings):
     base_url: HttpUrl
     api_code: str
 
-
-class DatabaseConfig(BaseSettings):
-    """数据库配置"""
-    model_config = SettingsConfigDict(env_file=BASE_DIR / ".env", env_prefix="DB_")
-    host: str
-    port: int = 5455
-    user: str
-    password: Optional[str] = None
-    database: str
-    charset: str = "utf8mb4"
-
-
 class LogConfig(BaseSettings):
     """日志配置"""
     model_config = SettingsConfigDict(env_file=BASE_DIR / ".env", env_prefix="LOG_")
@@ -96,7 +84,6 @@ class PDFConfig(BaseSettings):
 class Settings:
     """统一的配置入口"""
     tianyuan = TianYuanConfig()
-    db = DatabaseConfig()
     log = LogConfig()
     app = AppConfig()
     ai = AIConfig()
