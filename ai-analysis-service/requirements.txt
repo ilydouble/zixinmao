@@ -40,3 +40,9 @@ pycryptodome>=3.23.0
 # 注意: 安装后需要运行 "python -m playwright install chromium" 来下载浏览器引擎
 # 系统依赖: 需要在服务器上运行 "python -m playwright install-deps" 安装系统库
 playwright>=1.40.0
+
+python-dateutil
+
+openai
+
+pdfplumber
