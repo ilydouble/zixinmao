@@ -355,3 +355,11 @@ async function analyzeWithAI(fileBuffer, reportType, reportId) {
 ## 许可证
 
 MIT License
+
+## 包
+### HTML → PDF
+playwright install chromium 
+playwright install-deps
+playwright install chromium
+
+
