@@ -197,6 +197,24 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
     """
     request_id = f"sync_req_{int(time.time() * 1000)}"
 
+    # 将原始请求对象转换为字典用于日志记录
+    if hasattr(request, 'model_dump'):
+        input_data = request.model_dump()
+    elif hasattr(request, 'dict'):
+        input_data = request.dict()
+    else:
+        # 备用方案：手动提取字段
+        input_data = {
+            "file_base64": request.file_base64,
+            "markdown_content": request.markdown_content,
+            "mime_type": request.mime_type,
+            "report_type": request.report_type.value if request.report_type else None,
+            "custom_prompt": request.custom_prompt,
+            "name": getattr(request, 'name', None),
+            "id_card": getattr(request, 'id_card', None),
+            "mobile_no": getattr(request, 'mobile_no', None)
+        }
+
     try:
         # 验证输入
         if not request.file_base64 and not request.markdown_content:
@@ -262,7 +280,8 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
             except Exception:
                 pdf_report_b64 = None
 
-        return AnalysisResponse(
+        # 准备输出数据
+        response_data = AnalysisResponse(
             success=True,
             request_id=request_id,
             analysis_result=analysis_result_dict,
@@ -272,12 +291,40 @@ async def analyze_document_sync(request: AnalysisRequest, http_request: Request)
             pdf_report=pdf_report_b64
         )
 
+        # 记录输入输出日志到本地JSON文件
+        if settings.log.algorithm_enable:
+            try:
+                # 将响应对象转换为字典
+                if hasattr(response_data, 'model_dump'):
+                    output_data = response_data.model_dump()
+                elif hasattr(response_data, 'dict'):
+                    output_data = response_data.dict()
+                else:
+                    # 备用方案：手动提取字段
+                    output_data = {
+                        "success": response_data.success,
+                        "request_id": response_data.request_id,
+                        "analysis_result": response_data.analysis_result,
+                        "error_message": response_data.error_message,
+                        "processing_time": response_data.processing_time,
+                        "html_report": response_data.html_report,
+                        "pdf_report": response_data.pdf_report
+                    }
+                await algorithm_logger.log_input_output(request_id, input_data, output_data)
+            except Exception as log_error:
+                logger.warning(f"记录输入输出日志失败: {log_error}")
+
+        return response_data
+
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"❌ 分析失败: {str(e)} | ID: {request_id}")
+        
+        # 记录错误情况下的输入输出日志
         if settings.log.algorithm_enable:
             await algorithm_logger.log_error(request_id, "sync_analysis_error", str(e))
+                   
         raise HTTPException(status_code=500, detail=f"服务器内部错误: {str(e)}")
 
 

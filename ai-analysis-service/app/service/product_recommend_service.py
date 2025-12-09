@@ -91,7 +91,7 @@ class ProductRecommendService:
                 product_name = product.product_name or '未知产品'
 
                 # 检查地区
-                if "全国" not in product.region and analysisRequest.customer_info.province + analysisRequest.customer_info.city not in product.region:
+                if "全国" not in product.region and analysisRequest.customer_info.province + "-" + analysisRequest.customer_info.city not in product.region:
                     logger.debug(f"产品 {product_name} 不支持用户所在地区 {analysisRequest.customer_info.province}{analysisRequest.customer_info.city}")
                     continue
 
@@ -140,7 +140,7 @@ class ProductRecommendService:
                 # 检查信用卡使用率要求
                 credit_card_usage_rate = product.credit_card_usage_rate
                 if credit_card_usage_rate is not None:
-                    if credit_usage.usage_percentage > credit_card_usage_rate:
+                    if credit_usage.usage_percentage / 100 > credit_card_usage_rate:
                         logger.debug(f"产品 {product_name} 信用卡使用率要求不符合")
                         continue
                 
@@ -387,8 +387,8 @@ class ProductRecommendService:
                     if record.query_date is None:
                         continue
 
-                    # 跳过贷后管理查询
-                    if record.reason and "贷后管理" in record.reason:
+                    # 跳过贷后管理查询和个人查询
+                    if record.reason and "贷后管理" in record.reason and "个人查询" in record.query_type:
                         continue
 
                     # 将date对象转换为datetime对象进行比较
@@ -536,6 +536,10 @@ class ProductRecommendService:
                 loan_summary, credit_cards, credit_usage, overdue_analysis, query_records,
                 analysisRequest,dify_output
             )
+
+            if len(filtered_products) == 0:
+                logger.info(f"无符合条件的产品，不生成推荐")
+                return []
 
             # 构建产品信息摘要
             products_summary = self._build_products_summary(filtered_products)
@@ -696,7 +700,7 @@ class ProductRecommendService:
     
     def _build_prompt(self, user_summary: dict, products_summary: List[dict]) -> str:
         """构建提示词"""
-        prompt = f"""你是一位专业的金融产品推荐专家。请根据用户的信用状况和产品信息，推荐最合适的0-5个金融产品。产品只能从列表中选择，不能推荐列表外的产品。
+        prompt = f"""你是一位专业的金融产品推荐专家。请根据用户的信用状况和产品信息，推荐最合适的1-5个金融产品。产品只能从列表中选择，不能推荐列表外的产品。
 
 # 用户信息
 {json.dumps(user_summary, ensure_ascii=False, indent=2)}
@@ -731,7 +735,7 @@ class ProductRecommendService:
 ```
 
 注意：
-- 推荐0-5个产品
+- 推荐1-5个产品
 - rating必须是1-5之间的整数
 - 按推荐指数从高到低排序
 - 如果用户征信情况较差，应推荐门槛较低的产品并给出改善建议

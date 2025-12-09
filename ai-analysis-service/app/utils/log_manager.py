@@ -18,6 +18,10 @@ class AlgorithmLogger:
         self.log_dir = Path(log_dir)
         self.log_dir.mkdir(exist_ok=True)
         
+        # 创建输入输出日志目录
+        self.io_log_dir = self.log_dir / "io_logs"
+        self.io_log_dir.mkdir(exist_ok=True)
+        
         # 创建不同类型的日志文件
         self.request_log_file = self.log_dir / "algorithm_requests.jsonl"
         self.error_log_file = self.log_dir / "algorithm_errors.jsonl"
@@ -234,6 +238,55 @@ class AlgorithmLogger:
         except Exception as e:
             logger.error(f"生成统计摘要失败: {e}")
             return {"error": str(e)}
+    
+    async def log_input_output(self, request_id: str, input_data: Dict[str, Any], output_data: Dict[str, Any]):
+        """记录函数调用的输入和输出数据到本地JSON文件（保存全量原始数据）"""
+        try:
+            # 创建日志条目，直接保存原始数据
+            log_entry = {
+                "request_id": request_id,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "input": input_data,  # 保存完整的输入数据
+                "output": output_data  # 保存完整的输出数据
+            }
+            
+            # 生成文件名（按日期分组）
+            date_str = datetime.now().strftime("%Y%m%d")
+            log_file = self.io_log_dir / f"analyze_sync_{date_str}.json"
+            
+            # 写入JSON文件
+            await self._write_io_log(log_file, log_entry)
+            logger.info(f"记录输入输出日志: {request_id} -> {log_file}")
+            
+        except Exception as e:
+            logger.error(f"记录输入输出日志失败: {request_id}, 错误: {e}")
+    
+    async def _write_io_log(self, log_file: Path, log_entry: Dict[str, Any]):
+        """写入输入输出日志文件"""
+        try:
+            # 如果文件不存在，创建新文件并写入数组
+            if not log_file.exists():
+                async with aiofiles.open(log_file, "w", encoding="utf-8") as f:
+                    await f.write(json.dumps([log_entry], ensure_ascii=False, indent=2))
+            else:
+                # 如果文件存在，读取现有数据并追加
+                async with aiofiles.open(log_file, "r", encoding="utf-8") as f:
+                    content = await f.read()
+                    
+                try:
+                    existing_data = json.loads(content) if content.strip() else []
+                except json.JSONDecodeError:
+                    existing_data = []
+                
+                # 追加新条目
+                existing_data.append(log_entry)
+                
+                # 写回文件
+                async with aiofiles.open(log_file, "w", encoding="utf-8") as f:
+                    await f.write(json.dumps(existing_data, ensure_ascii=False, indent=2))
+                    
+        except Exception as e:
+            logger.error(f"写入输入输出日志文件失败: {log_file}, 错误: {e}")
 
 
 # 全局日志记录器实例
